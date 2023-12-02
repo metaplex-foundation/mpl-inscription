@@ -1,0 +1,407 @@
+{
+  "version": "0.1.0",
+  "name": "mpl_json",
+  "instructions": [
+    {
+      "name": "Initialize",
+      "accounts": [
+        {
+          "name": "jsonAccount",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account to store the metadata in."
+          ]
+        },
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the json account's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 0
+      }
+    },
+    {
+      "name": "Close",
+      "accounts": [
+        {
+          "name": "jsonAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata in."
+          ]
+        },
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the json account's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 1
+      }
+    },
+    {
+      "name": "SetValue",
+      "accounts": [
+        {
+          "name": "jsonAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata in."
+          ]
+        },
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the json account's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "setValueArgs",
+          "type": {
+            "defined": "SetValueArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      }
+    },
+    {
+      "name": "AppendValue",
+      "accounts": [
+        {
+          "name": "jsonAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata in."
+          ]
+        },
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the json account's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "appendValueArgs",
+          "type": {
+            "defined": "AppendValueArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 3
+      }
+    },
+    {
+      "name": "AddAuthority",
+      "accounts": [
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "addAuthorityArgs",
+          "type": {
+            "defined": "AddAuthorityArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 4
+      }
+    },
+    {
+      "name": "RemoveAuthority",
+      "accounts": [
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "removeAuthorityArgs",
+          "type": {
+            "defined": "RemoveAuthorityArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 5
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "JsonMetadata",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": {
+              "defined": "Key"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "mutable",
+            "type": "bool"
+          },
+          {
+            "name": "authorities",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "SetValueArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AppendValueArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddAuthorityArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "newAuthority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RemoveAuthorityArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Key",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "JsonMetadataAccount"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 0,
+      "name": "AlreadyInitialized",
+      "msg": "The account has already been initialized"
+    },
+    {
+      "code": 1,
+      "name": "NotInitialized",
+      "msg": "The account has not yet been initialized"
+    },
+    {
+      "code": 2,
+      "name": "MetadataDerivedKeyInvalid",
+      "msg": "The key for the JSON metadata account is invalid."
+    },
+    {
+      "code": 3,
+      "name": "InvalidSystemProgram",
+      "msg": "The system program account is invalid."
+    },
+    {
+      "code": 4,
+      "name": "InvalidJson",
+      "msg": "The JSON data is invalid."
+    },
+    {
+      "code": 5,
+      "name": "BorshSerializeError",
+      "msg": "Borsh failed to serialize this account."
+    },
+    {
+      "code": 6,
+      "name": "InvalidAuthority",
+      "msg": "The payer does not have authority to perform this action."
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa",
+    "binaryVersion": "0.3.0",
+    "libVersion": "0.3.0"
+  }
+}

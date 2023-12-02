@@ -6,44 +6,43 @@ const clientDir = path.join(__dirname, "..", "clients");
 const idlDir = path.join(__dirname, "..", "idls");
 
 // Instanciate Kinobi.
-const kinobi = k.createFromIdls([path.join(idlDir, "mpl_project_name_program.json")]);
+const kinobi = k.createFromIdls([path.join(idlDir, "mpl_json.json")]);
 
 // Update programs.
 kinobi.update(
   new k.UpdateProgramsVisitor({
-    mplProjectNameProgram: { name: "mplProjectName" },
+    mplJsonProgram: { name: "mplJson" },
   })
 );
 
 // Update accounts.
 kinobi.update(
   new k.UpdateAccountsVisitor({
-    myPdaAccount: {
+    jsonMetadata: {
       seeds: [
-        k.stringConstantSeed("myPdaAccount"),
+        k.stringConstantSeed("JSON"),
         k.programSeed(),
-        k.publicKeySeed("authority", "The address of the authority"),
-        k.stringSeed("name", "The name of the account"),
+        k.publicKeySeed("jsonAccount", "The address of the JSON Account"),
       ],
     },
   })
 );
 
 // Update instructions.
-kinobi.update(
-  new k.UpdateInstructionsVisitor({
-    create: {
-      bytesCreatedOnChain: k.bytesFromAccount("myAccount"),
-    },
-  })
-);
+// kinobi.update(
+//   new k.UpdateInstructionsVisitor({
+//     create: {
+//       bytesCreatedOnChain: k.bytesFromAccount("myAccount"),
+//     },
+//   })
+// );
 
 // Set ShankAccount discriminator.
 const key = (name) => ({ field: "key", value: k.vEnum("Key", name) });
 kinobi.update(
   new k.SetAccountDiscriminatorFromFieldVisitor({
-    myAccount: key("MyAccount"),
-    myPdaAccount: key("MyPdaAccount"),
+    // myAccount: key("MyAccount"),
+    jsonMetadataAccount: key("JsonMetadataAccount"),
   })
 );
 
