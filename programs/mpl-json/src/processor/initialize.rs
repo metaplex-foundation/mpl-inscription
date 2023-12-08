@@ -8,34 +8,37 @@ use solana_program::{
 
 use crate::{
     error::MplJsonError,
-    instruction::accounts::InitializeAccounts,
-    state::{JsonMetadata, Key, INITIAL_SIZE, PREFIX},
+    instruction::{accounts::InitializeAccounts, InitializeArgs},
+    state::{DataType, InscriptionMetadata, Key, INITIAL_SIZE, PREFIX},
 };
 
-pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
+pub(crate) fn process_initialize<'a>(
+    accounts: &'a [AccountInfo<'a>],
+    args: InitializeArgs,
+) -> ProgramResult {
     let ctx = &InitializeAccounts::context(accounts)?;
 
     // Check that the account isn't already initialized.
-    if (ctx.accounts.json_account.owner != &system_program::ID)
-        || !ctx.accounts.json_account.data_is_empty()
+    if (ctx.accounts.inscription_account.owner != &system_program::ID)
+        || !ctx.accounts.inscription_account.data_is_empty()
     {
         return Err(MplJsonError::AlreadyInitialized.into());
     }
 
     // Check that the account isn't already initialized.
-    if (ctx.accounts.json_metadata_account.owner != &system_program::ID)
-        || !ctx.accounts.json_metadata_account.data_is_empty()
+    if (ctx.accounts.metadata_account.owner != &system_program::ID)
+        || !ctx.accounts.metadata_account.data_is_empty()
     {
         return Err(MplJsonError::AlreadyInitialized.into());
     }
     // Verify that the derived address is correct for the JSON metadata account.
     let bump = assert_derivation(
         &crate::ID,
-        ctx.accounts.json_metadata_account,
+        ctx.accounts.metadata_account,
         &[
             PREFIX.as_bytes(),
             crate::ID.as_ref(),
-            ctx.accounts.json_account.key.as_ref(),
+            ctx.accounts.inscription_account.key.as_ref(),
         ],
         MplJsonError::MetadataDerivedKeyInvalid,
     )?;
@@ -49,9 +52,12 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
 
     // Initialize the JSON data with a null value.
     let json_data = serde_json::Value::Null;
-    let serialized_data = match serde_json::to_vec(&json_data) {
-        Ok(data) => data,
-        Err(_) => return Err(MplJsonError::InvalidJson.into()),
+    let serialized_data = match args.data_type {
+        DataType::Json => match serde_json::to_vec(&json_data) {
+            Ok(data) => data,
+            Err(_) => return Err(MplJsonError::InvalidJson.into()),
+        },
+        _ => vec![],
     };
 
     // Initialize the JSON metadata account.
@@ -61,47 +67,48 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
     invoke(
         &system_instruction::create_account(
             ctx.accounts.payer.key,
-            ctx.accounts.json_account.key,
+            ctx.accounts.inscription_account.key,
             rent_amount,
             serialized_data.len().to_u64().unwrap_or(0),
             &crate::ID,
         ),
         &[
             ctx.accounts.payer.clone(),
-            ctx.accounts.json_account.clone(),
+            ctx.accounts.inscription_account.clone(),
             ctx.accounts.system_program.clone(),
         ],
     )?;
 
     // Initialize the JSON metadata.
-    let json_metadata = JsonMetadata {
-        key: Key::JsonMetadataAccount,
+    let metadata = InscriptionMetadata {
+        key: Key::InscriptionMetadataAccount,
         bump,
-        mutable: true,
-        authorities: vec![*ctx.accounts.payer.key],
+        data_type: args.data_type,
+        inscription_number: None,
+        update_authorities: vec![*ctx.accounts.payer.key],
     };
 
-    let serialized_metadata = &json_metadata.try_to_vec()?;
+    let serialized_metadata = &metadata.try_to_vec()?;
 
     // Initialize the JSON metadata account.
-    solana_program::msg!("Creating JSON Metadata account");
+    solana_program::msg!("Creating Metadata account");
     create_or_allocate_account_raw(
         crate::ID,
-        ctx.accounts.json_metadata_account,
+        ctx.accounts.metadata_account,
         ctx.accounts.system_program,
         ctx.accounts.payer,
         serialized_metadata.len(),
         &[
             PREFIX.as_bytes(),
             crate::ID.as_ref(),
-            ctx.accounts.json_account.key.as_ref(),
+            ctx.accounts.inscription_account.key.as_ref(),
             &[bump],
         ],
     )?;
 
     // Write the JSON metadata to the JSON metadata account.
     sol_memcpy(
-        &mut ctx.accounts.json_metadata_account.try_borrow_mut_data()?,
+        &mut ctx.accounts.metadata_account.try_borrow_mut_data()?,
         serialized_metadata,
         serialized_metadata.len(),
     );

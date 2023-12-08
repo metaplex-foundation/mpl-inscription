@@ -185,6 +185,55 @@
       }
     },
     {
+      "name": "InjectValue",
+      "accounts": [
+        {
+          "name": "jsonAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata in."
+          ]
+        },
+        {
+          "name": "jsonMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the json account's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "injectValueArgs",
+          "type": {
+            "defined": "InjectValueArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 4
+      }
+    },
+    {
       "name": "AddAuthority",
       "accounts": [
         {
@@ -222,7 +271,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 4
+        "value": 5
       }
     },
     {
@@ -263,7 +312,7 @@
       ],
       "discriminant": {
         "type": "u8",
-        "value": 5
+        "value": 6
       }
     }
   ],
@@ -304,6 +353,18 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "start",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "end",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
             "name": "value",
             "type": "string"
           }
@@ -315,6 +376,38 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "start",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "end",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InjectValueArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start",
+            "type": "u64"
+          },
+          {
+            "name": "end",
+            "type": "u64"
+          },
           {
             "name": "value",
             "type": "string"
@@ -396,6 +489,11 @@
       "code": 6,
       "name": "InvalidAuthority",
       "msg": "The payer does not have authority to perform this action."
+    },
+    {
+      "code": 7,
+      "name": "NumericalOverflow",
+      "msg": "Numerical Overflow"
     }
   ],
   "metadata": {

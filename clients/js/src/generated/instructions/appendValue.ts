@@ -8,6 +8,8 @@
 
 import {
   Context,
+  Option,
+  OptionOrNullable,
   Pda,
   PublicKey,
   Signer,
@@ -17,8 +19,10 @@ import {
 import {
   Serializer,
   mapSerializer,
+  option,
   string,
   struct,
+  u64,
   u8,
 } from '@metaplex-foundation/umi/serializers';
 import {
@@ -42,10 +46,16 @@ export type AppendValueInstructionAccounts = {
 // Data.
 export type AppendValueInstructionData = {
   discriminator: number;
+  start: Option<bigint>;
+  end: Option<bigint>;
   value: string;
 };
 
-export type AppendValueInstructionDataArgs = { value: string };
+export type AppendValueInstructionDataArgs = {
+  start: OptionOrNullable<number | bigint>;
+  end: OptionOrNullable<number | bigint>;
+  value: string;
+};
 
 export function getAppendValueInstructionDataSerializer(): Serializer<
   AppendValueInstructionDataArgs,
@@ -59,6 +69,8 @@ export function getAppendValueInstructionDataSerializer(): Serializer<
     struct<AppendValueInstructionData>(
       [
         ['discriminator', u8()],
+        ['start', option(u64())],
+        ['end', option(u64())],
         ['value', string()],
       ],
       { description: 'AppendValueInstructionData' }

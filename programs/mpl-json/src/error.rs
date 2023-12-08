@@ -35,6 +35,14 @@ pub enum MplJsonError {
     /// 6 - The payer does not have authority to perform this action.
     #[error("The payer does not have authority to perform this action.")]
     InvalidAuthority,
+
+    /// 7 - Numerical Overflow
+    #[error("Numerical Overflow")]
+    NumericalOverflow,
+
+    /// 8 - Wrong data type for account
+    #[error("Wrong data type for account")]
+    WrongDataType,
 }
 
 impl PrintProgramError for MplJsonError {

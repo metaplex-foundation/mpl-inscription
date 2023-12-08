@@ -110,6 +110,19 @@ export class InvalidAuthorityError extends ProgramError {
 codeToErrorMap.set(0x6, InvalidAuthorityError);
 nameToErrorMap.set('InvalidAuthority', InvalidAuthorityError);
 
+/** NumericalOverflow: Numerical Overflow */
+export class NumericalOverflowError extends ProgramError {
+  readonly name: string = 'NumericalOverflow';
+
+  readonly code: number = 0x7; // 7
+
+  constructor(program: Program, cause?: Error) {
+    super('Numerical Overflow', program, cause);
+  }
+}
+codeToErrorMap.set(0x7, NumericalOverflowError);
+nameToErrorMap.set('NumericalOverflow', NumericalOverflowError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

@@ -31,6 +31,9 @@ pub enum MplJsonError {
     /// 6 (0x6) - The payer does not have authority to perform this action.
     #[error("The payer does not have authority to perform this action.")]
     InvalidAuthority,
+    /// 7 (0x7) - Numerical Overflow
+    #[error("Numerical Overflow")]
+    NumericalOverflow,
 }
 
 impl solana_program::program_error::PrintProgramError for MplJsonError {

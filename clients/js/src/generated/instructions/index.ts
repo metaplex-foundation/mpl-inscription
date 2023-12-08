@@ -10,5 +10,6 @@ export * from './addAuthority';
 export * from './appendValue';
 export * from './close';
 export * from './initialize';
+export * from './injectValue';
 export * from './removeAuthority';
 export * from './setValue';

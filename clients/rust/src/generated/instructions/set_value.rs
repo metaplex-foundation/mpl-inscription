@@ -76,6 +76,8 @@ impl SetValueInstructionData {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetValueInstructionArgs {
+    pub start: Option<u64>,
+    pub end: Option<u64>,
     pub value: String,
 }
 
@@ -86,6 +88,8 @@ pub struct SetValueBuilder {
     json_metadata_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
+    start: Option<u64>,
+    end: Option<u64>,
     value: Option<String>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
@@ -120,6 +124,18 @@ impl SetValueBuilder {
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
+        self
+    }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn start(&mut self, start: u64) -> &mut Self {
+        self.start = Some(start);
+        self
+    }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn end(&mut self, end: u64) -> &mut Self {
+        self.end = Some(end);
         self
     }
     #[inline(always)]
@@ -158,6 +174,8 @@ impl SetValueBuilder {
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
         let args = SetValueInstructionArgs {
+            start: self.start.clone(),
+            end: self.end.clone(),
             value: self.value.clone().expect("value is not set"),
         };
 
@@ -305,6 +323,8 @@ impl<'a, 'b> SetValueCpiBuilder<'a, 'b> {
             json_metadata_account: None,
             payer: None,
             system_program: None,
+            start: None,
+            end: None,
             value: None,
             __remaining_accounts: Vec::new(),
         });
@@ -341,6 +361,18 @@ impl<'a, 'b> SetValueCpiBuilder<'a, 'b> {
         system_program: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
+        self
+    }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn start(&mut self, start: u64) -> &mut Self {
+        self.instruction.start = Some(start);
+        self
+    }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn end(&mut self, end: u64) -> &mut Self {
+        self.instruction.end = Some(end);
         self
     }
     #[inline(always)]
@@ -390,6 +422,8 @@ impl<'a, 'b> SetValueCpiBuilder<'a, 'b> {
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
         let args = SetValueInstructionArgs {
+            start: self.instruction.start.clone(),
+            end: self.instruction.end.clone(),
             value: self.instruction.value.clone().expect("value is not set"),
         };
         let instruction = SetValueCpi {
@@ -426,6 +460,8 @@ struct SetValueCpiBuilderInstruction<'a, 'b> {
     json_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    start: Option<u64>,
+    end: Option<u64>,
     value: Option<String>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(

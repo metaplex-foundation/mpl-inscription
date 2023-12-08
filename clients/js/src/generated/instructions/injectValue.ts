@@ -8,8 +8,6 @@
 
 import {
   Context,
-  Option,
-  OptionOrNullable,
   Pda,
   PublicKey,
   Signer,
@@ -19,7 +17,6 @@ import {
 import {
   Serializer,
   mapSerializer,
-  option,
   string,
   struct,
   u64,
@@ -32,7 +29,7 @@ import {
 } from '../shared';
 
 // Accounts.
-export type SetValueInstructionAccounts = {
+export type InjectValueInstructionAccounts = {
   /** The account to store the metadata in. */
   jsonAccount: PublicKey | Pda;
   /** The account to store the json account's metadata in. */
@@ -44,48 +41,48 @@ export type SetValueInstructionAccounts = {
 };
 
 // Data.
-export type SetValueInstructionData = {
+export type InjectValueInstructionData = {
   discriminator: number;
-  start: Option<bigint>;
-  end: Option<bigint>;
+  start: bigint;
+  end: bigint;
   value: string;
 };
 
-export type SetValueInstructionDataArgs = {
-  start: OptionOrNullable<number | bigint>;
-  end: OptionOrNullable<number | bigint>;
+export type InjectValueInstructionDataArgs = {
+  start: number | bigint;
+  end: number | bigint;
   value: string;
 };
 
-export function getSetValueInstructionDataSerializer(): Serializer<
-  SetValueInstructionDataArgs,
-  SetValueInstructionData
+export function getInjectValueInstructionDataSerializer(): Serializer<
+  InjectValueInstructionDataArgs,
+  InjectValueInstructionData
 > {
   return mapSerializer<
-    SetValueInstructionDataArgs,
+    InjectValueInstructionDataArgs,
     any,
-    SetValueInstructionData
+    InjectValueInstructionData
   >(
-    struct<SetValueInstructionData>(
+    struct<InjectValueInstructionData>(
       [
         ['discriminator', u8()],
-        ['start', option(u64())],
-        ['end', option(u64())],
+        ['start', u64()],
+        ['end', u64()],
         ['value', string()],
       ],
-      { description: 'SetValueInstructionData' }
+      { description: 'InjectValueInstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 2 })
-  ) as Serializer<SetValueInstructionDataArgs, SetValueInstructionData>;
+    (value) => ({ ...value, discriminator: 4 })
+  ) as Serializer<InjectValueInstructionDataArgs, InjectValueInstructionData>;
 }
 
 // Args.
-export type SetValueInstructionArgs = SetValueInstructionDataArgs;
+export type InjectValueInstructionArgs = InjectValueInstructionDataArgs;
 
 // Instruction.
-export function setValue(
+export function injectValue(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: SetValueInstructionAccounts & SetValueInstructionArgs
+  input: InjectValueInstructionAccounts & InjectValueInstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -114,7 +111,7 @@ export function setValue(
   };
 
   // Arguments.
-  const resolvedArgs: SetValueInstructionArgs = { ...input };
+  const resolvedArgs: InjectValueInstructionArgs = { ...input };
 
   // Default values.
   if (!resolvedAccounts.payer.value) {
@@ -141,8 +138,8 @@ export function setValue(
   );
 
   // Data.
-  const data = getSetValueInstructionDataSerializer().serialize(
-    resolvedArgs as SetValueInstructionDataArgs
+  const data = getInjectValueInstructionDataSerializer().serialize(
+    resolvedArgs as InjectValueInstructionDataArgs
   );
 
   // Bytes Created On Chain.

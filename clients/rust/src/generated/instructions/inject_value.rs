@@ -7,11 +7,12 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
 
 /// Accounts.
-pub struct AddAuthority {
-    /// The account to store the metadata's metadata in.
+pub struct InjectValue {
+    /// The account to store the metadata in.
+    pub json_account: solana_program::pubkey::Pubkey,
+    /// The account to store the json account's metadata in.
     pub json_metadata_account: solana_program::pubkey::Pubkey,
     /// The account that will pay for the transaction and rent.
     pub payer: solana_program::pubkey::Pubkey,
@@ -19,20 +20,24 @@ pub struct AddAuthority {
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl AddAuthority {
+impl InjectValue {
     pub fn instruction(
         &self,
-        args: AddAuthorityInstructionArgs,
+        args: InjectValueInstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: AddAuthorityInstructionArgs,
+        args: InjectValueInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.json_account,
+            false,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.json_metadata_account,
             false,
@@ -45,7 +50,7 @@ impl AddAuthority {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = AddAuthorityInstructionData::new().try_to_vec().unwrap();
+        let mut data = InjectValueInstructionData::new().try_to_vec().unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -58,37 +63,48 @@ impl AddAuthority {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct AddAuthorityInstructionData {
+struct InjectValueInstructionData {
     discriminator: u8,
 }
 
-impl AddAuthorityInstructionData {
+impl InjectValueInstructionData {
     fn new() -> Self {
-        Self { discriminator: 5 }
+        Self { discriminator: 4 }
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct AddAuthorityInstructionArgs {
-    pub new_authority: Pubkey,
+pub struct InjectValueInstructionArgs {
+    pub start: u64,
+    pub end: u64,
+    pub value: String,
 }
 
 /// Instruction builder.
 #[derive(Default)]
-pub struct AddAuthorityBuilder {
+pub struct InjectValueBuilder {
+    json_account: Option<solana_program::pubkey::Pubkey>,
     json_metadata_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    new_authority: Option<Pubkey>,
+    start: Option<u64>,
+    end: Option<u64>,
+    value: Option<String>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl AddAuthorityBuilder {
+impl InjectValueBuilder {
     pub fn new() -> Self {
         Self::default()
     }
-    /// The account to store the metadata's metadata in.
+    /// The account to store the metadata in.
+    #[inline(always)]
+    pub fn json_account(&mut self, json_account: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.json_account = Some(json_account);
+        self
+    }
+    /// The account to store the json account's metadata in.
     #[inline(always)]
     pub fn json_metadata_account(
         &mut self,
@@ -111,8 +127,18 @@ impl AddAuthorityBuilder {
         self
     }
     #[inline(always)]
-    pub fn new_authority(&mut self, new_authority: Pubkey) -> &mut Self {
-        self.new_authority = Some(new_authority);
+    pub fn start(&mut self, start: u64) -> &mut Self {
+        self.start = Some(start);
+        self
+    }
+    #[inline(always)]
+    pub fn end(&mut self, end: u64) -> &mut Self {
+        self.end = Some(end);
+        self
+    }
+    #[inline(always)]
+    pub fn value(&mut self, value: String) -> &mut Self {
+        self.value = Some(value);
         self
     }
     /// Add an aditional account to the instruction.
@@ -135,7 +161,8 @@ impl AddAuthorityBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = AddAuthority {
+        let accounts = InjectValue {
+            json_account: self.json_account.expect("json_account is not set"),
             json_metadata_account: self
                 .json_metadata_account
                 .expect("json_metadata_account is not set"),
@@ -144,20 +171,21 @@ impl AddAuthorityBuilder {
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = AddAuthorityInstructionArgs {
-            new_authority: self
-                .new_authority
-                .clone()
-                .expect("new_authority is not set"),
+        let args = InjectValueInstructionArgs {
+            start: self.start.clone().expect("start is not set"),
+            end: self.end.clone().expect("end is not set"),
+            value: self.value.clone().expect("value is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `add_authority` CPI accounts.
-pub struct AddAuthorityCpiAccounts<'a, 'b> {
-    /// The account to store the metadata's metadata in.
+/// `inject_value` CPI accounts.
+pub struct InjectValueCpiAccounts<'a, 'b> {
+    /// The account to store the metadata in.
+    pub json_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account to store the json account's metadata in.
     pub json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
@@ -165,28 +193,31 @@ pub struct AddAuthorityCpiAccounts<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `add_authority` CPI instruction.
-pub struct AddAuthorityCpi<'a, 'b> {
+/// `inject_value` CPI instruction.
+pub struct InjectValueCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account to store the metadata's metadata in.
+    /// The account to store the metadata in.
+    pub json_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account to store the json account's metadata in.
     pub json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: AddAuthorityInstructionArgs,
+    pub __args: InjectValueInstructionArgs,
 }
 
-impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
+impl<'a, 'b> InjectValueCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: AddAuthorityCpiAccounts<'a, 'b>,
-        args: AddAuthorityInstructionArgs,
+        accounts: InjectValueCpiAccounts<'a, 'b>,
+        args: InjectValueInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
+            json_account: accounts.json_account,
             json_metadata_account: accounts.json_metadata_account,
             payer: accounts.payer,
             system_program: accounts.system_program,
@@ -226,7 +257,11 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.json_account.key,
+            false,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.json_metadata_account.key,
             false,
@@ -246,7 +281,7 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = AddAuthorityInstructionData::new().try_to_vec().unwrap();
+        let mut data = InjectValueInstructionData::new().try_to_vec().unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -255,8 +290,9 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(3 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
+        account_infos.push(self.json_account.clone());
         account_infos.push(self.json_metadata_account.clone());
         account_infos.push(self.payer.clone());
         account_infos.push(self.system_program.clone());
@@ -272,24 +308,36 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
     }
 }
 
-/// `add_authority` CPI instruction builder.
-pub struct AddAuthorityCpiBuilder<'a, 'b> {
-    instruction: Box<AddAuthorityCpiBuilderInstruction<'a, 'b>>,
+/// `inject_value` CPI instruction builder.
+pub struct InjectValueCpiBuilder<'a, 'b> {
+    instruction: Box<InjectValueCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
+impl<'a, 'b> InjectValueCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(AddAuthorityCpiBuilderInstruction {
+        let instruction = Box::new(InjectValueCpiBuilderInstruction {
             __program: program,
+            json_account: None,
             json_metadata_account: None,
             payer: None,
             system_program: None,
-            new_authority: None,
+            start: None,
+            end: None,
+            value: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
     }
-    /// The account to store the metadata's metadata in.
+    /// The account to store the metadata in.
+    #[inline(always)]
+    pub fn json_account(
+        &mut self,
+        json_account: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.json_account = Some(json_account);
+        self
+    }
+    /// The account to store the json account's metadata in.
     #[inline(always)]
     pub fn json_metadata_account(
         &mut self,
@@ -314,8 +362,18 @@ impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn new_authority(&mut self, new_authority: Pubkey) -> &mut Self {
-        self.instruction.new_authority = Some(new_authority);
+    pub fn start(&mut self, start: u64) -> &mut Self {
+        self.instruction.start = Some(start);
+        self
+    }
+    #[inline(always)]
+    pub fn end(&mut self, end: u64) -> &mut Self {
+        self.instruction.end = Some(end);
+        self
+    }
+    #[inline(always)]
+    pub fn value(&mut self, value: String) -> &mut Self {
+        self.instruction.value = Some(value);
         self
     }
     /// Add an additional account to the instruction.
@@ -359,15 +417,18 @@ impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = AddAuthorityInstructionArgs {
-            new_authority: self
-                .instruction
-                .new_authority
-                .clone()
-                .expect("new_authority is not set"),
+        let args = InjectValueInstructionArgs {
+            start: self.instruction.start.clone().expect("start is not set"),
+            end: self.instruction.end.clone().expect("end is not set"),
+            value: self.instruction.value.clone().expect("value is not set"),
         };
-        let instruction = AddAuthorityCpi {
+        let instruction = InjectValueCpi {
             __program: self.instruction.__program,
+
+            json_account: self
+                .instruction
+                .json_account
+                .expect("json_account is not set"),
 
             json_metadata_account: self
                 .instruction
@@ -389,12 +450,15 @@ impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
     }
 }
 
-struct AddAuthorityCpiBuilderInstruction<'a, 'b> {
+struct InjectValueCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
+    json_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     json_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    new_authority: Option<Pubkey>,
+    start: Option<u64>,
+    end: Option<u64>,
+    value: Option<String>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

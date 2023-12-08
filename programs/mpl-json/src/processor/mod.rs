@@ -3,16 +3,16 @@ use borsh::BorshDeserialize;
 use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, msg, pubkey::Pubkey};
 
 mod add_authority;
-mod append_value;
 mod close;
 mod initialize;
+mod inject_value;
 mod remove_authority;
 mod set_value;
 
 use add_authority::*;
-use append_value::*;
 use close::*;
 use initialize::*;
+use inject_value::*;
 use remove_authority::*;
 use set_value::*;
 
@@ -25,9 +25,9 @@ impl Processor {
     ) -> ProgramResult {
         let instruction: MplJsonInstruction = MplJsonInstruction::try_from_slice(instruction_data)?;
         match instruction {
-            MplJsonInstruction::Initialize => {
+            MplJsonInstruction::Initialize(args) => {
                 msg!("Instruction: Initialize");
-                process_initialize(accounts)
+                process_initialize(accounts, args)
             }
             MplJsonInstruction::Close => {
                 msg!("Instruction: Close");
@@ -37,9 +37,9 @@ impl Processor {
                 msg!("Instruction: SetValue");
                 process_set_value(accounts, args)
             }
-            MplJsonInstruction::AppendValue(args) => {
-                msg!("Instruction: AppendValue");
-                process_append_value(accounts, args)
+            MplJsonInstruction::InjectValue(args) => {
+                msg!("Instruction: SetValue");
+                process_inject_value(accounts, args)
             }
             MplJsonInstruction::AddAuthority(args) => {
                 msg!("Instruction: AddAuthority");

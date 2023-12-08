@@ -61,7 +61,7 @@ export function getRemoveAuthorityInstructionDataSerializer(): Serializer<
       ],
       { description: 'RemoveAuthorityInstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 5 })
+    (value) => ({ ...value, discriminator: 6 })
   ) as Serializer<
     RemoveAuthorityInstructionDataArgs,
     RemoveAuthorityInstructionData
