@@ -8,7 +8,7 @@ use solana_program::{
 use crate::{
     error::MplInscriptionError,
     instruction::accounts::InitializeAccounts,
-    state::{InscriptionMetadata, Key, INITIAL_SIZE, PREFIX},
+    state::{InscriptionMetadata, INITIAL_SIZE, PREFIX},
 };
 
 pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
@@ -66,10 +66,9 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
 
     // Initialize the inscription metadata.
     let inscription_metadata = InscriptionMetadata {
-        key: Key::InscriptionMetadataAccount,
         bump,
         update_authorities: vec![*ctx.accounts.payer.key],
-        inscription_number: None,
+        ..InscriptionMetadata::default()
     };
 
     let serialized_metadata = &inscription_metadata.try_to_vec()?;

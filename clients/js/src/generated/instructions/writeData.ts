@@ -64,7 +64,7 @@ export function getWriteDataInstructionDataSerializer(): Serializer<
       ],
       { description: 'WriteDataInstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 2 })
+    (value) => ({ ...value, discriminator: 3 })
   ) as Serializer<WriteDataInstructionDataArgs, WriteDataInstructionData>;
 }
 
@@ -79,7 +79,7 @@ export function writeData(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
 
   // Accounts.

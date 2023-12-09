@@ -1039,11 +1039,26 @@ name = "mpl-inscription"
 version = "0.1.0"
 dependencies = [
  "borsh 0.10.3",
+ "mpl-token-metadata",
  "mpl-utils",
  "num-derive",
  "num-traits",
  "serde_json",
  "shank",
+ "solana-program",
+ "spl-token 4.0.0",
+ "thiserror",
+]
+
+[[package]]
+name = "mpl-token-metadata"
+version = "3.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba8ee05284d79b367ae8966d558e1a305a781fc80c9df51f37775169117ba64f"
+dependencies = [
+ "borsh 0.10.3",
+ "num-derive",
+ "num-traits",
  "solana-program",
  "thiserror",
 ]
@@ -1854,6 +1869,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "spl-token"
+version = "4.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08459ba1b8f7c1020b4582c4edf0f5c7511a5e099a7a97570c9698d4f2337060"
+dependencies = [
+ "arrayref",
+ "bytemuck",
+ "num-derive",
+ "num-traits",
+ "num_enum 0.6.1",
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
 name = "spl-token-2022"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1867,7 +1897,7 @@ dependencies = [
  "solana-program",
  "solana-zk-token-sdk",
  "spl-memo",
- "spl-token",
+ "spl-token 3.5.0",
  "thiserror",
 ]
 

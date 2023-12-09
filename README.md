@@ -6,7 +6,7 @@ A simple program for inscribing bytes on chain.
 
 This project contains the following programs:
 
-- [Mpl Inscription](./programs/mpl-inscription/README.md) `JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa`
+- [Mpl Inscription](./programs/mpl-inscription/README.md) `1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo`
 
 You will need a Rust version compatible with BPF to compile the program, currently we recommend using Rust 1.68.0.
 

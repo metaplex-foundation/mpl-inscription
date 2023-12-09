@@ -58,7 +58,7 @@ struct RemoveAuthorityInstructionData {
 
 impl RemoveAuthorityInstructionData {
     fn new() -> Self {
-        Self { discriminator: 5 }
+        Self { discriminator: 6 }
     }
 }
 

@@ -51,7 +51,7 @@ export function getCloseInstructionDataSerializer(): Serializer<
     struct<CloseInstructionData>([['discriminator', u8()]], {
       description: 'CloseInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 1 })
+    (value) => ({ ...value, discriminator: 2 })
   ) as Serializer<CloseInstructionDataArgs, CloseInstructionData>;
 }
 
@@ -63,7 +63,7 @@ export function close(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
 
   // Accounts.

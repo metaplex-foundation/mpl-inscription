@@ -28,12 +28,27 @@ pub enum MplInscriptionError {
     /// 5 (0x5) - Borsh failed to serialize this account.
     #[error("Borsh failed to serialize this account.")]
     BorshSerializeError,
-    /// 6 (0x6) - The payer does not have authority to perform this action.
+    /// 6 (0x6) - Borsh failed to deserialize this account.
+    #[error("Borsh failed to deserialize this account.")]
+    BorshDeserializeError,
+    /// 7 (0x7) - The payer does not have authority to perform this action.
     #[error("The payer does not have authority to perform this action.")]
     InvalidAuthority,
-    /// 7 (0x7) - Numerical Overflow
+    /// 8 (0x8) - Numerical Overflow
     #[error("Numerical Overflow")]
     NumericalOverflow,
+    /// 9 (0x9) - Incorrect Owner
+    #[error("Incorrect Owner")]
+    IncorrectOwner,
+    /// 10 (0xA) - Mint Mismatch between Metadata and Mint Accounts.
+    #[error("Mint Mismatch between Metadata and Mint Accounts.")]
+    MintMismatch,
+    /// 11 (0xB) - Must be a NonFungible Token
+    #[error("Must be a NonFungible Token")]
+    InvalidTokenStandard,
+    /// 12 (0xC) - Not enough tokens in the provided token account.
+    #[error("Not enough tokens in the provided token account.")]
+    NotEnoughTokens,
 }
 
 impl solana_program::program_error::PrintProgramError for MplInscriptionError {

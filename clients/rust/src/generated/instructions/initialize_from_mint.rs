@@ -9,18 +9,24 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct Close {
+pub struct InitializeFromMint {
     /// The account to store the metadata in.
     pub inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
     pub metadata_account: solana_program::pubkey::Pubkey,
+    /// The mint that will be used to derive the PDA.
+    pub mint_account: solana_program::pubkey::Pubkey,
+    /// The metadata for the mint.
+    pub token_metadata_account: solana_program::pubkey::Pubkey,
+    /// The token account for the mint.
+    pub token_account: solana_program::pubkey::Pubkey,
     /// The account that will pay for the transaction and rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl Close {
+impl InitializeFromMint {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
@@ -29,13 +35,25 @@ impl Close {
         &self,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(7 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.inscription_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.metadata_account,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.mint_account,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.token_metadata_account,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.token_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -46,7 +64,9 @@ impl Close {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let data = CloseInstructionData::new().try_to_vec().unwrap();
+        let data = InitializeFromMintInstructionData::new()
+            .try_to_vec()
+            .unwrap();
 
         solana_program::instruction::Instruction {
             program_id: crate::MPL_INSCRIPTION_ID,
@@ -57,27 +77,30 @@ impl Close {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct CloseInstructionData {
+struct InitializeFromMintInstructionData {
     discriminator: u8,
 }
 
-impl CloseInstructionData {
+impl InitializeFromMintInstructionData {
     fn new() -> Self {
-        Self { discriminator: 2 }
+        Self { discriminator: 1 }
     }
 }
 
 /// Instruction builder.
 #[derive(Default)]
-pub struct CloseBuilder {
+pub struct InitializeFromMintBuilder {
     inscription_account: Option<solana_program::pubkey::Pubkey>,
     metadata_account: Option<solana_program::pubkey::Pubkey>,
+    mint_account: Option<solana_program::pubkey::Pubkey>,
+    token_metadata_account: Option<solana_program::pubkey::Pubkey>,
+    token_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl CloseBuilder {
+impl InitializeFromMintBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -97,6 +120,27 @@ impl CloseBuilder {
         metadata_account: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
         self.metadata_account = Some(metadata_account);
+        self
+    }
+    /// The mint that will be used to derive the PDA.
+    #[inline(always)]
+    pub fn mint_account(&mut self, mint_account: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.mint_account = Some(mint_account);
+        self
+    }
+    /// The metadata for the mint.
+    #[inline(always)]
+    pub fn token_metadata_account(
+        &mut self,
+        token_metadata_account: solana_program::pubkey::Pubkey,
+    ) -> &mut Self {
+        self.token_metadata_account = Some(token_metadata_account);
+        self
+    }
+    /// The token account for the mint.
+    #[inline(always)]
+    pub fn token_account(&mut self, token_account: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.token_account = Some(token_account);
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -132,11 +176,16 @@ impl CloseBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = Close {
+        let accounts = InitializeFromMint {
             inscription_account: self
                 .inscription_account
                 .expect("inscription_account is not set"),
             metadata_account: self.metadata_account.expect("metadata_account is not set"),
+            mint_account: self.mint_account.expect("mint_account is not set"),
+            token_metadata_account: self
+                .token_metadata_account
+                .expect("token_metadata_account is not set"),
+            token_account: self.token_account.expect("token_account is not set"),
             payer: self.payer.expect("payer is not set"),
             system_program: self
                 .system_program
@@ -147,41 +196,56 @@ impl CloseBuilder {
     }
 }
 
-/// `close` CPI accounts.
-pub struct CloseCpiAccounts<'a, 'b> {
+/// `initialize_from_mint` CPI accounts.
+pub struct InitializeFromMintCpiAccounts<'a, 'b> {
     /// The account to store the metadata in.
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The mint that will be used to derive the PDA.
+    pub mint_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The metadata for the mint.
+    pub token_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The token account for the mint.
+    pub token_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `close` CPI instruction.
-pub struct CloseCpi<'a, 'b> {
+/// `initialize_from_mint` CPI instruction.
+pub struct InitializeFromMintCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the metadata in.
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The mint that will be used to derive the PDA.
+    pub mint_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The metadata for the mint.
+    pub token_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The token account for the mint.
+    pub token_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-impl<'a, 'b> CloseCpi<'a, 'b> {
+impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: CloseCpiAccounts<'a, 'b>,
+        accounts: InitializeFromMintCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
             __program: program,
             inscription_account: accounts.inscription_account,
             metadata_account: accounts.metadata_account,
+            mint_account: accounts.mint_account,
+            token_metadata_account: accounts.token_metadata_account,
+            token_account: accounts.token_account,
             payer: accounts.payer,
             system_program: accounts.system_program,
         }
@@ -219,13 +283,25 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(7 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.inscription_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.metadata_account.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.mint_account.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.token_metadata_account.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.token_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -243,17 +319,22 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let data = CloseInstructionData::new().try_to_vec().unwrap();
+        let data = InitializeFromMintInstructionData::new()
+            .try_to_vec()
+            .unwrap();
 
         let instruction = solana_program::instruction::Instruction {
             program_id: crate::MPL_INSCRIPTION_ID,
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(7 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.inscription_account.clone());
         account_infos.push(self.metadata_account.clone());
+        account_infos.push(self.mint_account.clone());
+        account_infos.push(self.token_metadata_account.clone());
+        account_infos.push(self.token_account.clone());
         account_infos.push(self.payer.clone());
         account_infos.push(self.system_program.clone());
         remaining_accounts
@@ -268,17 +349,20 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
     }
 }
 
-/// `close` CPI instruction builder.
-pub struct CloseCpiBuilder<'a, 'b> {
-    instruction: Box<CloseCpiBuilderInstruction<'a, 'b>>,
+/// `initialize_from_mint` CPI instruction builder.
+pub struct InitializeFromMintCpiBuilder<'a, 'b> {
+    instruction: Box<InitializeFromMintCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
+impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(CloseCpiBuilderInstruction {
+        let instruction = Box::new(InitializeFromMintCpiBuilderInstruction {
             __program: program,
             inscription_account: None,
             metadata_account: None,
+            mint_account: None,
+            token_metadata_account: None,
+            token_account: None,
             payer: None,
             system_program: None,
             __remaining_accounts: Vec::new(),
@@ -301,6 +385,33 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
         metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.metadata_account = Some(metadata_account);
+        self
+    }
+    /// The mint that will be used to derive the PDA.
+    #[inline(always)]
+    pub fn mint_account(
+        &mut self,
+        mint_account: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.mint_account = Some(mint_account);
+        self
+    }
+    /// The metadata for the mint.
+    #[inline(always)]
+    pub fn token_metadata_account(
+        &mut self,
+        token_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.token_metadata_account = Some(token_metadata_account);
+        self
+    }
+    /// The token account for the mint.
+    #[inline(always)]
+    pub fn token_account(
+        &mut self,
+        token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.token_account = Some(token_account);
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -359,7 +470,7 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let instruction = CloseCpi {
+        let instruction = InitializeFromMintCpi {
             __program: self.instruction.__program,
 
             inscription_account: self
@@ -371,6 +482,21 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
                 .instruction
                 .metadata_account
                 .expect("metadata_account is not set"),
+
+            mint_account: self
+                .instruction
+                .mint_account
+                .expect("mint_account is not set"),
+
+            token_metadata_account: self
+                .instruction
+                .token_metadata_account
+                .expect("token_metadata_account is not set"),
+
+            token_account: self
+                .instruction
+                .token_account
+                .expect("token_account is not set"),
 
             payer: self.instruction.payer.expect("payer is not set"),
 
@@ -386,10 +512,13 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
     }
 }
 
-struct CloseCpiBuilderInstruction<'a, 'b> {
+struct InitializeFromMintCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    mint_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    token_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    token_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

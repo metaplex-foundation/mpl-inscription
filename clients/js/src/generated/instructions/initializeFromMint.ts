@@ -27,11 +27,17 @@ import {
 } from '../shared';
 
 // Accounts.
-export type InitializeInstructionAccounts = {
+export type InitializeFromMintInstructionAccounts = {
   /** The account to store the metadata in. */
-  inscriptionAccount: Signer;
+  inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
   metadataAccount: PublicKey | Pda;
+  /** The mint that will be used to derive the PDA. */
+  mintAccount: PublicKey | Pda;
+  /** The metadata for the mint. */
+  tokenMetadataAccount: PublicKey | Pda;
+  /** The token account for the mint. */
+  tokenAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -39,30 +45,33 @@ export type InitializeInstructionAccounts = {
 };
 
 // Data.
-export type InitializeInstructionData = { discriminator: number };
+export type InitializeFromMintInstructionData = { discriminator: number };
 
-export type InitializeInstructionDataArgs = {};
+export type InitializeFromMintInstructionDataArgs = {};
 
-export function getInitializeInstructionDataSerializer(): Serializer<
-  InitializeInstructionDataArgs,
-  InitializeInstructionData
+export function getInitializeFromMintInstructionDataSerializer(): Serializer<
+  InitializeFromMintInstructionDataArgs,
+  InitializeFromMintInstructionData
 > {
   return mapSerializer<
-    InitializeInstructionDataArgs,
+    InitializeFromMintInstructionDataArgs,
     any,
-    InitializeInstructionData
+    InitializeFromMintInstructionData
   >(
-    struct<InitializeInstructionData>([['discriminator', u8()]], {
-      description: 'InitializeInstructionData',
+    struct<InitializeFromMintInstructionData>([['discriminator', u8()]], {
+      description: 'InitializeFromMintInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 0 })
-  ) as Serializer<InitializeInstructionDataArgs, InitializeInstructionData>;
+    (value) => ({ ...value, discriminator: 1 })
+  ) as Serializer<
+    InitializeFromMintInstructionDataArgs,
+    InitializeFromMintInstructionData
+  >;
 }
 
 // Instruction.
-export function initialize(
+export function initializeFromMint(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: InitializeInstructionAccounts
+  input: InitializeFromMintInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -82,9 +91,24 @@ export function initialize(
       isWritable: true,
       value: input.metadataAccount ?? null,
     },
-    payer: { index: 2, isWritable: true, value: input.payer ?? null },
-    systemProgram: {
+    mintAccount: {
+      index: 2,
+      isWritable: false,
+      value: input.mintAccount ?? null,
+    },
+    tokenMetadataAccount: {
       index: 3,
+      isWritable: false,
+      value: input.tokenMetadataAccount ?? null,
+    },
+    tokenAccount: {
+      index: 4,
+      isWritable: false,
+      value: input.tokenAccount ?? null,
+    },
+    payer: { index: 5, isWritable: true, value: input.payer ?? null },
+    systemProgram: {
+      index: 6,
       isWritable: false,
       value: input.systemProgram ?? null,
     },
@@ -115,7 +139,7 @@ export function initialize(
   );
 
   // Data.
-  const data = getInitializeInstructionDataSerializer().serialize({});
+  const data = getInitializeFromMintInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

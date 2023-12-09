@@ -10,5 +10,6 @@ export * from './addAuthority';
 export * from './clearData';
 export * from './close';
 export * from './initialize';
+export * from './initializeFromMint';
 export * from './removeAuthority';
 export * from './writeData';

@@ -61,7 +61,7 @@ export function getAddAuthorityInstructionDataSerializer(): Serializer<
       ],
       { description: 'AddAuthorityInstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 4 })
+    (value) => ({ ...value, discriminator: 5 })
   ) as Serializer<AddAuthorityInstructionDataArgs, AddAuthorityInstructionData>;
 }
 
@@ -76,7 +76,7 @@ export function addAuthority(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
 
   // Accounts.

@@ -32,13 +32,33 @@ pub enum MplInscriptionError {
     #[error("Borsh failed to serialize this account.")]
     BorshSerializeError,
 
-    /// 6 - The payer does not have authority to perform this action.
+    /// 6 - Borsh failed to deserialize this account.
+    #[error("Borsh failed to deserialize this account.")]
+    BorshDeserializeError,
+
+    /// 7 - The payer does not have authority to perform this action.
     #[error("The payer does not have authority to perform this action.")]
     InvalidAuthority,
 
-    /// 7 - Numerical Overflow
+    /// 8 - Numerical Overflow
     #[error("Numerical Overflow")]
     NumericalOverflow,
+
+    /// 9 - Incorrect Owner
+    #[error("Incorrect Owner")]
+    IncorrectOwner,
+
+    /// 10 - Mint Mismatch
+    #[error("Mint Mismatch between Metadata and Mint Accounts.")]
+    MintMismatch,
+
+    /// 11 - Invalid Token Standard
+    #[error("Must be a NonFungible Token")]
+    InvalidTokenStandard,
+
+    /// 12 - Not enough tokens
+    #[error("Not enough tokens in the provided token account.")]
+    NotEnoughTokens,
 }
 
 impl PrintProgramError for MplInscriptionError {

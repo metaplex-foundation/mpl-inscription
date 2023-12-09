@@ -8,4 +8,4 @@
 use solana_program::{pubkey, pubkey::Pubkey};
 
 /// `mpl_inscription` program ID.
-pub const MPL_INSCRIPTION_ID: Pubkey = pubkey!("JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa");
+pub const MPL_INSCRIPTION_ID: Pubkey = pubkey!("1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo");

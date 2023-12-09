@@ -53,7 +53,7 @@ export function getRemoveAuthorityInstructionDataSerializer(): Serializer<
     struct<RemoveAuthorityInstructionData>([['discriminator', u8()]], {
       description: 'RemoveAuthorityInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 5 })
+    (value) => ({ ...value, discriminator: 6 })
   ) as Serializer<
     RemoveAuthorityInstructionDataArgs,
     RemoveAuthorityInstructionData
@@ -68,7 +68,7 @@ export function removeAuthority(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
 
   // Accounts.

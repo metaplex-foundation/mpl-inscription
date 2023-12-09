@@ -9,6 +9,7 @@ pub(crate) mod add_authority;
 pub(crate) mod clear_data;
 pub(crate) mod close;
 pub(crate) mod initialize;
+pub(crate) mod initialize_from_mint;
 pub(crate) mod remove_authority;
 pub(crate) mod write_data;
 
@@ -16,5 +17,6 @@ pub use self::add_authority::*;
 pub use self::clear_data::*;
 pub use self::close::*;
 pub use self::initialize::*;
+pub use self::initialize_from_mint::*;
 pub use self::remove_authority::*;
 pub use self::write_data::*;

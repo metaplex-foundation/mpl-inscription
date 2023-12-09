@@ -12,6 +12,16 @@ pub enum MplInscriptionInstruction {
     #[account(3, name="system_program", desc = "System program")]
     Initialize,
 
+    /// Initialize the Inscription and Metadata accounts as a Mint PDA
+    #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
+    #[account(1, writable, name="metadata_account", desc = "The account to store the inscription account's metadata in.")]
+    #[account(2, name="mint_account", desc="The mint that will be used to derive the PDA.")]
+    #[account(3, name="token_metadata_account", desc="The metadata for the mint.")]
+    #[account(4, name="token_account", desc="The token account for the mint.")]
+    #[account(5, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(6, name="system_program", desc = "System program")]
+    InitializeFromMint,
+
     /// Close the Inscription and Metadata accounts
     #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
     #[account(1, writable, name="metadata_account", desc = "The account to store the inscription account's metadata in.")]

@@ -93,11 +93,24 @@ export class BorshSerializeErrorError extends ProgramError {
 codeToErrorMap.set(0x5, BorshSerializeErrorError);
 nameToErrorMap.set('BorshSerializeError', BorshSerializeErrorError);
 
+/** BorshDeserializeError: Borsh failed to deserialize this account. */
+export class BorshDeserializeErrorError extends ProgramError {
+  readonly name: string = 'BorshDeserializeError';
+
+  readonly code: number = 0x6; // 6
+
+  constructor(program: Program, cause?: Error) {
+    super('Borsh failed to deserialize this account.', program, cause);
+  }
+}
+codeToErrorMap.set(0x6, BorshDeserializeErrorError);
+nameToErrorMap.set('BorshDeserializeError', BorshDeserializeErrorError);
+
 /** InvalidAuthority: The payer does not have authority to perform this action. */
 export class InvalidAuthorityError extends ProgramError {
   readonly name: string = 'InvalidAuthority';
 
-  readonly code: number = 0x6; // 6
+  readonly code: number = 0x7; // 7
 
   constructor(program: Program, cause?: Error) {
     super(
@@ -107,21 +120,73 @@ export class InvalidAuthorityError extends ProgramError {
     );
   }
 }
-codeToErrorMap.set(0x6, InvalidAuthorityError);
+codeToErrorMap.set(0x7, InvalidAuthorityError);
 nameToErrorMap.set('InvalidAuthority', InvalidAuthorityError);
 
 /** NumericalOverflow: Numerical Overflow */
 export class NumericalOverflowError extends ProgramError {
   readonly name: string = 'NumericalOverflow';
 
-  readonly code: number = 0x7; // 7
+  readonly code: number = 0x8; // 8
 
   constructor(program: Program, cause?: Error) {
     super('Numerical Overflow', program, cause);
   }
 }
-codeToErrorMap.set(0x7, NumericalOverflowError);
+codeToErrorMap.set(0x8, NumericalOverflowError);
 nameToErrorMap.set('NumericalOverflow', NumericalOverflowError);
+
+/** IncorrectOwner: Incorrect Owner */
+export class IncorrectOwnerError extends ProgramError {
+  readonly name: string = 'IncorrectOwner';
+
+  readonly code: number = 0x9; // 9
+
+  constructor(program: Program, cause?: Error) {
+    super('Incorrect Owner', program, cause);
+  }
+}
+codeToErrorMap.set(0x9, IncorrectOwnerError);
+nameToErrorMap.set('IncorrectOwner', IncorrectOwnerError);
+
+/** MintMismatch: Mint Mismatch between Metadata and Mint Accounts. */
+export class MintMismatchError extends ProgramError {
+  readonly name: string = 'MintMismatch';
+
+  readonly code: number = 0xa; // 10
+
+  constructor(program: Program, cause?: Error) {
+    super('Mint Mismatch between Metadata and Mint Accounts.', program, cause);
+  }
+}
+codeToErrorMap.set(0xa, MintMismatchError);
+nameToErrorMap.set('MintMismatch', MintMismatchError);
+
+/** InvalidTokenStandard: Must be a NonFungible Token */
+export class InvalidTokenStandardError extends ProgramError {
+  readonly name: string = 'InvalidTokenStandard';
+
+  readonly code: number = 0xb; // 11
+
+  constructor(program: Program, cause?: Error) {
+    super('Must be a NonFungible Token', program, cause);
+  }
+}
+codeToErrorMap.set(0xb, InvalidTokenStandardError);
+nameToErrorMap.set('InvalidTokenStandard', InvalidTokenStandardError);
+
+/** NotEnoughTokens: Not enough tokens in the provided token account. */
+export class NotEnoughTokensError extends ProgramError {
+  readonly name: string = 'NotEnoughTokens';
+
+  readonly code: number = 0xc; // 12
+
+  constructor(program: Program, cause?: Error) {
+    super('Not enough tokens in the provided token account.', program, cause);
+  }
+}
+codeToErrorMap.set(0xc, NotEnoughTokensError);
+nameToErrorMap.set('NotEnoughTokens', NotEnoughTokensError);
 
 /**
  * Attempts to resolve a custom program error from the provided error code.

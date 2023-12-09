@@ -6,6 +6,7 @@ mod add_authority;
 mod clear_data;
 mod close;
 mod initialize;
+mod initialize_from_mint;
 mod remove_authority;
 mod write_data;
 
@@ -13,6 +14,7 @@ use add_authority::*;
 use clear_data::*;
 use close::*;
 use initialize::*;
+use initialize_from_mint::*;
 use remove_authority::*;
 use write_data::*;
 
@@ -29,6 +31,10 @@ impl Processor {
             MplInscriptionInstruction::Initialize => {
                 msg!("Instruction: Initialize");
                 process_initialize(accounts)
+            }
+            MplInscriptionInstruction::InitializeFromMint => {
+                msg!("Instruction: InitializeFromMint");
+                process_initialize_from_mint(accounts)
             }
             MplInscriptionInstruction::Close => {
                 msg!("Instruction: Close");

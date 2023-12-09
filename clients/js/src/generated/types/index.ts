@@ -6,4 +6,6 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
+export * from './dataType';
+export * from './inscriptionState';
 export * from './key';

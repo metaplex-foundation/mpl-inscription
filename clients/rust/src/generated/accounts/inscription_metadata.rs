@@ -5,6 +5,7 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+use crate::generated::types::InscriptionState;
 use crate::generated::types::Key;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
@@ -15,7 +16,9 @@ use solana_program::pubkey::Pubkey;
 pub struct InscriptionMetadata {
     pub key: Key,
     pub bump: u8,
+    pub state: InscriptionState,
     pub inscription_number: Option<u64>,
+    pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
 }
 

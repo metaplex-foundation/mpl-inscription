@@ -8,17 +8,16 @@
 
 import { Serializer, scalarEnum } from '@metaplex-foundation/umi/serializers';
 
-export enum Key {
-  Uninitialized,
-  InscriptionMetadataAccount,
-  MintInscriptionMetadataAccount,
+export enum DataType {
+  Binary,
+  Json,
+  Png,
 }
 
-export type KeyArgs = Key;
+export type DataTypeArgs = DataType;
 
-export function getKeySerializer(): Serializer<KeyArgs, Key> {
-  return scalarEnum<Key>(Key, { description: 'Key' }) as Serializer<
-    KeyArgs,
-    Key
-  >;
+export function getDataTypeSerializer(): Serializer<DataTypeArgs, DataType> {
+  return scalarEnum<DataType>(DataType, {
+    description: 'DataType',
+  }) as Serializer<DataTypeArgs, DataType>;
 }

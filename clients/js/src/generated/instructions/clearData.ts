@@ -55,7 +55,7 @@ export function getClearDataInstructionDataSerializer(): Serializer<
     struct<ClearDataInstructionData>([['discriminator', u8()]], {
       description: 'ClearDataInstructionData',
     }),
-    (value) => ({ ...value, discriminator: 3 })
+    (value) => ({ ...value, discriminator: 4 })
   ) as Serializer<ClearDataInstructionDataArgs, ClearDataInstructionData>;
 }
 
@@ -67,7 +67,7 @@ export function clearData(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
 
   // Accounts.

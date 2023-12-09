@@ -31,21 +31,32 @@ import {
   u64,
   u8,
 } from '@metaplex-foundation/umi/serializers';
-import { Key, KeyArgs, getKeySerializer } from '../types';
+import {
+  InscriptionState,
+  InscriptionStateArgs,
+  Key,
+  KeyArgs,
+  getInscriptionStateSerializer,
+  getKeySerializer,
+} from '../types';
 
 export type InscriptionMetadata = Account<InscriptionMetadataAccountData>;
 
 export type InscriptionMetadataAccountData = {
   key: Key;
   bump: number;
+  state: InscriptionState;
   inscriptionNumber: Option<bigint>;
+  inscriptionBump: Option<number>;
   updateAuthorities: Array<PublicKey>;
 };
 
 export type InscriptionMetadataAccountDataArgs = {
   key: KeyArgs;
   bump: number;
+  state: InscriptionStateArgs;
   inscriptionNumber: OptionOrNullable<number | bigint>;
+  inscriptionBump: OptionOrNullable<number>;
   updateAuthorities: Array<PublicKey>;
 };
 
@@ -57,7 +68,9 @@ export function getInscriptionMetadataAccountDataSerializer(): Serializer<
     [
       ['key', getKeySerializer()],
       ['bump', u8()],
+      ['state', getInscriptionStateSerializer()],
       ['inscriptionNumber', option(u64())],
+      ['inscriptionBump', option(u8())],
       ['updateAuthorities', array(publicKeySerializer())],
     ],
     { description: 'InscriptionMetadataAccountData' }
@@ -139,18 +152,22 @@ export function getInscriptionMetadataGpaBuilder(
 ) {
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
   return gpaBuilder(context, programId)
     .registerFields<{
       key: KeyArgs;
       bump: number;
+      state: InscriptionStateArgs;
       inscriptionNumber: OptionOrNullable<number | bigint>;
+      inscriptionBump: OptionOrNullable<number>;
       updateAuthorities: Array<PublicKey>;
     }>({
       key: [0, getKeySerializer()],
       bump: [1, u8()],
-      inscriptionNumber: [2, option(u64())],
+      state: [2, getInscriptionStateSerializer()],
+      inscriptionNumber: [3, option(u64())],
+      inscriptionBump: [null, option(u8())],
       updateAuthorities: [null, array(publicKeySerializer())],
     })
     .deserializeUsing<InscriptionMetadata>((account) =>
@@ -167,7 +184,7 @@ export function findInscriptionMetadataPda(
 ): Pda {
   const programId = context.programs.getPublicKey(
     'mplInscription',
-    'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
   );
   return context.eddsa.findPda(programId, [
     string({ size: 'variable' }).serialize('Inscription'),
