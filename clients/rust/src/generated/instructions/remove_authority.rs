@@ -7,50 +7,44 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
 
 /// Accounts.
 pub struct RemoveAuthority {
     /// The account to store the metadata's metadata in.
-    pub json_metadata_account: solana_program::pubkey::Pubkey,
-    /// The account that will pay for the transaction and rent.
-    pub payer: solana_program::pubkey::Pubkey,
+    pub metadata_account: solana_program::pubkey::Pubkey,
+    /// The authority paying and being removed.
+    pub authority: solana_program::pubkey::Pubkey,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
 impl RemoveAuthority {
-    pub fn instruction(
-        &self,
-        args: RemoveAuthorityInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
-        self.instruction_with_remaining_accounts(args, &[])
+    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+        self.instruction_with_remaining_accounts(&[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: RemoveAuthorityInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.json_metadata_account,
+            self.metadata_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.payer, true,
+            self.authority,
+            true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = RemoveAuthorityInstructionData::new().try_to_vec().unwrap();
-        let mut args = args.try_to_vec().unwrap();
-        data.append(&mut args);
+        let data = RemoveAuthorityInstructionData::new().try_to_vec().unwrap();
 
         solana_program::instruction::Instruction {
-            program_id: crate::MPL_JSON_ID,
+            program_id: crate::MPL_INSCRIPTION_ID,
             accounts,
             data,
         }
@@ -68,19 +62,12 @@ impl RemoveAuthorityInstructionData {
     }
 }
 
-#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RemoveAuthorityInstructionArgs {
-    pub authority: Pubkey,
-}
-
 /// Instruction builder.
 #[derive(Default)]
 pub struct RemoveAuthorityBuilder {
-    json_metadata_account: Option<solana_program::pubkey::Pubkey>,
-    payer: Option<solana_program::pubkey::Pubkey>,
+    metadata_account: Option<solana_program::pubkey::Pubkey>,
+    authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    authority: Option<Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
@@ -90,17 +77,17 @@ impl RemoveAuthorityBuilder {
     }
     /// The account to store the metadata's metadata in.
     #[inline(always)]
-    pub fn json_metadata_account(
+    pub fn metadata_account(
         &mut self,
-        json_metadata_account: solana_program::pubkey::Pubkey,
+        metadata_account: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
-        self.json_metadata_account = Some(json_metadata_account);
+        self.metadata_account = Some(metadata_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The authority paying and being removed.
     #[inline(always)]
-    pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.payer = Some(payer);
+    pub fn authority(&mut self, authority: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.authority = Some(authority);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
@@ -108,11 +95,6 @@ impl RemoveAuthorityBuilder {
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
-        self
-    }
-    #[inline(always)]
-    pub fn authority(&mut self, authority: Pubkey) -> &mut Self {
-        self.authority = Some(authority);
         self
     }
     /// Add an aditional account to the instruction.
@@ -136,28 +118,23 @@ impl RemoveAuthorityBuilder {
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = RemoveAuthority {
-            json_metadata_account: self
-                .json_metadata_account
-                .expect("json_metadata_account is not set"),
-            payer: self.payer.expect("payer is not set"),
+            metadata_account: self.metadata_account.expect("metadata_account is not set"),
+            authority: self.authority.expect("authority is not set"),
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = RemoveAuthorityInstructionArgs {
-            authority: self.authority.clone().expect("authority is not set"),
-        };
 
-        accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
+        accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
     }
 }
 
 /// `remove_authority` CPI accounts.
 pub struct RemoveAuthorityCpiAccounts<'a, 'b> {
     /// The account to store the metadata's metadata in.
-    pub json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
-    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The authority paying and being removed.
+    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
@@ -167,27 +144,23 @@ pub struct RemoveAuthorityCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the metadata's metadata in.
-    pub json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
-    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The authority paying and being removed.
+    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The arguments for the instruction.
-    pub __args: RemoveAuthorityInstructionArgs,
 }
 
 impl<'a, 'b> RemoveAuthorityCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
         accounts: RemoveAuthorityCpiAccounts<'a, 'b>,
-        args: RemoveAuthorityInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
-            json_metadata_account: accounts.json_metadata_account,
-            payer: accounts.payer,
+            metadata_account: accounts.metadata_account,
+            authority: accounts.authority,
             system_program: accounts.system_program,
-            __args: args,
         }
     }
     #[inline(always)]
@@ -225,11 +198,11 @@ impl<'a, 'b> RemoveAuthorityCpi<'a, 'b> {
     ) -> solana_program::entrypoint::ProgramResult {
         let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.json_metadata_account.key,
+            *self.metadata_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.payer.key,
+            *self.authority.key,
             true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
@@ -243,19 +216,17 @@ impl<'a, 'b> RemoveAuthorityCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = RemoveAuthorityInstructionData::new().try_to_vec().unwrap();
-        let mut args = self.__args.try_to_vec().unwrap();
-        data.append(&mut args);
+        let data = RemoveAuthorityInstructionData::new().try_to_vec().unwrap();
 
         let instruction = solana_program::instruction::Instruction {
-            program_id: crate::MPL_JSON_ID,
+            program_id: crate::MPL_INSCRIPTION_ID,
             accounts,
             data,
         };
         let mut account_infos = Vec::with_capacity(3 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.json_metadata_account.clone());
-        account_infos.push(self.payer.clone());
+        account_infos.push(self.metadata_account.clone());
+        account_infos.push(self.authority.clone());
         account_infos.push(self.system_program.clone());
         remaining_accounts
             .iter()
@@ -278,27 +249,29 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RemoveAuthorityCpiBuilderInstruction {
             __program: program,
-            json_metadata_account: None,
-            payer: None,
-            system_program: None,
+            metadata_account: None,
             authority: None,
+            system_program: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
     }
     /// The account to store the metadata's metadata in.
     #[inline(always)]
-    pub fn json_metadata_account(
+    pub fn metadata_account(
         &mut self,
-        json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+        metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.json_metadata_account = Some(json_metadata_account);
+        self.instruction.metadata_account = Some(metadata_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The authority paying and being removed.
     #[inline(always)]
-    pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-        self.instruction.payer = Some(payer);
+    pub fn authority(
+        &mut self,
+        authority: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.authority = Some(authority);
         self
     }
     /// System program
@@ -308,11 +281,6 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
         system_program: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
-        self
-    }
-    #[inline(always)]
-    pub fn authority(&mut self, authority: Pubkey) -> &mut Self {
-        self.instruction.authority = Some(authority);
         self
     }
     /// Add an additional account to the instruction.
@@ -356,28 +324,20 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = RemoveAuthorityInstructionArgs {
-            authority: self
-                .instruction
-                .authority
-                .clone()
-                .expect("authority is not set"),
-        };
         let instruction = RemoveAuthorityCpi {
             __program: self.instruction.__program,
 
-            json_metadata_account: self
+            metadata_account: self
                 .instruction
-                .json_metadata_account
-                .expect("json_metadata_account is not set"),
+                .metadata_account
+                .expect("metadata_account is not set"),
 
-            payer: self.instruction.payer.expect("payer is not set"),
+            authority: self.instruction.authority.expect("authority is not set"),
 
             system_program: self
                 .instruction
                 .system_program
                 .expect("system_program is not set"),
-            __args: args,
         };
         instruction.invoke_signed_with_remaining_accounts(
             signers_seeds,
@@ -388,10 +348,9 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
 
 struct RemoveAuthorityCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    json_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    authority: Option<Pubkey>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

@@ -9,7 +9,7 @@ use num_derive::FromPrimitive;
 use thiserror::Error;
 
 #[derive(Clone, Debug, Eq, Error, FromPrimitive, PartialEq)]
-pub enum MplJsonError {
+pub enum MplInscriptionError {
     /// 0 (0x0) - The account has already been initialized
     #[error("The account has already been initialized")]
     AlreadyInitialized,
@@ -31,9 +31,12 @@ pub enum MplJsonError {
     /// 6 (0x6) - The payer does not have authority to perform this action.
     #[error("The payer does not have authority to perform this action.")]
     InvalidAuthority,
+    /// 7 (0x7) - Numerical Overflow
+    #[error("Numerical Overflow")]
+    NumericalOverflow,
 }
 
-impl solana_program::program_error::PrintProgramError for MplJsonError {
+impl solana_program::program_error::PrintProgramError for MplInscriptionError {
     fn print<E>(&self) {
         solana_program::msg!(&self.to_string());
     }

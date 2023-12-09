@@ -17,7 +17,6 @@ import {
 import {
   Serializer,
   mapSerializer,
-  string,
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
@@ -28,11 +27,11 @@ import {
 } from '../shared';
 
 // Accounts.
-export type SetValueInstructionAccounts = {
+export type ClearDataInstructionAccounts = {
   /** The account to store the metadata in. */
-  jsonAccount: PublicKey | Pda;
-  /** The account to store the json account's metadata in. */
-  jsonMetadataAccount: PublicKey | Pda;
+  inscriptionAccount: PublicKey | Pda;
+  /** The account to store the inscription account's metadata in. */
+  metadataAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -40,55 +39,48 @@ export type SetValueInstructionAccounts = {
 };
 
 // Data.
-export type SetValueInstructionData = { discriminator: number; value: string };
+export type ClearDataInstructionData = { discriminator: number };
 
-export type SetValueInstructionDataArgs = { value: string };
+export type ClearDataInstructionDataArgs = {};
 
-export function getSetValueInstructionDataSerializer(): Serializer<
-  SetValueInstructionDataArgs,
-  SetValueInstructionData
+export function getClearDataInstructionDataSerializer(): Serializer<
+  ClearDataInstructionDataArgs,
+  ClearDataInstructionData
 > {
   return mapSerializer<
-    SetValueInstructionDataArgs,
+    ClearDataInstructionDataArgs,
     any,
-    SetValueInstructionData
+    ClearDataInstructionData
   >(
-    struct<SetValueInstructionData>(
-      [
-        ['discriminator', u8()],
-        ['value', string()],
-      ],
-      { description: 'SetValueInstructionData' }
-    ),
-    (value) => ({ ...value, discriminator: 2 })
-  ) as Serializer<SetValueInstructionDataArgs, SetValueInstructionData>;
+    struct<ClearDataInstructionData>([['discriminator', u8()]], {
+      description: 'ClearDataInstructionData',
+    }),
+    (value) => ({ ...value, discriminator: 3 })
+  ) as Serializer<ClearDataInstructionDataArgs, ClearDataInstructionData>;
 }
 
-// Args.
-export type SetValueInstructionArgs = SetValueInstructionDataArgs;
-
 // Instruction.
-export function setValue(
+export function clearData(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: SetValueInstructionAccounts & SetValueInstructionArgs
+  input: ClearDataInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'mplJson',
+    'mplInscription',
     'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
   );
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    jsonAccount: {
+    inscriptionAccount: {
       index: 0,
       isWritable: true,
-      value: input.jsonAccount ?? null,
+      value: input.inscriptionAccount ?? null,
     },
-    jsonMetadataAccount: {
+    metadataAccount: {
       index: 1,
       isWritable: true,
-      value: input.jsonMetadataAccount ?? null,
+      value: input.metadataAccount ?? null,
     },
     payer: { index: 2, isWritable: true, value: input.payer ?? null },
     systemProgram: {
@@ -97,9 +89,6 @@ export function setValue(
       value: input.systemProgram ?? null,
     },
   };
-
-  // Arguments.
-  const resolvedArgs: SetValueInstructionArgs = { ...input };
 
   // Default values.
   if (!resolvedAccounts.payer.value) {
@@ -126,9 +115,7 @@ export function setValue(
   );
 
   // Data.
-  const data = getSetValueInstructionDataSerializer().serialize(
-    resolvedArgs as SetValueInstructionDataArgs
-  );
+  const data = getClearDataInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

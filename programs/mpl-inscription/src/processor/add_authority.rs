@@ -6,9 +6,9 @@ use solana_program::{
 };
 
 use crate::{
-    error::MplJsonError,
+    error::MplInscriptionError,
     instruction::{accounts::AddAuthorityAccounts, AddAuthorityArgs},
-    state::JsonMetadata,
+    state::InscriptionMetadata,
 };
 
 pub(crate) fn process_add_authority<'a>(
@@ -18,41 +18,46 @@ pub(crate) fn process_add_authority<'a>(
     let ctx = &AddAuthorityAccounts::context(accounts)?;
 
     // Check that the account isn't already initialized.
-    if (ctx.accounts.json_metadata_account.owner != &crate::ID)
-        || ctx.accounts.json_metadata_account.data_is_empty()
+    if (ctx.accounts.metadata_account.owner != &crate::ID)
+        || ctx.accounts.metadata_account.data_is_empty()
     {
-        return Err(MplJsonError::NotInitialized.into());
+        return Err(MplInscriptionError::NotInitialized.into());
     }
-    let mut json_metadata =
-        JsonMetadata::try_from_slice(&ctx.accounts.json_metadata_account.data.borrow())?;
+    let mut inscription_metadata =
+        InscriptionMetadata::try_from_slice(&ctx.accounts.metadata_account.data.borrow())?;
 
     // The payer and authority must sign.
     assert_signer(ctx.accounts.payer)?;
-    if !json_metadata.authorities.contains(ctx.accounts.payer.key) {
-        return Err(MplJsonError::InvalidAuthority.into());
+    if !inscription_metadata
+        .update_authorities
+        .contains(ctx.accounts.payer.key)
+    {
+        return Err(MplInscriptionError::InvalidAuthority.into());
     }
 
     if ctx.accounts.system_program.key != &system_program::ID {
-        return Err(MplJsonError::InvalidSystemProgram.into());
+        return Err(MplInscriptionError::InvalidSystemProgram.into());
     }
 
     // Add the new authority.
-    json_metadata.authorities.push(args.new_authority);
+    inscription_metadata
+        .update_authorities
+        .push(args.new_authority);
 
-    // Write the updated JSON metadata account back to the account.
-    let serialized_data = json_metadata.try_to_vec()?;
+    // Write the updated inscription metadata account back to the account.
+    let serialized_data = inscription_metadata.try_to_vec()?;
 
     // Resize the account to fit the new authority.
     resize_or_reallocate_account_raw(
-        ctx.accounts.json_metadata_account,
+        ctx.accounts.metadata_account,
         ctx.accounts.payer,
         ctx.accounts.system_program,
         serialized_data.len(),
     )?;
 
-    // Write the JSON metadata to the JSON metadata account.
+    // Write the inscription metadata to the metadata account.
     sol_memcpy(
-        &mut ctx.accounts.json_metadata_account.try_borrow_mut_data()?,
+        &mut ctx.accounts.metadata_account.try_borrow_mut_data()?,
         &serialized_data,
         serialized_data.len(),
     );

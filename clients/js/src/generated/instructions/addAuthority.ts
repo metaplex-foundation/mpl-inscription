@@ -30,7 +30,7 @@ import {
 // Accounts.
 export type AddAuthorityInstructionAccounts = {
   /** The account to store the metadata's metadata in. */
-  jsonMetadataAccount: PublicKey | Pda;
+  metadataAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -75,16 +75,16 @@ export function addAuthority(
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'mplJson',
+    'mplInscription',
     'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
   );
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    jsonMetadataAccount: {
+    metadataAccount: {
       index: 0,
       isWritable: true,
-      value: input.jsonMetadataAccount ?? null,
+      value: input.metadataAccount ?? null,
     },
     payer: { index: 1, isWritable: true, value: input.payer ?? null },
     systemProgram: {

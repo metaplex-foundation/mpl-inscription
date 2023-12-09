@@ -12,20 +12,23 @@ import {
   Program,
   PublicKey,
 } from '@metaplex-foundation/umi';
-import { getMplJsonErrorFromCode, getMplJsonErrorFromName } from '../errors';
+import {
+  getMplInscriptionErrorFromCode,
+  getMplInscriptionErrorFromName,
+} from '../errors';
 
-export const MPL_JSON_PROGRAM_ID =
+export const MPL_INSCRIPTION_PROGRAM_ID =
   'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa' as PublicKey<'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'>;
 
-export function createMplJsonProgram(): Program {
+export function createMplInscriptionProgram(): Program {
   return {
-    name: 'mplJson',
-    publicKey: MPL_JSON_PROGRAM_ID,
+    name: 'mplInscription',
+    publicKey: MPL_INSCRIPTION_PROGRAM_ID,
     getErrorFromCode(code: number, cause?: Error) {
-      return getMplJsonErrorFromCode(code, this, cause);
+      return getMplInscriptionErrorFromCode(code, this, cause);
     },
     getErrorFromName(name: string, cause?: Error) {
-      return getMplJsonErrorFromName(name, this, cause);
+      return getMplInscriptionErrorFromName(name, this, cause);
     },
     isOnCluster() {
       return true;
@@ -33,20 +36,20 @@ export function createMplJsonProgram(): Program {
   };
 }
 
-export function getMplJsonProgram<T extends Program = Program>(
+export function getMplInscriptionProgram<T extends Program = Program>(
   context: Pick<Context, 'programs'>,
   clusterFilter?: ClusterFilter
 ): T {
-  return context.programs.get<T>('mplJson', clusterFilter);
+  return context.programs.get<T>('mplInscription', clusterFilter);
 }
 
-export function getMplJsonProgramId(
+export function getMplInscriptionProgramId(
   context: Pick<Context, 'programs'>,
   clusterFilter?: ClusterFilter
 ): PublicKey {
   return context.programs.getPublicKey(
-    'mplJson',
-    MPL_JSON_PROGRAM_ID,
+    'mplInscription',
+    MPL_INSCRIPTION_PROGRAM_ID,
     clusterFilter
   );
 }

@@ -3,7 +3,7 @@ use solana_program::{
     program_error::PrintProgramError, pubkey::Pubkey,
 };
 
-use crate::{error::MplJsonError, processor};
+use crate::{error::MplInscriptionError, processor};
 
 entrypoint!(process_instruction);
 fn process_instruction<'a>(
@@ -15,7 +15,7 @@ fn process_instruction<'a>(
         processor::Processor::process_instruction(program_id, accounts, instruction_data)
     {
         // catch the error so we can print it
-        error.print::<MplJsonError>();
+        error.print::<MplInscriptionError>();
         return Err(error);
     }
     Ok(())

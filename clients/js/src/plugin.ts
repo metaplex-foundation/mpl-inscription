@@ -1,8 +1,8 @@
 import { UmiPlugin } from '@metaplex-foundation/umi';
-import { createMplJsonProgram } from './generated';
+import { createMplInscriptionProgram } from './generated';
 
-export const mplJson = (): UmiPlugin => ({
+export const MplInscription = (): UmiPlugin => ({
   install(umi) {
-    umi.programs.add(createMplJsonProgram(), false);
+    umi.programs.add(createMplInscriptionProgram(), false);
   },
 });

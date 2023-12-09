@@ -2,7 +2,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use shank::ShankAccount;
 use solana_program::pubkey::Pubkey;
 
-pub const PREFIX: &str = "JSON";
+pub const PREFIX: &str = "Inscription";
 
 pub const INITIAL_SIZE: usize = 1024;
 
@@ -10,14 +10,14 @@ pub const INITIAL_SIZE: usize = 1024;
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub enum Key {
     Uninitialized,
-    JsonMetadataAccount,
+    InscriptionMetadataAccount,
 }
 
 #[repr(C)]
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug, ShankAccount)]
-pub struct JsonMetadata {
+pub struct InscriptionMetadata {
     pub key: Key,
     pub bump: u8,
-    pub mutable: bool,
-    pub authorities: Vec<Pubkey>,
+    pub inscription_number: Option<u64>,
+    pub update_authorities: Vec<Pubkey>,
 }

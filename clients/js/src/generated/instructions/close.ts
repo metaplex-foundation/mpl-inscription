@@ -29,9 +29,9 @@ import {
 // Accounts.
 export type CloseInstructionAccounts = {
   /** The account to store the metadata in. */
-  jsonAccount: PublicKey | Pda;
-  /** The account to store the json account's metadata in. */
-  jsonMetadataAccount: PublicKey | Pda;
+  inscriptionAccount: PublicKey | Pda;
+  /** The account to store the inscription account's metadata in. */
+  metadataAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -62,21 +62,21 @@ export function close(
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'mplJson',
+    'mplInscription',
     'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
   );
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    jsonAccount: {
+    inscriptionAccount: {
       index: 0,
       isWritable: true,
-      value: input.jsonAccount ?? null,
+      value: input.inscriptionAccount ?? null,
     },
-    jsonMetadataAccount: {
+    metadataAccount: {
       index: 1,
       isWritable: true,
-      value: input.jsonMetadataAccount ?? null,
+      value: input.metadataAccount ?? null,
     },
     payer: { index: 2, isWritable: true, value: input.payer ?? null },
     systemProgram: {

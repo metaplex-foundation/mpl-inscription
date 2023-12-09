@@ -1,36 +1,36 @@
 import { generateSigner } from '@metaplex-foundation/umi';
 import test from 'ava';
-import { JsonMetadata, Key, MPL_JSON_PROGRAM_ID, fetchJsonMetadata, findJsonMetadataPda, initialize } from '../src';
+import { InscriptionMetadata, Key, MPL_INSCRIPTION_PROGRAM_ID, fetchInscriptionMetadata, findInscriptionMetadataPda, initialize } from '../src';
 import { createUmi } from './_setup';
 
 test('it can create initialize a JSON account', async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
-  const jsonAccount = generateSigner(umi);
+  const inscriptionAccount = generateSigner(umi);
 
-  const jsonMetadataAccount = await findJsonMetadataPda(umi, {jsonAccount: jsonAccount.publicKey});
+  const metadataAccount = await findInscriptionMetadataPda(umi, {inscriptionAccount: inscriptionAccount.publicKey});
 
   // When we create a new account.
   await initialize(umi, {
-    jsonAccount,
-    jsonMetadataAccount,
+    inscriptionAccount,
+    metadataAccount,
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.
-  const jsonMetadata = await fetchJsonMetadata(umi, jsonMetadataAccount);
+  const jsonMetadata = await fetchInscriptionMetadata(umi, metadataAccount);
   console.log(jsonMetadata);
-  t.like(jsonMetadata, <JsonMetadata>{
-    key: Key.JsonMetadataAccount,
-    bump: jsonMetadataAccount[1],
-    authorities: [umi.identity.publicKey],
+  t.like(jsonMetadata, <InscriptionMetadata>{
+    key: Key.InscriptionMetadataAccount,
+    bump: metadataAccount[1],
+    updateAuthorities: [umi.identity.publicKey],
   });
 
-  const jsonData = await umi.rpc.getAccount(jsonAccount.publicKey);
+  const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
   if (jsonData.exists) {
     console.log(jsonData);
     t.like(jsonData, {
-      owner: MPL_JSON_PROGRAM_ID,
-      data: Uint8Array.from([0, 0, 0, 0]),
+      owner: MPL_INSCRIPTION_PROGRAM_ID,
+      data: Uint8Array.from([]),
     });
   }
 });

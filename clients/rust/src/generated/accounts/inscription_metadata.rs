@@ -12,37 +12,37 @@ use solana_program::pubkey::Pubkey;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct JsonMetadata {
+pub struct InscriptionMetadata {
     pub key: Key,
     pub bump: u8,
-    pub mutable: bool,
-    pub authorities: Vec<Pubkey>,
+    pub inscription_number: Option<u64>,
+    pub update_authorities: Vec<Pubkey>,
 }
 
-impl JsonMetadata {
+impl InscriptionMetadata {
     pub fn create_pda(
-        json_account: Pubkey,
+        inscription_account: Pubkey,
         bump: u8,
     ) -> Result<solana_program::pubkey::Pubkey, solana_program::pubkey::PubkeyError> {
         solana_program::pubkey::Pubkey::create_program_address(
             &[
-                "JSON".as_bytes(),
-                crate::MPL_JSON_ID.as_ref(),
-                json_account.as_ref(),
+                "Inscription".as_bytes(),
+                crate::MPL_INSCRIPTION_ID.as_ref(),
+                inscription_account.as_ref(),
                 &[bump],
             ],
-            &crate::MPL_JSON_ID,
+            &crate::MPL_INSCRIPTION_ID,
         )
     }
 
-    pub fn find_pda(json_account: &Pubkey) -> (solana_program::pubkey::Pubkey, u8) {
+    pub fn find_pda(inscription_account: &Pubkey) -> (solana_program::pubkey::Pubkey, u8) {
         solana_program::pubkey::Pubkey::find_program_address(
             &[
-                "JSON".as_bytes(),
-                crate::MPL_JSON_ID.as_ref(),
-                json_account.as_ref(),
+                "Inscription".as_bytes(),
+                crate::MPL_INSCRIPTION_ID.as_ref(),
+                inscription_account.as_ref(),
             ],
-            &crate::MPL_JSON_ID,
+            &crate::MPL_INSCRIPTION_ID,
         )
     }
 
@@ -53,7 +53,7 @@ impl JsonMetadata {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for JsonMetadata {
+impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for InscriptionMetadata {
     type Error = std::io::Error;
 
     fn try_from(

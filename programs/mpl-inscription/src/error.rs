@@ -7,7 +7,7 @@ use solana_program::{
 use thiserror::Error;
 
 #[derive(Error, Clone, Debug, Eq, PartialEq, FromPrimitive)]
-pub enum MplJsonError {
+pub enum MplInscriptionError {
     /// 0 - The account passed in was already initialized.
     #[error("The account has already been initialized")]
     AlreadyInitialized,
@@ -35,21 +35,25 @@ pub enum MplJsonError {
     /// 6 - The payer does not have authority to perform this action.
     #[error("The payer does not have authority to perform this action.")]
     InvalidAuthority,
+
+    /// 7 - Numerical Overflow
+    #[error("Numerical Overflow")]
+    NumericalOverflow,
 }
 
-impl PrintProgramError for MplJsonError {
+impl PrintProgramError for MplInscriptionError {
     fn print<E>(&self) {
         msg!(&self.to_string());
     }
 }
 
-impl From<MplJsonError> for ProgramError {
-    fn from(e: MplJsonError) -> Self {
+impl From<MplInscriptionError> for ProgramError {
+    fn from(e: MplInscriptionError) -> Self {
         ProgramError::Custom(e as u32)
     }
 }
 
-impl<T> DecodeError<T> for MplJsonError {
+impl<T> DecodeError<T> for MplInscriptionError {
     fn type_of() -> &'static str {
         "Mpl Json Error"
     }

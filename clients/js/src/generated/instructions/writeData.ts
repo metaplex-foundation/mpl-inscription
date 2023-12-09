@@ -16,9 +16,10 @@ import {
 } from '@metaplex-foundation/umi';
 import {
   Serializer,
+  bytes,
   mapSerializer,
-  string,
   struct,
+  u32,
   u8,
 } from '@metaplex-foundation/umi/serializers';
 import {
@@ -28,11 +29,11 @@ import {
 } from '../shared';
 
 // Accounts.
-export type AppendValueInstructionAccounts = {
+export type WriteDataInstructionAccounts = {
   /** The account to store the metadata in. */
-  jsonAccount: PublicKey | Pda;
-  /** The account to store the json account's metadata in. */
-  jsonMetadataAccount: PublicKey | Pda;
+  inscriptionAccount: PublicKey | Pda;
+  /** The account to store the inscription account's metadata in. */
+  metadataAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -40,58 +41,58 @@ export type AppendValueInstructionAccounts = {
 };
 
 // Data.
-export type AppendValueInstructionData = {
+export type WriteDataInstructionData = {
   discriminator: number;
-  value: string;
+  value: Uint8Array;
 };
 
-export type AppendValueInstructionDataArgs = { value: string };
+export type WriteDataInstructionDataArgs = { value: Uint8Array };
 
-export function getAppendValueInstructionDataSerializer(): Serializer<
-  AppendValueInstructionDataArgs,
-  AppendValueInstructionData
+export function getWriteDataInstructionDataSerializer(): Serializer<
+  WriteDataInstructionDataArgs,
+  WriteDataInstructionData
 > {
   return mapSerializer<
-    AppendValueInstructionDataArgs,
+    WriteDataInstructionDataArgs,
     any,
-    AppendValueInstructionData
+    WriteDataInstructionData
   >(
-    struct<AppendValueInstructionData>(
+    struct<WriteDataInstructionData>(
       [
         ['discriminator', u8()],
-        ['value', string()],
+        ['value', bytes({ size: u32() })],
       ],
-      { description: 'AppendValueInstructionData' }
+      { description: 'WriteDataInstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 3 })
-  ) as Serializer<AppendValueInstructionDataArgs, AppendValueInstructionData>;
+    (value) => ({ ...value, discriminator: 2 })
+  ) as Serializer<WriteDataInstructionDataArgs, WriteDataInstructionData>;
 }
 
 // Args.
-export type AppendValueInstructionArgs = AppendValueInstructionDataArgs;
+export type WriteDataInstructionArgs = WriteDataInstructionDataArgs;
 
 // Instruction.
-export function appendValue(
+export function writeData(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: AppendValueInstructionAccounts & AppendValueInstructionArgs
+  input: WriteDataInstructionAccounts & WriteDataInstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'mplJson',
+    'mplInscription',
     'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
   );
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    jsonAccount: {
+    inscriptionAccount: {
       index: 0,
       isWritable: true,
-      value: input.jsonAccount ?? null,
+      value: input.inscriptionAccount ?? null,
     },
-    jsonMetadataAccount: {
+    metadataAccount: {
       index: 1,
       isWritable: true,
-      value: input.jsonMetadataAccount ?? null,
+      value: input.metadataAccount ?? null,
     },
     payer: { index: 2, isWritable: true, value: input.payer ?? null },
     systemProgram: {
@@ -102,7 +103,7 @@ export function appendValue(
   };
 
   // Arguments.
-  const resolvedArgs: AppendValueInstructionArgs = { ...input };
+  const resolvedArgs: WriteDataInstructionArgs = { ...input };
 
   // Default values.
   if (!resolvedAccounts.payer.value) {
@@ -129,8 +130,8 @@ export function appendValue(
   );
 
   // Data.
-  const data = getAppendValueInstructionDataSerializer().serialize(
-    resolvedArgs as AppendValueInstructionDataArgs
+  const data = getWriteDataInstructionDataSerializer().serialize(
+    resolvedArgs as WriteDataInstructionDataArgs
   );
 
   // Bytes Created On Chain.

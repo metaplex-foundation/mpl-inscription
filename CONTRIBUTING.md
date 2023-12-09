@@ -1,6 +1,6 @@
-# Contributing to Mpl Json
+# Contributing to Mpl Inscription
 
-This is a quick guide to help you contribute to Mpl Json.
+This is a quick guide to help you contribute to Mpl Inscription.
 
 ## Getting started
 

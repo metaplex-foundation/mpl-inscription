@@ -5,6 +5,6 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
-pub(crate) mod json_metadata;
+pub(crate) mod inscription_metadata;
 
-pub use self::json_metadata::*;
+pub use self::inscription_metadata::*;

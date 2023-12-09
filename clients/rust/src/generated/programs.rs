@@ -7,5 +7,5 @@
 
 use solana_program::{pubkey, pubkey::Pubkey};
 
-/// `mpl_json` program ID.
-pub const MPL_JSON_ID: Pubkey = pubkey!("JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa");
+/// `mpl_inscription` program ID.
+pub const MPL_INSCRIPTION_ID: Pubkey = pubkey!("JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa");

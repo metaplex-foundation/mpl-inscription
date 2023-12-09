@@ -5,6 +5,6 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
-pub(crate) mod mpl_json;
+pub(crate) mod mpl_inscription;
 
-pub use self::mpl_json::MplJsonError;
+pub use self::mpl_inscription::MplInscriptionError;

@@ -11,9 +11,9 @@ use borsh::BorshSerialize;
 /// Accounts.
 pub struct Close {
     /// The account to store the metadata in.
-    pub json_account: solana_program::pubkey::Pubkey,
-    /// The account to store the json account's metadata in.
-    pub json_metadata_account: solana_program::pubkey::Pubkey,
+    pub inscription_account: solana_program::pubkey::Pubkey,
+    /// The account to store the inscription account's metadata in.
+    pub metadata_account: solana_program::pubkey::Pubkey,
     /// The account that will pay for the transaction and rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// System program
@@ -31,11 +31,11 @@ impl Close {
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.json_account,
+            self.inscription_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.json_metadata_account,
+            self.metadata_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -49,7 +49,7 @@ impl Close {
         let data = CloseInstructionData::new().try_to_vec().unwrap();
 
         solana_program::instruction::Instruction {
-            program_id: crate::MPL_JSON_ID,
+            program_id: crate::MPL_INSCRIPTION_ID,
             accounts,
             data,
         }
@@ -70,8 +70,8 @@ impl CloseInstructionData {
 /// Instruction builder.
 #[derive(Default)]
 pub struct CloseBuilder {
-    json_account: Option<solana_program::pubkey::Pubkey>,
-    json_metadata_account: Option<solana_program::pubkey::Pubkey>,
+    inscription_account: Option<solana_program::pubkey::Pubkey>,
+    metadata_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -83,17 +83,20 @@ impl CloseBuilder {
     }
     /// The account to store the metadata in.
     #[inline(always)]
-    pub fn json_account(&mut self, json_account: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.json_account = Some(json_account);
+    pub fn inscription_account(
+        &mut self,
+        inscription_account: solana_program::pubkey::Pubkey,
+    ) -> &mut Self {
+        self.inscription_account = Some(inscription_account);
         self
     }
-    /// The account to store the json account's metadata in.
+    /// The account to store the inscription account's metadata in.
     #[inline(always)]
-    pub fn json_metadata_account(
+    pub fn metadata_account(
         &mut self,
-        json_metadata_account: solana_program::pubkey::Pubkey,
+        metadata_account: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
-        self.json_metadata_account = Some(json_metadata_account);
+        self.metadata_account = Some(metadata_account);
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -130,10 +133,10 @@ impl CloseBuilder {
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = Close {
-            json_account: self.json_account.expect("json_account is not set"),
-            json_metadata_account: self
-                .json_metadata_account
-                .expect("json_metadata_account is not set"),
+            inscription_account: self
+                .inscription_account
+                .expect("inscription_account is not set"),
+            metadata_account: self.metadata_account.expect("metadata_account is not set"),
             payer: self.payer.expect("payer is not set"),
             system_program: self
                 .system_program
@@ -147,9 +150,9 @@ impl CloseBuilder {
 /// `close` CPI accounts.
 pub struct CloseCpiAccounts<'a, 'b> {
     /// The account to store the metadata in.
-    pub json_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account to store the json account's metadata in.
-    pub json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account to store the inscription account's metadata in.
+    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
@@ -161,9 +164,9 @@ pub struct CloseCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the metadata in.
-    pub json_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account to store the json account's metadata in.
-    pub json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account to store the inscription account's metadata in.
+    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
@@ -177,8 +180,8 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
     ) -> Self {
         Self {
             __program: program,
-            json_account: accounts.json_account,
-            json_metadata_account: accounts.json_metadata_account,
+            inscription_account: accounts.inscription_account,
+            metadata_account: accounts.metadata_account,
             payer: accounts.payer,
             system_program: accounts.system_program,
         }
@@ -218,11 +221,11 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
     ) -> solana_program::entrypoint::ProgramResult {
         let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.json_account.key,
+            *self.inscription_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.json_metadata_account.key,
+            *self.metadata_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -243,14 +246,14 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
         let data = CloseInstructionData::new().try_to_vec().unwrap();
 
         let instruction = solana_program::instruction::Instruction {
-            program_id: crate::MPL_JSON_ID,
+            program_id: crate::MPL_INSCRIPTION_ID,
             accounts,
             data,
         };
         let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.json_account.clone());
-        account_infos.push(self.json_metadata_account.clone());
+        account_infos.push(self.inscription_account.clone());
+        account_infos.push(self.metadata_account.clone());
         account_infos.push(self.payer.clone());
         account_infos.push(self.system_program.clone());
         remaining_accounts
@@ -274,8 +277,8 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(CloseCpiBuilderInstruction {
             __program: program,
-            json_account: None,
-            json_metadata_account: None,
+            inscription_account: None,
+            metadata_account: None,
             payer: None,
             system_program: None,
             __remaining_accounts: Vec::new(),
@@ -284,20 +287,20 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
     }
     /// The account to store the metadata in.
     #[inline(always)]
-    pub fn json_account(
+    pub fn inscription_account(
         &mut self,
-        json_account: &'b solana_program::account_info::AccountInfo<'a>,
+        inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.json_account = Some(json_account);
+        self.instruction.inscription_account = Some(inscription_account);
         self
     }
-    /// The account to store the json account's metadata in.
+    /// The account to store the inscription account's metadata in.
     #[inline(always)]
-    pub fn json_metadata_account(
+    pub fn metadata_account(
         &mut self,
-        json_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+        metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.json_metadata_account = Some(json_metadata_account);
+        self.instruction.metadata_account = Some(metadata_account);
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -359,15 +362,15 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
         let instruction = CloseCpi {
             __program: self.instruction.__program,
 
-            json_account: self
+            inscription_account: self
                 .instruction
-                .json_account
-                .expect("json_account is not set"),
+                .inscription_account
+                .expect("inscription_account is not set"),
 
-            json_metadata_account: self
+            metadata_account: self
                 .instruction
-                .json_metadata_account
-                .expect("json_metadata_account is not set"),
+                .metadata_account
+                .expect("metadata_account is not set"),
 
             payer: self.instruction.payer.expect("payer is not set"),
 
@@ -385,8 +388,8 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
 
 struct CloseCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    json_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    json_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

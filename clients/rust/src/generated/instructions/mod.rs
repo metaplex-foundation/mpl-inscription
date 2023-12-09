@@ -6,15 +6,15 @@
 //!
 
 pub(crate) mod add_authority;
-pub(crate) mod append_value;
+pub(crate) mod clear_data;
 pub(crate) mod close;
 pub(crate) mod initialize;
 pub(crate) mod remove_authority;
-pub(crate) mod set_value;
+pub(crate) mod write_data;
 
 pub use self::add_authority::*;
-pub use self::append_value::*;
+pub use self::clear_data::*;
 pub use self::close::*;
 pub use self::initialize::*;
 pub use self::remove_authority::*;
-pub use self::set_value::*;
+pub use self::write_data::*;

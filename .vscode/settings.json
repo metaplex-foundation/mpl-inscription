@@ -1,5 +1,5 @@
 {
     "rust-analyzer.linkedProjects": [
-        "./programs/mpl-json/Cargo.toml",
+        "./programs/mpl-inscription/Cargo.toml",
     ]
 }

@@ -17,7 +17,6 @@ import {
 import {
   Serializer,
   mapSerializer,
-  publicKey as publicKeySerializer,
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
@@ -30,20 +29,17 @@ import {
 // Accounts.
 export type RemoveAuthorityInstructionAccounts = {
   /** The account to store the metadata's metadata in. */
-  jsonMetadataAccount: PublicKey | Pda;
-  /** The account that will pay for the transaction and rent. */
-  payer?: Signer;
+  metadataAccount: PublicKey | Pda;
+  /** The authority paying and being removed. */
+  authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
 };
 
 // Data.
-export type RemoveAuthorityInstructionData = {
-  discriminator: number;
-  authority: PublicKey;
-};
+export type RemoveAuthorityInstructionData = { discriminator: number };
 
-export type RemoveAuthorityInstructionDataArgs = { authority: PublicKey };
+export type RemoveAuthorityInstructionDataArgs = {};
 
 export function getRemoveAuthorityInstructionDataSerializer(): Serializer<
   RemoveAuthorityInstructionDataArgs,
@@ -54,13 +50,9 @@ export function getRemoveAuthorityInstructionDataSerializer(): Serializer<
     any,
     RemoveAuthorityInstructionData
   >(
-    struct<RemoveAuthorityInstructionData>(
-      [
-        ['discriminator', u8()],
-        ['authority', publicKeySerializer()],
-      ],
-      { description: 'RemoveAuthorityInstructionData' }
-    ),
+    struct<RemoveAuthorityInstructionData>([['discriminator', u8()]], {
+      description: 'RemoveAuthorityInstructionData',
+    }),
     (value) => ({ ...value, discriminator: 5 })
   ) as Serializer<
     RemoveAuthorityInstructionDataArgs,
@@ -68,28 +60,25 @@ export function getRemoveAuthorityInstructionDataSerializer(): Serializer<
   >;
 }
 
-// Args.
-export type RemoveAuthorityInstructionArgs = RemoveAuthorityInstructionDataArgs;
-
 // Instruction.
 export function removeAuthority(
-  context: Pick<Context, 'payer' | 'programs'>,
-  input: RemoveAuthorityInstructionAccounts & RemoveAuthorityInstructionArgs
+  context: Pick<Context, 'identity' | 'programs'>,
+  input: RemoveAuthorityInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'mplJson',
+    'mplInscription',
     'JSoNoHBzUEFnjpZtcNcNzv5KLzo4tD5v4Z1pT9G4jJa'
   );
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    jsonMetadataAccount: {
+    metadataAccount: {
       index: 0,
       isWritable: true,
-      value: input.jsonMetadataAccount ?? null,
+      value: input.metadataAccount ?? null,
     },
-    payer: { index: 1, isWritable: true, value: input.payer ?? null },
+    authority: { index: 1, isWritable: true, value: input.authority ?? null },
     systemProgram: {
       index: 2,
       isWritable: false,
@@ -97,12 +86,9 @@ export function removeAuthority(
     },
   };
 
-  // Arguments.
-  const resolvedArgs: RemoveAuthorityInstructionArgs = { ...input };
-
   // Default values.
-  if (!resolvedAccounts.payer.value) {
-    resolvedAccounts.payer.value = context.payer;
+  if (!resolvedAccounts.authority.value) {
+    resolvedAccounts.authority.value = context.identity;
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
@@ -125,9 +111,7 @@ export function removeAuthority(
   );
 
   // Data.
-  const data = getRemoveAuthorityInstructionDataSerializer().serialize(
-    resolvedArgs as RemoveAuthorityInstructionDataArgs
-  );
+  const data = getRemoveAuthorityInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

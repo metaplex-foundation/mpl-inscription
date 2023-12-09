@@ -7,8 +7,8 @@
  */
 
 export * from './addAuthority';
-export * from './appendValue';
+export * from './clearData';
 export * from './close';
 export * from './initialize';
 export * from './removeAuthority';
-export * from './setValue';
+export * from './writeData';

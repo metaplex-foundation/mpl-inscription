@@ -1,20 +1,20 @@
-use crate::instruction::MplJsonInstruction;
+use crate::instruction::MplInscriptionInstruction;
 use borsh::BorshDeserialize;
 use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, msg, pubkey::Pubkey};
 
 mod add_authority;
-mod append_value;
+mod clear_data;
 mod close;
 mod initialize;
 mod remove_authority;
-mod set_value;
+mod write_data;
 
 use add_authority::*;
-use append_value::*;
+use clear_data::*;
 use close::*;
 use initialize::*;
 use remove_authority::*;
-use set_value::*;
+use write_data::*;
 
 pub struct Processor;
 impl Processor {
@@ -23,31 +23,32 @@ impl Processor {
         accounts: &'a [AccountInfo<'a>],
         instruction_data: &[u8],
     ) -> ProgramResult {
-        let instruction: MplJsonInstruction = MplJsonInstruction::try_from_slice(instruction_data)?;
+        let instruction: MplInscriptionInstruction =
+            MplInscriptionInstruction::try_from_slice(instruction_data)?;
         match instruction {
-            MplJsonInstruction::Initialize => {
+            MplInscriptionInstruction::Initialize => {
                 msg!("Instruction: Initialize");
                 process_initialize(accounts)
             }
-            MplJsonInstruction::Close => {
+            MplInscriptionInstruction::Close => {
                 msg!("Instruction: Close");
                 process_close(accounts)
             }
-            MplJsonInstruction::SetValue(args) => {
-                msg!("Instruction: SetValue");
-                process_set_value(accounts, args)
+            MplInscriptionInstruction::WriteData(args) => {
+                msg!("Instruction: WriteData");
+                process_write_data(accounts, args)
             }
-            MplJsonInstruction::AppendValue(args) => {
-                msg!("Instruction: AppendValue");
-                process_append_value(accounts, args)
+            MplInscriptionInstruction::ClearData => {
+                msg!("Instruction: ClearData");
+                process_clear_data(accounts)
             }
-            MplJsonInstruction::AddAuthority(args) => {
+            MplInscriptionInstruction::AddAuthority(args) => {
                 msg!("Instruction: AddAuthority");
                 process_add_authority(accounts, args)
             }
-            MplJsonInstruction::RemoveAuthority(args) => {
+            MplInscriptionInstruction::RemoveAuthority => {
                 msg!("Instruction: RemoveAuthority");
-                process_remove_authority(accounts, args)
+                process_remove_authority(accounts)
             }
         }
     }

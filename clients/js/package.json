@@ -1,7 +1,7 @@
 {
-  "name": "@metaplex-foundation/mpl-json",
+  "name": "@metaplex-foundation/mpl-inscription",
   "version": "0.1.0",
-  "description": "A simple program for writing JSON bytes on chain.",
+  "description": "A simple program for inscribing bytes on chain.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {

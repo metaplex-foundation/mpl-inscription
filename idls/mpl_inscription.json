@@ -1,12 +1,12 @@
 {
   "version": "0.1.0",
-  "name": "mpl_json",
+  "name": "mpl_inscription",
   "instructions": [
     {
       "name": "Initialize",
       "accounts": [
         {
-          "name": "jsonAccount",
+          "name": "inscriptionAccount",
           "isMut": true,
           "isSigner": true,
           "docs": [
@@ -14,11 +14,11 @@
           ]
         },
         {
-          "name": "jsonMetadataAccount",
+          "name": "metadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The account to store the json account's metadata in."
+            "The account to store the inscription account's metadata in."
           ]
         },
         {
@@ -48,7 +48,7 @@
       "name": "Close",
       "accounts": [
         {
-          "name": "jsonAccount",
+          "name": "inscriptionAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -56,11 +56,11 @@
           ]
         },
         {
-          "name": "jsonMetadataAccount",
+          "name": "metadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The account to store the json account's metadata in."
+            "The account to store the inscription account's metadata in."
           ]
         },
         {
@@ -87,10 +87,10 @@
       }
     },
     {
-      "name": "SetValue",
+      "name": "WriteData",
       "accounts": [
         {
-          "name": "jsonAccount",
+          "name": "inscriptionAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -98,11 +98,11 @@
           ]
         },
         {
-          "name": "jsonMetadataAccount",
+          "name": "metadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The account to store the json account's metadata in."
+            "The account to store the inscription account's metadata in."
           ]
         },
         {
@@ -124,9 +124,9 @@
       ],
       "args": [
         {
-          "name": "setValueArgs",
+          "name": "writeDataArgs",
           "type": {
-            "defined": "SetValueArgs"
+            "defined": "WriteDataArgs"
           }
         }
       ],
@@ -136,10 +136,10 @@
       }
     },
     {
-      "name": "AppendValue",
+      "name": "ClearData",
       "accounts": [
         {
-          "name": "jsonAccount",
+          "name": "inscriptionAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -147,11 +147,11 @@
           ]
         },
         {
-          "name": "jsonMetadataAccount",
+          "name": "metadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The account to store the json account's metadata in."
+            "The account to store the inscription account's metadata in."
           ]
         },
         {
@@ -171,14 +171,7 @@
           ]
         }
       ],
-      "args": [
-        {
-          "name": "appendValueArgs",
-          "type": {
-            "defined": "AppendValueArgs"
-          }
-        }
-      ],
+      "args": [],
       "discriminant": {
         "type": "u8",
         "value": 3
@@ -188,7 +181,7 @@
       "name": "AddAuthority",
       "accounts": [
         {
-          "name": "jsonMetadataAccount",
+          "name": "metadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -229,7 +222,7 @@
       "name": "RemoveAuthority",
       "accounts": [
         {
-          "name": "jsonMetadataAccount",
+          "name": "metadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -237,11 +230,11 @@
           ]
         },
         {
-          "name": "payer",
+          "name": "authority",
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The authority paying and being removed."
           ]
         },
         {
@@ -253,14 +246,7 @@
           ]
         }
       ],
-      "args": [
-        {
-          "name": "removeAuthorityArgs",
-          "type": {
-            "defined": "RemoveAuthorityArgs"
-          }
-        }
-      ],
+      "args": [],
       "discriminant": {
         "type": "u8",
         "value": 5
@@ -269,7 +255,7 @@
   ],
   "accounts": [
     {
-      "name": "JsonMetadata",
+      "name": "InscriptionMetadata",
       "type": {
         "kind": "struct",
         "fields": [
@@ -284,11 +270,13 @@
             "type": "u8"
           },
           {
-            "name": "mutable",
-            "type": "bool"
+            "name": "inscriptionNumber",
+            "type": {
+              "option": "u64"
+            }
           },
           {
-            "name": "authorities",
+            "name": "updateAuthorities",
             "type": {
               "vec": "publicKey"
             }
@@ -299,25 +287,13 @@
   ],
   "types": [
     {
-      "name": "SetValueArgs",
+      "name": "WriteDataArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "value",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AppendValueArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "value",
-            "type": "string"
+            "type": "bytes"
           }
         ]
       }
@@ -335,18 +311,6 @@
       }
     },
     {
-      "name": "RemoveAuthorityArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
       "name": "Key",
       "type": {
         "kind": "enum",
@@ -355,7 +319,7 @@
             "name": "Uninitialized"
           },
           {
-            "name": "JsonMetadataAccount"
+            "name": "InscriptionMetadataAccount"
           }
         ]
       }
@@ -396,6 +360,11 @@
       "code": 6,
       "name": "InvalidAuthority",
       "msg": "The payer does not have authority to perform this action."
+    },
+    {
+      "code": 7,
+      "name": "NumericalOverflow",
+      "msg": "Numerical Overflow"
     }
   ],
   "metadata": {
