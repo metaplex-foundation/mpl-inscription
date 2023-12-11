@@ -1,5 +1,5 @@
 use borsh::{BorshDeserialize, BorshSerialize};
-use mpl_token_metadata::{accounts::Metadata, types::TokenStandard};
+use mpl_token_metadata::accounts::Metadata;
 use mpl_utils::{
     assert_derivation, assert_initialized, assert_owned_by, assert_signer,
     create_or_allocate_account_raw,
@@ -60,19 +60,6 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         return Err(MplInscriptionError::MintMismatch.into());
     }
 
-    let token_standard = token_metadata
-        .token_standard
-        .ok_or(MplInscriptionError::InvalidTokenStandard)?;
-    if !matches!(
-        token_standard,
-        TokenStandard::NonFungible
-            | TokenStandard::NonFungibleEdition
-            | TokenStandard::ProgrammableNonFungible
-            | TokenStandard::ProgrammableNonFungibleEdition
-    ) {
-        return Err(MplInscriptionError::InvalidTokenStandard.into());
-    }
-
     let token_account: spl_token::state::Account = assert_initialized(
         ctx.accounts.token_account,
         MplInscriptionError::BorshDeserializeError,
@@ -88,6 +75,10 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
 
     if token_account.mint != token_metadata.mint {
         return Err(MplInscriptionError::MintMismatch.into());
+    }
+
+    if token_metadata.update_authority != *ctx.accounts.payer.key {
+        return Err(MplInscriptionError::InvalidAuthority.into());
     }
 
     // Verify that the derived address is correct for the metadata account.
@@ -136,17 +127,12 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         ],
     )?;
 
-    let mut update_authorities = vec![token_metadata.update_authority];
-    if token_metadata.update_authority != *ctx.accounts.payer.key {
-        update_authorities.push(*ctx.accounts.payer.key);
-    }
-
     // Initialize the inscription metadata.
     let mut inscription_metadata = InscriptionMetadata {
         key: Key::MintInscriptionMetadataAccount,
         bump,
         inscription_bump: Some(inscription_bump),
-        update_authorities,
+        update_authorities: vec![token_metadata.update_authority],
         ..InscriptionMetadata::default()
     };
 
