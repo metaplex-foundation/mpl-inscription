@@ -38,6 +38,8 @@ export type InitializeFromMintInstructionAccounts = {
   tokenMetadataAccount: PublicKey | Pda;
   /** The token account for the mint. */
   tokenAccount: PublicKey | Pda;
+  /** The shard account for the inscription counter. */
+  inscriptionShardAccount?: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -106,9 +108,14 @@ export function initializeFromMint(
       isWritable: false,
       value: input.tokenAccount ?? null,
     },
-    payer: { index: 5, isWritable: true, value: input.payer ?? null },
+    inscriptionShardAccount: {
+      index: 5,
+      isWritable: true,
+      value: input.inscriptionShardAccount ?? null,
+    },
+    payer: { index: 6, isWritable: true, value: input.payer ?? null },
     systemProgram: {
-      index: 6,
+      index: 7,
       isWritable: false,
       value: input.systemProgram ?? null,
     },

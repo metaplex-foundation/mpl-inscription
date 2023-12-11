@@ -36,7 +36,7 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
             crate::ID.as_ref(),
             ctx.accounts.inscription_account.key.as_ref(),
         ],
-        MplInscriptionError::MetadataDerivedKeyInvalid,
+        MplInscriptionError::DerivedKeyInvalid,
     )?;
 
     // The payer and authority must sign.

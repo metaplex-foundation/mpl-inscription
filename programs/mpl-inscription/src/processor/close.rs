@@ -36,10 +36,10 @@ pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResul
             crate::ID.as_ref(),
             ctx.accounts.inscription_account.key.as_ref(),
         ],
-        MplInscriptionError::MetadataDerivedKeyInvalid,
+        MplInscriptionError::DerivedKeyInvalid,
     )?;
     if bump != inscription_metadata.bump {
-        return Err(MplInscriptionError::MetadataDerivedKeyInvalid.into());
+        return Err(MplInscriptionError::DerivedKeyInvalid.into());
     }
 
     // The payer and authority must sign.

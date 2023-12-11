@@ -5,6 +5,7 @@ use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, msg, 
 mod add_authority;
 mod clear_data;
 mod close;
+mod create_shard;
 mod initialize;
 mod initialize_from_mint;
 mod remove_authority;
@@ -13,6 +14,7 @@ mod write_data;
 use add_authority::*;
 use clear_data::*;
 use close::*;
+use create_shard::*;
 use initialize::*;
 use initialize_from_mint::*;
 use remove_authority::*;
@@ -55,6 +57,10 @@ impl Processor {
             MplInscriptionInstruction::RemoveAuthority => {
                 msg!("Instruction: RemoveAuthority");
                 process_remove_authority(accounts)
+            }
+            MplInscriptionInstruction::CreateShard(args) => {
+                msg!("Instruction: CreateShard");
+                process_create_shard(accounts, args)
             }
         }
     }

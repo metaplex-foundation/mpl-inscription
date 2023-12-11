@@ -9,6 +9,7 @@
 export * from './addAuthority';
 export * from './clearData';
 export * from './close';
+export * from './createShard';
 export * from './initialize';
 export * from './initializeFromMint';
 export * from './removeAuthority';

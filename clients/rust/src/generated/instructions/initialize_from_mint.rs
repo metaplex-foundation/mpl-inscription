@@ -20,6 +20,8 @@ pub struct InitializeFromMint {
     pub token_metadata_account: solana_program::pubkey::Pubkey,
     /// The token account for the mint.
     pub token_account: solana_program::pubkey::Pubkey,
+    /// The shard account for the inscription counter.
+    pub inscription_shard_account: Option<solana_program::pubkey::Pubkey>,
     /// The account that will pay for the transaction and rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// System program
@@ -35,7 +37,7 @@ impl InitializeFromMint {
         &self,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(7 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(8 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.inscription_account,
             false,
@@ -56,6 +58,17 @@ impl InitializeFromMint {
             self.token_account,
             false,
         ));
+        if let Some(inscription_shard_account) = self.inscription_shard_account {
+            accounts.push(solana_program::instruction::AccountMeta::new(
+                inscription_shard_account,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.payer, true,
         ));
@@ -95,6 +108,7 @@ pub struct InitializeFromMintBuilder {
     mint_account: Option<solana_program::pubkey::Pubkey>,
     token_metadata_account: Option<solana_program::pubkey::Pubkey>,
     token_account: Option<solana_program::pubkey::Pubkey>,
+    inscription_shard_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -143,6 +157,16 @@ impl InitializeFromMintBuilder {
         self.token_account = Some(token_account);
         self
     }
+    /// `[optional account]`
+    /// The shard account for the inscription counter.
+    #[inline(always)]
+    pub fn inscription_shard_account(
+        &mut self,
+        inscription_shard_account: Option<solana_program::pubkey::Pubkey>,
+    ) -> &mut Self {
+        self.inscription_shard_account = inscription_shard_account;
+        self
+    }
     /// The account that will pay for the transaction and rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
@@ -186,6 +210,7 @@ impl InitializeFromMintBuilder {
                 .token_metadata_account
                 .expect("token_metadata_account is not set"),
             token_account: self.token_account.expect("token_account is not set"),
+            inscription_shard_account: self.inscription_shard_account,
             payer: self.payer.expect("payer is not set"),
             system_program: self
                 .system_program
@@ -208,6 +233,8 @@ pub struct InitializeFromMintCpiAccounts<'a, 'b> {
     pub token_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The token account for the mint.
     pub token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The shard account for the inscription counter.
+    pub inscription_shard_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
@@ -228,6 +255,8 @@ pub struct InitializeFromMintCpi<'a, 'b> {
     pub token_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The token account for the mint.
     pub token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The shard account for the inscription counter.
+    pub inscription_shard_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
@@ -246,6 +275,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             mint_account: accounts.mint_account,
             token_metadata_account: accounts.token_metadata_account,
             token_account: accounts.token_account,
+            inscription_shard_account: accounts.inscription_shard_account,
             payer: accounts.payer,
             system_program: accounts.system_program,
         }
@@ -283,7 +313,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(7 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(8 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.inscription_account.key,
             false,
@@ -304,6 +334,17 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             *self.token_account.key,
             false,
         ));
+        if let Some(inscription_shard_account) = self.inscription_shard_account {
+            accounts.push(solana_program::instruction::AccountMeta::new(
+                *inscription_shard_account.key,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.payer.key,
             true,
@@ -328,13 +369,16 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(7 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(8 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.inscription_account.clone());
         account_infos.push(self.metadata_account.clone());
         account_infos.push(self.mint_account.clone());
         account_infos.push(self.token_metadata_account.clone());
         account_infos.push(self.token_account.clone());
+        if let Some(inscription_shard_account) = self.inscription_shard_account {
+            account_infos.push(inscription_shard_account.clone());
+        }
         account_infos.push(self.payer.clone());
         account_infos.push(self.system_program.clone());
         remaining_accounts
@@ -363,6 +407,7 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
             mint_account: None,
             token_metadata_account: None,
             token_account: None,
+            inscription_shard_account: None,
             payer: None,
             system_program: None,
             __remaining_accounts: Vec::new(),
@@ -412,6 +457,16 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
         token_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_account = Some(token_account);
+        self
+    }
+    /// `[optional account]`
+    /// The shard account for the inscription counter.
+    #[inline(always)]
+    pub fn inscription_shard_account(
+        &mut self,
+        inscription_shard_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    ) -> &mut Self {
+        self.instruction.inscription_shard_account = inscription_shard_account;
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -498,6 +553,8 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
                 .token_account
                 .expect("token_account is not set"),
 
+            inscription_shard_account: self.instruction.inscription_shard_account,
+
             payer: self.instruction.payer.expect("payer is not set"),
 
             system_program: self
@@ -519,6 +576,7 @@ struct InitializeFromMintCpiBuilderInstruction<'a, 'b> {
     mint_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     token_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     token_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    inscription_shard_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

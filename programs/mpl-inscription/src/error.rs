@@ -17,8 +17,8 @@ pub enum MplInscriptionError {
     NotInitialized,
 
     /// 2 - The key for the JSON metadata account is invalid.
-    #[error("The key for the JSON metadata account is invalid.")]
-    MetadataDerivedKeyInvalid,
+    #[error("The key for the account is invalid.")]
+    DerivedKeyInvalid,
 
     /// 3 - The system program account is invalid.
     #[error("The system program account is invalid.")]
@@ -59,6 +59,10 @@ pub enum MplInscriptionError {
     /// 12 - Not enough tokens
     #[error("Not enough tokens in the provided token account.")]
     NotEnoughTokens,
+
+    /// 13 - Invalid Shard Account
+    #[error("The shard account is invalid.")]
+    InvalidShardAccount,
 }
 
 impl PrintProgramError for MplInscriptionError {

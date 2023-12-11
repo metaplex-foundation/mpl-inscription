@@ -12,6 +12,7 @@ export enum Key {
   Uninitialized,
   InscriptionMetadataAccount,
   MintInscriptionMetadataAccount,
+  InscriptionShardAccount,
 }
 
 export type KeyArgs = Key;

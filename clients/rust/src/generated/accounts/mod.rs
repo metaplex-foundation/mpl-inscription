@@ -6,5 +6,7 @@
 //!
 
 pub(crate) mod inscription_metadata;
+pub(crate) mod inscription_shard;
 
 pub use self::inscription_metadata::*;
+pub use self::inscription_shard::*;

@@ -46,7 +46,7 @@ export type InscriptionMetadataAccountData = {
   key: Key;
   bump: number;
   state: InscriptionState;
-  inscriptionNumber: Option<bigint>;
+  inscriptionRank: Option<bigint>;
   inscriptionBump: Option<number>;
   updateAuthorities: Array<PublicKey>;
 };
@@ -55,7 +55,7 @@ export type InscriptionMetadataAccountDataArgs = {
   key: KeyArgs;
   bump: number;
   state: InscriptionStateArgs;
-  inscriptionNumber: OptionOrNullable<number | bigint>;
+  inscriptionRank: OptionOrNullable<number | bigint>;
   inscriptionBump: OptionOrNullable<number>;
   updateAuthorities: Array<PublicKey>;
 };
@@ -69,7 +69,7 @@ export function getInscriptionMetadataAccountDataSerializer(): Serializer<
       ['key', getKeySerializer()],
       ['bump', u8()],
       ['state', getInscriptionStateSerializer()],
-      ['inscriptionNumber', option(u64())],
+      ['inscriptionRank', option(u64())],
       ['inscriptionBump', option(u8())],
       ['updateAuthorities', array(publicKeySerializer())],
     ],
@@ -159,14 +159,14 @@ export function getInscriptionMetadataGpaBuilder(
       key: KeyArgs;
       bump: number;
       state: InscriptionStateArgs;
-      inscriptionNumber: OptionOrNullable<number | bigint>;
+      inscriptionRank: OptionOrNullable<number | bigint>;
       inscriptionBump: OptionOrNullable<number>;
       updateAuthorities: Array<PublicKey>;
     }>({
       key: [0, getKeySerializer()],
       bump: [1, u8()],
       state: [2, getInscriptionStateSerializer()],
-      inscriptionNumber: [3, option(u64())],
+      inscriptionRank: [3, option(u64())],
       inscriptionBump: [null, option(u8())],
       updateAuthorities: [null, array(publicKeySerializer())],
     })

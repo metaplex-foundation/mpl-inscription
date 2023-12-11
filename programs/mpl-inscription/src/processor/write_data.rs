@@ -40,10 +40,10 @@ pub(crate) fn process_write_data<'a>(
             crate::ID.as_ref(),
             ctx.accounts.inscription_account.key.as_ref(),
         ],
-        MplInscriptionError::MetadataDerivedKeyInvalid,
+        MplInscriptionError::DerivedKeyInvalid,
     )?;
     if bump != inscription_metadata.bump {
-        return Err(MplInscriptionError::MetadataDerivedKeyInvalid.into());
+        return Err(MplInscriptionError::DerivedKeyInvalid.into());
     }
 
     // The payer and authority must sign.

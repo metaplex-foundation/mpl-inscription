@@ -18,8 +18,9 @@ pub enum MplInscriptionInstruction {
     #[account(2, name="mint_account", desc="The mint that will be used to derive the PDA.")]
     #[account(3, name="token_metadata_account", desc="The metadata for the mint.")]
     #[account(4, name="token_account", desc="The token account for the mint.")]
-    #[account(5, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
-    #[account(6, name="system_program", desc = "System program")]
+    #[account(5, writable, optional, name="inscription_shard_account", desc="The shard account for the inscription counter.")]
+    #[account(6, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(7, name="system_program", desc = "System program")]
     InitializeFromMint,
 
     /// Close the Inscription and Metadata accounts
@@ -54,6 +55,12 @@ pub enum MplInscriptionInstruction {
     #[account(1, writable, signer, name="authority", desc="The authority paying and being removed.")]
     #[account(2, name="system_program", desc = "System program")]
     RemoveAuthority,
+
+    /// Create an Inscription Shard account for counting inscriptions
+    #[account(0, writable, name="shard_account", desc = "The account to store the shard data in.")]
+    #[account(1, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(2, name="system_program", desc = "System program")]
+    CreateShard(CreateShardArgs),
 }
 
 #[repr(C)]
@@ -66,4 +73,10 @@ pub struct WriteDataArgs {
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
 pub struct AddAuthorityArgs {
     pub new_authority: Pubkey,
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
+pub struct CreateShardArgs {
+    pub shard_number: u8,
 }

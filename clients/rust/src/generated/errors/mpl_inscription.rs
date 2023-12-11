@@ -16,9 +16,9 @@ pub enum MplInscriptionError {
     /// 1 (0x1) - The account has not yet been initialized
     #[error("The account has not yet been initialized")]
     NotInitialized,
-    /// 2 (0x2) - The key for the JSON metadata account is invalid.
-    #[error("The key for the JSON metadata account is invalid.")]
-    MetadataDerivedKeyInvalid,
+    /// 2 (0x2) - The key for the account is invalid.
+    #[error("The key for the account is invalid.")]
+    DerivedKeyInvalid,
     /// 3 (0x3) - The system program account is invalid.
     #[error("The system program account is invalid.")]
     InvalidSystemProgram,
@@ -49,6 +49,9 @@ pub enum MplInscriptionError {
     /// 12 (0xC) - Not enough tokens in the provided token account.
     #[error("Not enough tokens in the provided token account.")]
     NotEnoughTokens,
+    /// 13 (0xD) - The shard account is invalid.
+    #[error("The shard account is invalid.")]
+    InvalidShardAccount,
 }
 
 impl solana_program::program_error::PrintProgramError for MplInscriptionError {

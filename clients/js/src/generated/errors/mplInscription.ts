@@ -41,18 +41,18 @@ export class NotInitializedError extends ProgramError {
 codeToErrorMap.set(0x1, NotInitializedError);
 nameToErrorMap.set('NotInitialized', NotInitializedError);
 
-/** MetadataDerivedKeyInvalid: The key for the JSON metadata account is invalid. */
-export class MetadataDerivedKeyInvalidError extends ProgramError {
-  readonly name: string = 'MetadataDerivedKeyInvalid';
+/** DerivedKeyInvalid: The key for the account is invalid. */
+export class DerivedKeyInvalidError extends ProgramError {
+  readonly name: string = 'DerivedKeyInvalid';
 
   readonly code: number = 0x2; // 2
 
   constructor(program: Program, cause?: Error) {
-    super('The key for the JSON metadata account is invalid.', program, cause);
+    super('The key for the account is invalid.', program, cause);
   }
 }
-codeToErrorMap.set(0x2, MetadataDerivedKeyInvalidError);
-nameToErrorMap.set('MetadataDerivedKeyInvalid', MetadataDerivedKeyInvalidError);
+codeToErrorMap.set(0x2, DerivedKeyInvalidError);
+nameToErrorMap.set('DerivedKeyInvalid', DerivedKeyInvalidError);
 
 /** InvalidSystemProgram: The system program account is invalid. */
 export class InvalidSystemProgramError extends ProgramError {
@@ -187,6 +187,19 @@ export class NotEnoughTokensError extends ProgramError {
 }
 codeToErrorMap.set(0xc, NotEnoughTokensError);
 nameToErrorMap.set('NotEnoughTokens', NotEnoughTokensError);
+
+/** InvalidShardAccount: The shard account is invalid. */
+export class InvalidShardAccountError extends ProgramError {
+  readonly name: string = 'InvalidShardAccount';
+
+  readonly code: number = 0xd; // 13
+
+  constructor(program: Program, cause?: Error) {
+    super('The shard account is invalid.', program, cause);
+  }
+}
+codeToErrorMap.set(0xd, InvalidShardAccountError);
+nameToErrorMap.set('InvalidShardAccount', InvalidShardAccountError);
 
 /**
  * Attempts to resolve a custom program error from the provided error code.

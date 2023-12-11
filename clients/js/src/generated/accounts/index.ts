@@ -7,3 +7,4 @@
  */
 
 export * from './inscriptionMetadata';
+export * from './inscriptionShard';

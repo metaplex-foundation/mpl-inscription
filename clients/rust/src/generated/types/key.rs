@@ -14,4 +14,5 @@ pub enum Key {
     Uninitialized,
     InscriptionMetadataAccount,
     MintInscriptionMetadataAccount,
+    InscriptionShardAccount,
 }
