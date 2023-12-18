@@ -1,4 +1,4 @@
-# Mpl Inscriptions
+# MPL Inscriptions
 
 Inscribing is the practice of treating the Solana blockchain as a form of data storage, much like Arweave or IPFS. While other data storage providers provide their own immutability and data integrity guarantees, there is demand for data directly on the native chain of the underlying NFT. Features such as dynamic metadata and images, on-chain attribute orders, and trait locked smart contracts all become possible with inscribed metadata.
 
