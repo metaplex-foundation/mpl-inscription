@@ -1,7 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { createUmi as basecreateUmi } from '@metaplex-foundation/umi-bundle-tests';
 import { Umi } from '@metaplex-foundation/umi';
-import { MplInscription, createShard, findInscriptionShardPda, safeFetchInscriptionShard } from '../src';
+import {
+  MplInscription,
+  createShard,
+  findInscriptionShardPda,
+  safeFetchInscriptionShard,
+} from '../src';
 
 export const createUmi = async () =>
   (await basecreateUmi()).use(MplInscription());
@@ -15,7 +20,7 @@ export async function fetchIdempotentInscriptionShard(umi: Umi) {
   if (!shardData) {
     await createShard(umi, {
       shardAccount,
-      shardNumber: 0
+      shardNumber: 0,
     }).sendAndConfirm(umi);
 
     // Then an account was created with the correct data.

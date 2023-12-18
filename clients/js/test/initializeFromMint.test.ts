@@ -1,7 +1,21 @@
 import { generateSigner, percentAmount } from '@metaplex-foundation/umi';
 import test from 'ava';
-import { TokenStandard, createV1, fetchDigitalAssetWithTokenByMint, mintV1, mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
-import { InscriptionMetadata, Key, MPL_INSCRIPTION_PROGRAM_ID, fetchInscriptionMetadata, findInscriptionMetadataPda, findMintInscriptionPda, initializeFromMint } from '../src';
+import {
+  TokenStandard,
+  createV1,
+  fetchDigitalAssetWithTokenByMint,
+  mintV1,
+  mplTokenMetadata,
+} from '@metaplex-foundation/mpl-token-metadata';
+import {
+  InscriptionMetadata,
+  Key,
+  MPL_INSCRIPTION_PROGRAM_ID,
+  fetchInscriptionMetadata,
+  findInscriptionMetadataPda,
+  findMintInscriptionPda,
+  initializeFromMint,
+} from '../src';
 import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
 
 test('it can create initialize an Inscription account', async (t) => {
@@ -9,11 +23,11 @@ test('it can create initialize an Inscription account', async (t) => {
   const umi = await createUmi();
   umi.use(mplTokenMetadata());
 
-  const mint = generateSigner(umi)
+  const mint = generateSigner(umi);
   await createV1(umi, {
     mint,
     name: 'My NFT',
-    uri: "https://arweave.net/LcjCf-NDr5bhCJ0YMKGlc8m8qT_J6TDWtIuW8lbu0-A",
+    uri: 'https://arweave.net/LcjCf-NDr5bhCJ0YMKGlc8m8qT_J6TDWtIuW8lbu0-A',
     sellerFeeBasisPoints: percentAmount(5.5),
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
@@ -23,8 +37,12 @@ test('it can create initialize an Inscription account', async (t) => {
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
-  const inscriptionAccount = await findMintInscriptionPda(umi, { mint: mint.publicKey });
-  const metadataAccount = await findInscriptionMetadataPda(umi, { inscriptionAccount: inscriptionAccount[0] });
+  const inscriptionAccount = await findMintInscriptionPda(umi, {
+    mint: mint.publicKey,
+  });
+  const metadataAccount = await findInscriptionMetadataPda(umi, {
+    inscriptionAccount: inscriptionAccount[0],
+  });
   const asset = await fetchDigitalAssetWithTokenByMint(umi, mint.publicKey);
 
   // When we create a new account.
@@ -38,7 +56,10 @@ test('it can create initialize an Inscription account', async (t) => {
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.
-  const inscriptionMetadata = await fetchInscriptionMetadata(umi, metadataAccount);
+  const inscriptionMetadata = await fetchInscriptionMetadata(
+    umi,
+    metadataAccount
+  );
 
   // eslint-disable-next-line no-console
   console.log(inscriptionMetadata);

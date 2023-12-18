@@ -1,7 +1,14 @@
 /* eslint-disable no-await-in-loop */
 import { generateSigner } from '@metaplex-foundation/umi';
 import test from 'ava';
-import { InscriptionMetadata, Key, MPL_INSCRIPTION_PROGRAM_ID, fetchInscriptionMetadata, findInscriptionMetadataPda, initialize } from '../src';
+import {
+  InscriptionMetadata,
+  Key,
+  MPL_INSCRIPTION_PROGRAM_ID,
+  fetchInscriptionMetadata,
+  findInscriptionMetadataPda,
+  initialize,
+} from '../src';
 import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
 
 test('it can create initialize an Inscription account', async (t) => {
@@ -9,7 +16,9 @@ test('it can create initialize an Inscription account', async (t) => {
   const umi = await createUmi();
   const inscriptionAccount = generateSigner(umi);
 
-  const metadataAccount = await findInscriptionMetadataPda(umi, { inscriptionAccount: inscriptionAccount.publicKey });
+  const metadataAccount = await findInscriptionMetadataPda(umi, {
+    inscriptionAccount: inscriptionAccount.publicKey,
+  });
 
   // When we create a new account.
   await initialize(umi, {
@@ -19,7 +28,10 @@ test('it can create initialize an Inscription account', async (t) => {
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.
-  const inscriptionMetadata = await fetchInscriptionMetadata(umi, metadataAccount);
+  const inscriptionMetadata = await fetchInscriptionMetadata(
+    umi,
+    metadataAccount
+  );
 
   // eslint-disable-next-line no-console
   console.log(inscriptionMetadata);
@@ -42,11 +54,16 @@ test('it can create initialize an Inscription account', async (t) => {
 test('it can create initialize multiple Inscription accounts', async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
-  const inscriptionAccount = [generateSigner(umi), generateSigner(umi), generateSigner(umi)];
+  const inscriptionAccount = [
+    generateSigner(umi),
+    generateSigner(umi),
+    generateSigner(umi),
+  ];
 
-
-  for (let i = 0; i < inscriptionAccount.length; i+=1) {
-    const metadataAccount = await findInscriptionMetadataPda(umi, { inscriptionAccount: inscriptionAccount[i].publicKey });
+  for (let i = 0; i < inscriptionAccount.length; i += 1) {
+    const metadataAccount = await findInscriptionMetadataPda(umi, {
+      inscriptionAccount: inscriptionAccount[i].publicKey,
+    });
 
     // When we create a new account.
     await initialize(umi, {
@@ -56,7 +73,10 @@ test('it can create initialize multiple Inscription accounts', async (t) => {
     }).sendAndConfirm(umi);
 
     // Then an account was created with the correct data.
-    const inscriptionMetadata = await fetchInscriptionMetadata(umi, metadataAccount);
+    const inscriptionMetadata = await fetchInscriptionMetadata(
+      umi,
+      metadataAccount
+    );
 
     // eslint-disable-next-line no-console
     console.log(inscriptionMetadata);
