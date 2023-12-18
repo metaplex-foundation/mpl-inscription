@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@metaplex-foundation/mpl-toolbox':
     specifier: ^0.8.0
@@ -9,6 +13,9 @@ devDependencies:
   '@ava/typescript':
     specifier: ^3.0.1
     version: 3.0.1
+  '@metaplex-foundation/mpl-token-metadata':
+    specifier: ^3.1.1
+    version: 3.1.1(@metaplex-foundation/umi@0.8.2)
   '@metaplex-foundation/umi':
     specifier: ^0.8.2
     version: 0.8.2
@@ -1618,6 +1625,15 @@ packages:
       - supports-color
     dev: true
 
+  /@metaplex-foundation/mpl-token-metadata@3.1.1(@metaplex-foundation/umi@0.8.2):
+    resolution: {integrity: sha512-jhS/M9jCcHRWj37mxkI/cwRS50o2K1HT49gKVxHrlVb9hjGAbB4apXA3MuTJ/x73UuqUX59v76QPL+stVQynpw==}
+    peerDependencies:
+      '@metaplex-foundation/umi': ^0.8.2
+    dependencies:
+      '@metaplex-foundation/mpl-toolbox': 0.9.1(@metaplex-foundation/umi@0.8.2)
+      '@metaplex-foundation/umi': 0.8.2
+    dev: true
+
   /@metaplex-foundation/mpl-toolbox@0.8.0(@metaplex-foundation/umi@0.8.2):
     resolution: {integrity: sha512-SK1VUPU4hCaL3sozgtoVjjbZxqx2gWiRt0YTFbwEt5LAHWOlCb7J7rcrrA5XwymX4iV2bIWygYs0yz7hYyx2rg==}
     peerDependencies:
@@ -1625,6 +1641,14 @@ packages:
     dependencies:
       '@metaplex-foundation/umi': 0.8.2
     dev: false
+
+  /@metaplex-foundation/mpl-toolbox@0.9.1(@metaplex-foundation/umi@0.8.2):
+    resolution: {integrity: sha512-Jm98H997MrDfKItjA8bxfsQa+ijVVR6YmMapSd0l75+nKo6Ca0eve/tv2z4qudMS2A4HbH6NLKSW3JHkutzvkQ==}
+    peerDependencies:
+      '@metaplex-foundation/umi': ^0.8.2
+    dependencies:
+      '@metaplex-foundation/umi': 0.8.2
+    dev: true
 
   /@metaplex-foundation/umi-bundle-tests@0.8.2(@metaplex-foundation/umi@0.8.2)(@solana/web3.js@1.73.0):
     resolution: {integrity: sha512-FO8rXJw3ZBKE8YHW+4zOodJmB+Lh50kCMtAA+DfZ9x6JKKMtk1kbmz2186Gclrx3/bl7Ep5FwokSAmoBiOys0A==}

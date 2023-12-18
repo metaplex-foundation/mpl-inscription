@@ -8,7 +8,7 @@ use solana_program::{
 use crate::{
     error::MplInscriptionError,
     instruction::{accounts::CreateShardAccounts, CreateShardArgs},
-    state::{InscriptionShard, PREFIX, SHARD_PREFIX},
+    state::{InscriptionShard, PREFIX, SHARD_COUNT, SHARD_PREFIX},
 };
 
 pub(crate) fn process_create_shard<'a>(
@@ -22,6 +22,10 @@ pub(crate) fn process_create_shard<'a>(
         || !ctx.accounts.shard_account.data_is_empty()
     {
         return Err(MplInscriptionError::AlreadyInitialized.into());
+    }
+
+    if args.shard_number > SHARD_COUNT {
+        return Err(MplInscriptionError::InvalidShardAccount.into());
     }
 
     let bump = assert_derivation(
@@ -56,6 +60,7 @@ pub(crate) fn process_create_shard<'a>(
             SHARD_PREFIX.as_bytes(),
             crate::ID.as_ref(),
             args.shard_number.to_le_bytes().as_ref(),
+            &[bump],
         ],
     )?;
 

@@ -1,4 +1,4 @@
-use borsh::BorshSerialize;
+use borsh::{BorshDeserialize, BorshSerialize};
 use mpl_utils::{assert_derivation, assert_signer, create_or_allocate_account_raw};
 use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, program::invoke,
@@ -8,7 +8,9 @@ use solana_program::{
 use crate::{
     error::MplInscriptionError,
     instruction::accounts::InitializeAccounts,
-    state::{InscriptionMetadata, INITIAL_SIZE, PREFIX},
+    state::{
+        InscriptionMetadata, InscriptionShard, Key, INITIAL_SIZE, PREFIX, SHARD_COUNT, SHARD_PREFIX,
+    },
 };
 
 pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
@@ -65,11 +67,45 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
     )?;
 
     // Initialize the inscription metadata.
-    let inscription_metadata = InscriptionMetadata {
+    let mut inscription_metadata = InscriptionMetadata {
         bump,
         update_authorities: vec![*ctx.accounts.payer.key],
         ..InscriptionMetadata::default()
     };
+
+    let mut shard =
+        InscriptionShard::try_from_slice(&ctx.accounts.inscription_shard_account.data.borrow())?;
+    if shard.key != Key::InscriptionShardAccount {
+        return Err(MplInscriptionError::InvalidShardAccount.into());
+    }
+
+    let shard_bump = assert_derivation(
+        &crate::ID,
+        ctx.accounts.inscription_shard_account,
+        &[
+            PREFIX.as_bytes(),
+            SHARD_PREFIX.as_bytes(),
+            crate::ID.as_ref(),
+            shard.shard_number.to_le_bytes().as_ref(),
+        ],
+        MplInscriptionError::DerivedKeyInvalid,
+    )?;
+
+    if shard_bump != shard.bump {
+        return Err(MplInscriptionError::DerivedKeyInvalid.into());
+    }
+
+    inscription_metadata.inscription_rank = shard
+        .count
+        .checked_mul(SHARD_COUNT as u64)
+        .ok_or(MplInscriptionError::NumericalOverflow)?
+        .checked_add(shard.shard_number as u64)
+        .ok_or(MplInscriptionError::NumericalOverflow)?;
+
+    shard.count = shard
+        .count
+        .checked_add(1)
+        .ok_or(MplInscriptionError::NumericalOverflow)?;
 
     let serialized_metadata = &inscription_metadata.try_to_vec()?;
 
@@ -93,6 +129,18 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
         &mut ctx.accounts.metadata_account.try_borrow_mut_data()?,
         serialized_metadata,
         serialized_metadata.len(),
+    );
+
+    let serialized_shard = &shard.try_to_vec()?;
+
+    // Write the shard data back to the shard account.
+    sol_memcpy(
+        &mut ctx
+            .accounts
+            .inscription_shard_account
+            .try_borrow_mut_data()?,
+        serialized_shard,
+        serialized_shard.len(),
     );
 
     Ok(())

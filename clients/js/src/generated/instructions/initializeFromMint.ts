@@ -29,7 +29,7 @@ import {
 // Accounts.
 export type InitializeFromMintInstructionAccounts = {
   /** The account to store the metadata in. */
-  inscriptionAccount: PublicKey | Pda;
+  mintInscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
   metadataAccount: PublicKey | Pda;
   /** The mint that will be used to derive the PDA. */
@@ -39,7 +39,7 @@ export type InitializeFromMintInstructionAccounts = {
   /** The token account for the mint. */
   tokenAccount: PublicKey | Pda;
   /** The shard account for the inscription counter. */
-  inscriptionShardAccount?: PublicKey | Pda;
+  inscriptionShardAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -83,10 +83,10 @@ export function initializeFromMint(
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    inscriptionAccount: {
+    mintInscriptionAccount: {
       index: 0,
       isWritable: true,
-      value: input.inscriptionAccount ?? null,
+      value: input.mintInscriptionAccount ?? null,
     },
     metadataAccount: {
       index: 1,

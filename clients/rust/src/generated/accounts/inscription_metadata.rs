@@ -17,7 +17,7 @@ pub struct InscriptionMetadata {
     pub key: Key,
     pub bump: u8,
     pub state: InscriptionState,
-    pub inscription_rank: Option<u64>,
+    pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
 }

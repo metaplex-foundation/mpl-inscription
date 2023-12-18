@@ -38,7 +38,7 @@ pub struct InscriptionMetadata {
     pub key: Key,
     pub bump: u8,
     pub state: InscriptionState,
-    pub inscription_rank: Option<u64>,
+    pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
 }
@@ -49,7 +49,7 @@ impl Default for InscriptionMetadata {
             key: Key::InscriptionMetadataAccount,
             bump: 0,
             state: InscriptionState::Raw,
-            inscription_rank: None,
+            inscription_rank: u64::MAX,
             inscription_bump: None,
             update_authorities: vec![],
         }

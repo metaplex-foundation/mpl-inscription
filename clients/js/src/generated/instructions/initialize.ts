@@ -32,6 +32,8 @@ export type InitializeInstructionAccounts = {
   inscriptionAccount: Signer;
   /** The account to store the inscription account's metadata in. */
   metadataAccount: PublicKey | Pda;
+  /** The shard account for the inscription counter. */
+  inscriptionShardAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** System program */
@@ -82,9 +84,14 @@ export function initialize(
       isWritable: true,
       value: input.metadataAccount ?? null,
     },
-    payer: { index: 2, isWritable: true, value: input.payer ?? null },
+    inscriptionShardAccount: {
+      index: 2,
+      isWritable: true,
+      value: input.inscriptionShardAccount ?? null,
+    },
+    payer: { index: 3, isWritable: true, value: input.payer ?? null },
     systemProgram: {
-      index: 3,
+      index: 4,
       isWritable: false,
       value: input.systemProgram ?? null,
     },

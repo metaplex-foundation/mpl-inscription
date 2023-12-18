@@ -21,6 +21,34 @@ pub struct InscriptionShard {
 impl InscriptionShard {
     pub const LEN: usize = 11;
 
+    pub fn create_pda(
+        shard_number: u8,
+        bump: u8,
+    ) -> Result<solana_program::pubkey::Pubkey, solana_program::pubkey::PubkeyError> {
+        solana_program::pubkey::Pubkey::create_program_address(
+            &[
+                "Inscription".as_bytes(),
+                "Shard".as_bytes(),
+                crate::MPL_INSCRIPTION_ID.as_ref(),
+                shard_number.to_string().as_ref(),
+                &[bump],
+            ],
+            &crate::MPL_INSCRIPTION_ID,
+        )
+    }
+
+    pub fn find_pda(shard_number: u8) -> (solana_program::pubkey::Pubkey, u8) {
+        solana_program::pubkey::Pubkey::find_program_address(
+            &[
+                "Inscription".as_bytes(),
+                "Shard".as_bytes(),
+                crate::MPL_INSCRIPTION_ID.as_ref(),
+                shard_number.to_string().as_ref(),
+            ],
+            &crate::MPL_INSCRIPTION_ID,
+        )
+    }
+
     #[inline(always)]
     pub fn from_bytes(data: &[u8]) -> Result<Self, std::io::Error> {
         let mut data = data;

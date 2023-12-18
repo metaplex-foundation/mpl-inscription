@@ -21,6 +21,8 @@ import {
 } from '@metaplex-foundation/umi';
 import {
   Serializer,
+  publicKey as publicKeySerializer,
+  string,
   struct,
   u64,
   u8,
@@ -149,4 +151,46 @@ export function getInscriptionShardGpaBuilder(
 
 export function getInscriptionShardSize(): number {
   return 11;
+}
+
+export function findInscriptionShardPda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    shardNumber: number;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey(
+    'mplInscription',
+    '1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo'
+  );
+  return context.eddsa.findPda(programId, [
+    string({ size: 'variable' }).serialize('Inscription'),
+    string({ size: 'variable' }).serialize('Shard'),
+    publicKeySerializer().serialize(programId),
+    u8().serialize(seeds.shardNumber),
+  ]);
+}
+
+export async function fetchInscriptionShardFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findInscriptionShardPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<InscriptionShard> {
+  return fetchInscriptionShard(
+    context,
+    findInscriptionShardPda(context, seeds),
+    options
+  );
+}
+
+export async function safeFetchInscriptionShardFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findInscriptionShardPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<InscriptionShard | null> {
+  return safeFetchInscriptionShard(
+    context,
+    findInscriptionShardPda(context, seeds),
+    options
+  );
 }

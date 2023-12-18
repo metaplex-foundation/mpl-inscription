@@ -25,6 +25,14 @@ kinobi.update(
         k.publicKeySeed("inscriptionAccount", "The address of the Inscription Account"),
       ],
     },
+    inscriptionShard: {
+      seeds: [
+        k.stringConstantSeed("Inscription"),
+        k.stringConstantSeed("Shard"),
+        k.programSeed(),
+        k.variableSeed("Shard Number", k.numberTypeNode('u8', 'le')),
+      ],
+    }
   })
 );
 
@@ -42,7 +50,10 @@ const key = (name) => ({ field: "key", value: k.vEnum("Key", name) });
 kinobi.update(
   new k.SetAccountDiscriminatorFromFieldVisitor({
     // myAccount: key("MyAccount"),
+    uninitialized: key("Uninitialized"),
     inscriptionMetadataAccount: key("InscriptionMetadataAccount"),
+    mintInscriptionMetadataAccount: key("MintInscriptionMetadataAccount"),
+    inscriptionShardAccount: key("InscriptionShardAccount"),
   })
 );
 
