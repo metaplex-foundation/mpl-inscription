@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 readme = "README.md"
 license-file = "../../LICENSE"
+homepage = "www.metaplex.com"
+description = "Program to inscribe binary data to a Solana account."
+repository = "https://github.com/metaplex-foundation/mpl-engraver"
 
 [lib]
 crate-type = ["cdylib", "lib"]
