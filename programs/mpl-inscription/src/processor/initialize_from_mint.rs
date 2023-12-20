@@ -1,8 +1,7 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use mpl_token_metadata::accounts::Metadata;
 use mpl_utils::{
-    assert_derivation, assert_initialized, assert_owned_by, assert_signer,
-    create_or_allocate_account_raw,
+    assert_derivation, assert_owned_by, assert_signer, create_or_allocate_account_raw,
 };
 use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, program_memory::sol_memcpy,
@@ -45,38 +44,11 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         MplInscriptionError::IncorrectOwner,
     )?;
 
-    assert_owned_by(
-        ctx.accounts.token_account,
-        &spl_token::ID,
-        MplInscriptionError::IncorrectOwner,
-    )?;
-
     let token_metadata_data = ctx.accounts.token_metadata_account.try_borrow_data()?;
     let token_metadata: Metadata = Metadata::safe_deserialize(&token_metadata_data)?;
 
     if token_metadata.mint != *ctx.accounts.mint_account.key {
         return Err(MplInscriptionError::MintMismatch.into());
-    }
-
-    let token_account: spl_token::state::Account = assert_initialized(
-        ctx.accounts.token_account,
-        MplInscriptionError::BorshDeserializeError,
-    )?;
-
-    if token_account.mint != *ctx.accounts.mint_account.key {
-        return Err(MplInscriptionError::MintMismatch.into());
-    }
-
-    if token_account.amount < 1 {
-        return Err(MplInscriptionError::NotEnoughTokens.into());
-    }
-
-    if token_account.mint != token_metadata.mint {
-        return Err(MplInscriptionError::MintMismatch.into());
-    }
-
-    if token_metadata.update_authority != *ctx.accounts.payer.key {
-        return Err(MplInscriptionError::InvalidAuthority.into());
     }
 
     // Verify that the derived address is correct for the metadata account.
@@ -104,7 +76,18 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
     )?;
 
     // The payer and authority must sign.
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
     assert_signer(ctx.accounts.payer)?;
+
+    if token_metadata.update_authority != *authority.key {
+        return Err(MplInscriptionError::InvalidAuthority.into());
+    }
 
     if ctx.accounts.system_program.key != &system_program::ID {
         return Err(MplInscriptionError::InvalidSystemProgram.into());

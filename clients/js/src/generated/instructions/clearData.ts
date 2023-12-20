@@ -34,6 +34,8 @@ export type ClearDataInstructionAccounts = {
   metadataAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
+  /** The authority of the inscription account. */
+  authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
 };
@@ -83,8 +85,9 @@ export function clearData(
       value: input.metadataAccount ?? null,
     },
     payer: { index: 2, isWritable: true, value: input.payer ?? null },
+    authority: { index: 3, isWritable: false, value: input.authority ?? null },
     systemProgram: {
-      index: 3,
+      index: 4,
       isWritable: false,
       value: input.systemProgram ?? null,
     },

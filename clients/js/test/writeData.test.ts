@@ -6,7 +6,7 @@ import {
 import {
   TokenStandard,
   createV1,
-  fetchDigitalAssetWithTokenByMint,
+  fetchDigitalAsset,
   mintV1,
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
@@ -96,7 +96,7 @@ test('it can set JSON data on a mint inscription account', async (t) => {
   const metadataAccount = await findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount[0],
   });
-  const asset = await fetchDigitalAssetWithTokenByMint(umi, mint.publicKey);
+  const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   let builder = new TransactionBuilder();
 
@@ -107,7 +107,6 @@ test('it can set JSON data on a mint inscription account', async (t) => {
       metadataAccount,
       mintAccount: mint.publicKey,
       tokenMetadataAccount: asset.metadata.publicKey,
-      tokenAccount: asset.token.publicKey,
       inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
@@ -127,6 +126,59 @@ test('it can set JSON data on a mint inscription account', async (t) => {
 
   // Then an account was created with the correct data.
   const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);
+  if (jsonData.exists) {
+    const jsonString = Buffer.from(jsonData.data).toString('utf8');
+    const parsedData = JSON.parse(jsonString);
+
+    t.assert(parsedData.description);
+    t.is(parsedData.description, 'A bread! But on-chain!');
+    t.assert(parsedData.external_url);
+    t.is(parsedData.external_url, 'https://breadheads.io');
+
+    t.like(jsonData, {
+      owner: MPL_INSCRIPTION_PROGRAM_ID,
+    });
+  }
+});
+
+test('it can set JSON data on an inscription account with a separate authority', async (t) => {
+  // Given a Umi instance and a new signer.
+  const umi = await createUmi();
+  const inscriptionAccount = generateSigner(umi);
+  const authority = generateSigner(umi);
+
+  const metadataAccount = await findInscriptionMetadataPda(umi, {
+    inscriptionAccount: inscriptionAccount.publicKey,
+  });
+
+  let builder = new TransactionBuilder();
+
+  // When we create a new account.
+  builder = builder.add(
+    initialize(umi, {
+      inscriptionAccount,
+      metadataAccount,
+      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+      authority,
+    })
+  );
+
+  // And set the value.
+  builder = builder.add(
+    writeData(umi, {
+      inscriptionAccount: inscriptionAccount.publicKey,
+      metadataAccount,
+      authority,
+      value: Buffer.from(
+        '{"description": "A bread! But on-chain!", "external_url": "https://breadheads.io"}'
+      ),
+    })
+  );
+
+  await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
+
+  // Then an account was created with the correct data.
+  const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
   if (jsonData.exists) {
     const jsonString = Buffer.from(jsonData.data).toString('utf8');
     const parsedData = JSON.parse(jsonString);

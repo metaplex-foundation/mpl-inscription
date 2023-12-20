@@ -3,7 +3,6 @@ use shank::ShankAccount;
 use solana_program::pubkey::Pubkey;
 
 pub const PREFIX: &str = "Inscription";
-pub const INITIAL_SIZE: usize = 1024;
 pub const SHARD_COUNT: u8 = 32;
 pub const SHARD_PREFIX: &str = "Shard";
 

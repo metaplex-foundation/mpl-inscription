@@ -15,6 +15,8 @@ pub struct AddAuthority {
     pub metadata_account: solana_program::pubkey::Pubkey,
     /// The account that will pay for the transaction and rent.
     pub payer: solana_program::pubkey::Pubkey,
+    /// The authority of the inscription account.
+    pub authority: Option<solana_program::pubkey::Pubkey>,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
 }
@@ -32,7 +34,7 @@ impl AddAuthority {
         args: AddAuthorityInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.metadata_account,
             false,
@@ -40,6 +42,16 @@ impl AddAuthority {
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.payer, true,
         ));
+        if let Some(authority) = self.authority {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                authority, true,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
@@ -79,6 +91,7 @@ pub struct AddAuthorityInstructionArgs {
 pub struct AddAuthorityBuilder {
     metadata_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
+    authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     new_authority: Option<Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -101,6 +114,13 @@ impl AddAuthorityBuilder {
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
+        self
+    }
+    /// `[optional account]`
+    /// The authority of the inscription account.
+    #[inline(always)]
+    pub fn authority(&mut self, authority: Option<solana_program::pubkey::Pubkey>) -> &mut Self {
+        self.authority = authority;
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
@@ -138,6 +158,7 @@ impl AddAuthorityBuilder {
         let accounts = AddAuthority {
             metadata_account: self.metadata_account.expect("metadata_account is not set"),
             payer: self.payer.expect("payer is not set"),
+            authority: self.authority,
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
@@ -159,6 +180,8 @@ pub struct AddAuthorityCpiAccounts<'a, 'b> {
     pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The authority of the inscription account.
+    pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
@@ -171,6 +194,8 @@ pub struct AddAuthorityCpi<'a, 'b> {
     pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The authority of the inscription account.
+    pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
@@ -187,6 +212,7 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
             __program: program,
             metadata_account: accounts.metadata_account,
             payer: accounts.payer,
+            authority: accounts.authority,
             system_program: accounts.system_program,
             __args: args,
         }
@@ -224,7 +250,7 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.metadata_account.key,
             false,
@@ -233,6 +259,17 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
             *self.payer.key,
             true,
         ));
+        if let Some(authority) = self.authority {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                *authority.key,
+                true,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
@@ -253,10 +290,13 @@ impl<'a, 'b> AddAuthorityCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(3 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.metadata_account.clone());
         account_infos.push(self.payer.clone());
+        if let Some(authority) = self.authority {
+            account_infos.push(authority.clone());
+        }
         account_infos.push(self.system_program.clone());
         remaining_accounts
             .iter()
@@ -281,6 +321,7 @@ impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
             __program: program,
             metadata_account: None,
             payer: None,
+            authority: None,
             system_program: None,
             new_authority: None,
             __remaining_accounts: Vec::new(),
@@ -300,6 +341,16 @@ impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);
+        self
+    }
+    /// `[optional account]`
+    /// The authority of the inscription account.
+    #[inline(always)]
+    pub fn authority(
+        &mut self,
+        authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    ) -> &mut Self {
+        self.instruction.authority = authority;
         self
     }
     /// System program
@@ -374,6 +425,8 @@ impl<'a, 'b> AddAuthorityCpiBuilder<'a, 'b> {
 
             payer: self.instruction.payer.expect("payer is not set"),
 
+            authority: self.instruction.authority,
+
             system_program: self
                 .instruction
                 .system_program
@@ -391,6 +444,7 @@ struct AddAuthorityCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     new_authority: Option<Pubkey>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

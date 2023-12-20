@@ -47,10 +47,19 @@ pub(crate) fn process_write_data<'a>(
     }
 
     // The payer and authority must sign.
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
+
     assert_signer(ctx.accounts.payer)?;
+
     if !inscription_metadata
         .update_authorities
-        .contains(ctx.accounts.payer.key)
+        .contains(authority.key)
     {
         return Err(MplInscriptionError::InvalidAuthority.into());
     }
@@ -63,6 +72,7 @@ pub(crate) fn process_write_data<'a>(
     let new_size = old_size
         .checked_add(args.value.len())
         .ok_or(MplInscriptionError::NumericalOverflow)?;
+
     // Resize the account to fit the new authority.
     resize_or_reallocate_account_raw(
         ctx.accounts.inscription_account,

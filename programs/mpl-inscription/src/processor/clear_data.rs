@@ -8,7 +8,7 @@ use solana_program::{
 use crate::{
     error::MplInscriptionError,
     instruction::accounts::WriteDataAccounts,
-    state::{InscriptionMetadata, INITIAL_SIZE, PREFIX},
+    state::{InscriptionMetadata, PREFIX},
 };
 
 pub(crate) fn process_clear_data<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
@@ -44,10 +44,19 @@ pub(crate) fn process_clear_data<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
     }
 
     // The payer and authority must sign.
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
+
     assert_signer(ctx.accounts.payer)?;
+
     if !inscription_metadata
         .update_authorities
-        .contains(ctx.accounts.payer.key)
+        .contains(authority.key)
     {
         return Err(MplInscriptionError::InvalidAuthority.into());
     }
@@ -61,7 +70,7 @@ pub(crate) fn process_clear_data<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
         ctx.accounts.inscription_account,
         ctx.accounts.payer,
         ctx.accounts.system_program,
-        INITIAL_SIZE,
+        0,
     )?;
 
     // Write the inscription metadata to the metadata account.

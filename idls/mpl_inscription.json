@@ -38,6 +38,15 @@
           ]
         },
         {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
+          ]
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
@@ -88,14 +97,6 @@
           ]
         },
         {
-          "name": "tokenAccount",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The token account for the mint."
-          ]
-        },
-        {
           "name": "inscriptionShardAccount",
           "isMut": true,
           "isSigner": false,
@@ -109,6 +110,15 @@
           "isSigner": true,
           "docs": [
             "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
           ]
         },
         {
@@ -154,6 +164,15 @@
           ]
         },
         {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
+          ]
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
@@ -193,6 +212,15 @@
           "isSigner": true,
           "docs": [
             "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
           ]
         },
         {
@@ -245,6 +273,15 @@
           ]
         },
         {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
+          ]
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
@@ -276,6 +313,15 @@
           "isSigner": true,
           "docs": [
             "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
           ]
         },
         {
@@ -312,11 +358,20 @@
           ]
         },
         {
-          "name": "authority",
+          "name": "payer",
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The authority paying and being removed."
+            "The account paying for the transaction and rent."
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account to be removed."
           ]
         },
         {

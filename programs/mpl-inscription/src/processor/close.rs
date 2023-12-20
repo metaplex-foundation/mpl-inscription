@@ -11,19 +11,20 @@ use crate::{
 pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
     let ctx = &CloseAccounts::context(accounts)?;
 
-    // Check that the account isn't already initialized.
+    // Check that the account is already initialized.
     if (ctx.accounts.inscription_account.owner != &crate::ID)
         || ctx.accounts.inscription_account.data_is_empty()
     {
         return Err(MplInscriptionError::NotInitialized.into());
     }
 
-    // Check that the account isn't already initialized.
+    // Check that the account is already initialized.
     if (ctx.accounts.metadata_account.owner != &crate::ID)
         || ctx.accounts.metadata_account.data_is_empty()
     {
         return Err(MplInscriptionError::NotInitialized.into());
     }
+
     let inscription_metadata =
         InscriptionMetadata::try_from_slice(&ctx.accounts.metadata_account.data.borrow())?;
 
@@ -38,15 +39,24 @@ pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResul
         ],
         MplInscriptionError::DerivedKeyInvalid,
     )?;
+
     if bump != inscription_metadata.bump {
         return Err(MplInscriptionError::DerivedKeyInvalid.into());
     }
 
     // The payer and authority must sign.
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
+
     assert_signer(ctx.accounts.payer)?;
     if !inscription_metadata
         .update_authorities
-        .contains(ctx.accounts.payer.key)
+        .contains(authority.key)
     {
         return Err(MplInscriptionError::InvalidAuthority.into());
     }

@@ -8,9 +8,7 @@ use solana_program::{
 use crate::{
     error::MplInscriptionError,
     instruction::accounts::InitializeAccounts,
-    state::{
-        InscriptionMetadata, InscriptionShard, Key, INITIAL_SIZE, PREFIX, SHARD_COUNT, SHARD_PREFIX,
-    },
+    state::{InscriptionMetadata, InscriptionShard, Key, PREFIX, SHARD_COUNT, SHARD_PREFIX},
 };
 
 pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
@@ -42,15 +40,22 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
     )?;
 
     // The payer and authority must sign.
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
     assert_signer(ctx.accounts.payer)?;
 
     if ctx.accounts.system_program.key != &system_program::ID {
         return Err(MplInscriptionError::InvalidSystemProgram.into());
     }
 
-    // Initialize the inscription metadata account.
+    // Initialize the inscription account.
     let rent = Rent::get()?;
-    let rent_amount = rent.minimum_balance(INITIAL_SIZE);
+    let rent_amount = rent.minimum_balance(0);
     invoke(
         &system_instruction::create_account(
             ctx.accounts.payer.key,
@@ -69,7 +74,7 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
     // Initialize the inscription metadata.
     let mut inscription_metadata = InscriptionMetadata {
         bump,
-        update_authorities: vec![*ctx.accounts.payer.key],
+        update_authorities: vec![*authority.key],
         ..InscriptionMetadata::default()
     };
 

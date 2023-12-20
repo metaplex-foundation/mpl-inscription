@@ -11,7 +11,7 @@ import {
 } from '../src';
 import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
 
-test('it can create initialize an Inscription account', async (t) => {
+test('it can initialize an Inscription account', async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
   const inscriptionAccount = generateSigner(umi);
@@ -51,7 +51,7 @@ test('it can create initialize an Inscription account', async (t) => {
   }
 });
 
-test('it can create initialize multiple Inscription accounts', async (t) => {
+test('it can initialize multiple Inscription accounts', async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
   const inscriptionAccount = [
@@ -94,5 +94,47 @@ test('it can create initialize multiple Inscription accounts', async (t) => {
         data: Uint8Array.from([]),
       });
     }
+  }
+});
+
+test('it can initialize an Inscription account with separate authority', async (t) => {
+  // Given a Umi instance and a new signer.
+  const umi = await createUmi();
+  const inscriptionAccount = generateSigner(umi);
+  const authority = generateSigner(umi);
+
+  const metadataAccount = await findInscriptionMetadataPda(umi, {
+    inscriptionAccount: inscriptionAccount.publicKey,
+  });
+
+  // When we create a new account.
+  await initialize(umi, {
+    inscriptionAccount,
+    metadataAccount,
+    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    authority,
+  }).sendAndConfirm(umi);
+
+  // Then an account was created with the correct data.
+  const inscriptionMetadata = await fetchInscriptionMetadata(
+    umi,
+    metadataAccount
+  );
+
+  // eslint-disable-next-line no-console
+  console.log(inscriptionMetadata);
+
+  t.like(inscriptionMetadata, <InscriptionMetadata>{
+    key: Key.InscriptionMetadataAccount,
+    bump: metadataAccount[1],
+    updateAuthorities: [authority.publicKey],
+  });
+
+  const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
+  if (jsonData.exists) {
+    t.like(jsonData, {
+      owner: MPL_INSCRIPTION_PROGRAM_ID,
+      data: Uint8Array.from([]),
+    });
   }
 });

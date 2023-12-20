@@ -1,5 +1,4 @@
 import test from 'ava';
-import { createBigInt } from '@metaplex-foundation/umi';
 import {
   Key,
   createShard,
@@ -31,7 +30,6 @@ test('it can create a shard account', async (t) => {
     key: Key.InscriptionShardAccount,
     bump: shardAccount[1],
     shardNumber: 0,
-    count: createBigInt(0),
   });
 });
 
@@ -61,7 +59,6 @@ test('it can create all of the shard accounts', async (t) => {
       key: Key.InscriptionShardAccount,
       bump: shardAccount[1],
       shardNumber: i,
-      count: createBigInt(0),
     });
   }
 });

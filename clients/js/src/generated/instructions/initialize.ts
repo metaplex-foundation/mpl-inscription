@@ -36,6 +36,8 @@ export type InitializeInstructionAccounts = {
   inscriptionShardAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
+  /** The authority of the inscription account. */
+  authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
 };
@@ -90,8 +92,9 @@ export function initialize(
       value: input.inscriptionShardAccount ?? null,
     },
     payer: { index: 3, isWritable: true, value: input.payer ?? null },
+    authority: { index: 4, isWritable: false, value: input.authority ?? null },
     systemProgram: {
-      index: 4,
+      index: 5,
       isWritable: false,
       value: input.systemProgram ?? null,
     },

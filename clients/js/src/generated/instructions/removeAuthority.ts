@@ -30,7 +30,9 @@ import {
 export type RemoveAuthorityInstructionAccounts = {
   /** The account to store the metadata's metadata in. */
   metadataAccount: PublicKey | Pda;
-  /** The authority paying and being removed. */
+  /** The account paying for the transaction and rent. */
+  payer?: Signer;
+  /** The authority of the inscription account to be removed. */
   authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
@@ -62,7 +64,7 @@ export function getRemoveAuthorityInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function removeAuthority(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'payer' | 'programs'>,
   input: RemoveAuthorityInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -78,17 +80,18 @@ export function removeAuthority(
       isWritable: true,
       value: input.metadataAccount ?? null,
     },
-    authority: { index: 1, isWritable: true, value: input.authority ?? null },
+    payer: { index: 1, isWritable: true, value: input.payer ?? null },
+    authority: { index: 2, isWritable: false, value: input.authority ?? null },
     systemProgram: {
-      index: 2,
+      index: 3,
       isWritable: false,
       value: input.systemProgram ?? null,
     },
   };
 
   // Default values.
-  if (!resolvedAccounts.authority.value) {
-    resolvedAccounts.authority.value = context.identity;
+  if (!resolvedAccounts.payer.value) {
+    resolvedAccounts.payer.value = context.payer;
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(

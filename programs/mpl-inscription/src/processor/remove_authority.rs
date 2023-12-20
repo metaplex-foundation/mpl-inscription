@@ -23,10 +23,18 @@ pub(crate) fn process_remove_authority<'a>(accounts: &'a [AccountInfo<'a>]) -> P
         InscriptionMetadata::try_from_slice(&ctx.accounts.metadata_account.data.borrow())?;
 
     // The payer and authority must sign.
-    assert_signer(ctx.accounts.authority)?;
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
+    assert_signer(ctx.accounts.payer)?;
+
     if !inscription_metadata
         .update_authorities
-        .contains(ctx.accounts.authority.key)
+        .contains(authority.key)
     {
         return Err(MplInscriptionError::InvalidAuthority.into());
     }
@@ -39,7 +47,7 @@ pub(crate) fn process_remove_authority<'a>(accounts: &'a [AccountInfo<'a>]) -> P
     let index = inscription_metadata
         .update_authorities
         .iter()
-        .position(|x| x == ctx.accounts.authority.key)
+        .position(|x| x == authority.key)
         .ok_or(MplInscriptionError::InvalidAuthority)?;
     inscription_metadata.update_authorities.swap_remove(index);
 
@@ -49,7 +57,7 @@ pub(crate) fn process_remove_authority<'a>(accounts: &'a [AccountInfo<'a>]) -> P
     // Resize the account to fit the new authority.
     resize_or_reallocate_account_raw(
         ctx.accounts.metadata_account,
-        ctx.accounts.authority,
+        ctx.accounts.payer,
         ctx.accounts.system_program,
         serialized_data.len(),
     )?;

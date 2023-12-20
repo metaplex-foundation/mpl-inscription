@@ -17,7 +17,7 @@ pub(crate) fn process_add_authority<'a>(
 ) -> ProgramResult {
     let ctx = &AddAuthorityAccounts::context(accounts)?;
 
-    // Check that the account isn't already initialized.
+    // Check that the account is already initialized.
     if (ctx.accounts.metadata_account.owner != &crate::ID)
         || ctx.accounts.metadata_account.data_is_empty()
     {
@@ -27,10 +27,19 @@ pub(crate) fn process_add_authority<'a>(
         InscriptionMetadata::try_from_slice(&ctx.accounts.metadata_account.data.borrow())?;
 
     // The payer and authority must sign.
+    let authority = match ctx.accounts.authority {
+        Some(authority) => {
+            assert_signer(authority)?;
+            authority
+        }
+        None => ctx.accounts.payer,
+    };
+
     assert_signer(ctx.accounts.payer)?;
+
     if !inscription_metadata
         .update_authorities
-        .contains(ctx.accounts.payer.key)
+        .contains(authority.key)
     {
         return Err(MplInscriptionError::InvalidAuthority.into());
     }

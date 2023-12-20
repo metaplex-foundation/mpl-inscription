@@ -12,8 +12,10 @@ use borsh::BorshSerialize;
 pub struct RemoveAuthority {
     /// The account to store the metadata's metadata in.
     pub metadata_account: solana_program::pubkey::Pubkey,
-    /// The authority paying and being removed.
-    pub authority: solana_program::pubkey::Pubkey,
+    /// The account paying for the transaction and rent.
+    pub payer: solana_program::pubkey::Pubkey,
+    /// The authority of the inscription account to be removed.
+    pub authority: Option<solana_program::pubkey::Pubkey>,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
 }
@@ -27,15 +29,24 @@ impl RemoveAuthority {
         &self,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.metadata_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.authority,
-            true,
+            self.payer, true,
         ));
+        if let Some(authority) = self.authority {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                authority, true,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
@@ -66,6 +77,7 @@ impl RemoveAuthorityInstructionData {
 #[derive(Default)]
 pub struct RemoveAuthorityBuilder {
     metadata_account: Option<solana_program::pubkey::Pubkey>,
+    payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
@@ -84,10 +96,17 @@ impl RemoveAuthorityBuilder {
         self.metadata_account = Some(metadata_account);
         self
     }
-    /// The authority paying and being removed.
+    /// The account paying for the transaction and rent.
     #[inline(always)]
-    pub fn authority(&mut self, authority: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.authority = Some(authority);
+    pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.payer = Some(payer);
+        self
+    }
+    /// `[optional account]`
+    /// The authority of the inscription account to be removed.
+    #[inline(always)]
+    pub fn authority(&mut self, authority: Option<solana_program::pubkey::Pubkey>) -> &mut Self {
+        self.authority = authority;
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
@@ -119,7 +138,8 @@ impl RemoveAuthorityBuilder {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = RemoveAuthority {
             metadata_account: self.metadata_account.expect("metadata_account is not set"),
-            authority: self.authority.expect("authority is not set"),
+            payer: self.payer.expect("payer is not set"),
+            authority: self.authority,
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
@@ -133,8 +153,10 @@ impl RemoveAuthorityBuilder {
 pub struct RemoveAuthorityCpiAccounts<'a, 'b> {
     /// The account to store the metadata's metadata in.
     pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The authority paying and being removed.
-    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account paying for the transaction and rent.
+    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The authority of the inscription account to be removed.
+    pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
@@ -145,8 +167,10 @@ pub struct RemoveAuthorityCpi<'a, 'b> {
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the metadata's metadata in.
     pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The authority paying and being removed.
-    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account paying for the transaction and rent.
+    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The authority of the inscription account to be removed.
+    pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
@@ -159,6 +183,7 @@ impl<'a, 'b> RemoveAuthorityCpi<'a, 'b> {
         Self {
             __program: program,
             metadata_account: accounts.metadata_account,
+            payer: accounts.payer,
             authority: accounts.authority,
             system_program: accounts.system_program,
         }
@@ -196,15 +221,26 @@ impl<'a, 'b> RemoveAuthorityCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.metadata_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.authority.key,
+            *self.payer.key,
             true,
         ));
+        if let Some(authority) = self.authority {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                *authority.key,
+                true,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
@@ -223,10 +259,13 @@ impl<'a, 'b> RemoveAuthorityCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(3 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.metadata_account.clone());
-        account_infos.push(self.authority.clone());
+        account_infos.push(self.payer.clone());
+        if let Some(authority) = self.authority {
+            account_infos.push(authority.clone());
+        }
         account_infos.push(self.system_program.clone());
         remaining_accounts
             .iter()
@@ -250,6 +289,7 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
         let instruction = Box::new(RemoveAuthorityCpiBuilderInstruction {
             __program: program,
             metadata_account: None,
+            payer: None,
             authority: None,
             system_program: None,
             __remaining_accounts: Vec::new(),
@@ -265,13 +305,20 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
         self.instruction.metadata_account = Some(metadata_account);
         self
     }
-    /// The authority paying and being removed.
+    /// The account paying for the transaction and rent.
+    #[inline(always)]
+    pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+        self.instruction.payer = Some(payer);
+        self
+    }
+    /// `[optional account]`
+    /// The authority of the inscription account to be removed.
     #[inline(always)]
     pub fn authority(
         &mut self,
-        authority: &'b solana_program::account_info::AccountInfo<'a>,
+        authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     ) -> &mut Self {
-        self.instruction.authority = Some(authority);
+        self.instruction.authority = authority;
         self
     }
     /// System program
@@ -332,7 +379,9 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
                 .metadata_account
                 .expect("metadata_account is not set"),
 
-            authority: self.instruction.authority.expect("authority is not set"),
+            payer: self.instruction.payer.expect("payer is not set"),
+
+            authority: self.instruction.authority,
 
             system_program: self
                 .instruction
@@ -349,6 +398,7 @@ impl<'a, 'b> RemoveAuthorityCpiBuilder<'a, 'b> {
 struct RemoveAuthorityCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
