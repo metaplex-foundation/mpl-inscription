@@ -57,7 +57,6 @@ A Umi-compatible JavaScript library for the project.
      metadataAccount: inscriptionMetadataAccount,
      mintAccount: mint.publicKey,
      tokenMetadataAccount, // The metadata account from token metadata
-     tokenAccount, // The ATA
      inscriptionShardAccount, // For concurrency
    }).add(
      writeData(umi, {
