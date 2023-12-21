@@ -17,18 +17,10 @@ pub enum Key {
 
 #[repr(C)]
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
-pub enum InscriptionState {
-    Raw,
-    Validated,
-    Curated,
-}
-
-#[repr(C)]
-#[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
 pub enum DataType {
+    Uninitialized,
     Binary,
     Json,
-    Png,
 }
 
 #[repr(C)]
@@ -36,7 +28,7 @@ pub enum DataType {
 pub struct InscriptionMetadata {
     pub key: Key,
     pub bump: u8,
-    pub state: InscriptionState,
+    pub data_type: DataType,
     pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
@@ -47,7 +39,7 @@ impl Default for InscriptionMetadata {
         Self {
             key: Key::InscriptionMetadataAccount,
             bump: 0,
-            state: InscriptionState::Raw,
+            data_type: DataType::Uninitialized,
             inscription_rank: u64::MAX,
             inscription_bump: None,
             update_authorities: vec![],

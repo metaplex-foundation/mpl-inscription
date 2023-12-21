@@ -31,7 +31,7 @@ export type InitializeFromMintInstructionAccounts = {
   /** The account to store the metadata in. */
   mintInscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
-  metadataAccount: PublicKey | Pda;
+  inscriptionMetadataAccount: PublicKey | Pda;
   /** The mint that will be used to derive the PDA. */
   mintAccount: PublicKey | Pda;
   /** The metadata for the mint. */
@@ -88,10 +88,10 @@ export function initializeFromMint(
       isWritable: true,
       value: input.mintInscriptionAccount ?? null,
     },
-    metadataAccount: {
+    inscriptionMetadataAccount: {
       index: 1,
       isWritable: true,
-      value: input.metadataAccount ?? null,
+      value: input.inscriptionMetadataAccount ?? null,
     },
     mintAccount: {
       index: 2,

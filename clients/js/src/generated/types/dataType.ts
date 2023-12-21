@@ -9,9 +9,9 @@
 import { Serializer, scalarEnum } from '@metaplex-foundation/umi/serializers';
 
 export enum DataType {
+  Uninitialized,
   Binary,
   Json,
-  Png,
 }
 
 export type DataTypeArgs = DataType;

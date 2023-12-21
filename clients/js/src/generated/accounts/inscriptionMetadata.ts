@@ -32,11 +32,11 @@ import {
   u8,
 } from '@metaplex-foundation/umi/serializers';
 import {
-  InscriptionState,
-  InscriptionStateArgs,
+  DataType,
+  DataTypeArgs,
   Key,
   KeyArgs,
-  getInscriptionStateSerializer,
+  getDataTypeSerializer,
   getKeySerializer,
 } from '../types';
 
@@ -45,7 +45,7 @@ export type InscriptionMetadata = Account<InscriptionMetadataAccountData>;
 export type InscriptionMetadataAccountData = {
   key: Key;
   bump: number;
-  state: InscriptionState;
+  dataType: DataType;
   inscriptionRank: bigint;
   inscriptionBump: Option<number>;
   updateAuthorities: Array<PublicKey>;
@@ -54,7 +54,7 @@ export type InscriptionMetadataAccountData = {
 export type InscriptionMetadataAccountDataArgs = {
   key: KeyArgs;
   bump: number;
-  state: InscriptionStateArgs;
+  dataType: DataTypeArgs;
   inscriptionRank: number | bigint;
   inscriptionBump: OptionOrNullable<number>;
   updateAuthorities: Array<PublicKey>;
@@ -68,7 +68,7 @@ export function getInscriptionMetadataAccountDataSerializer(): Serializer<
     [
       ['key', getKeySerializer()],
       ['bump', u8()],
-      ['state', getInscriptionStateSerializer()],
+      ['dataType', getDataTypeSerializer()],
       ['inscriptionRank', u64()],
       ['inscriptionBump', option(u8())],
       ['updateAuthorities', array(publicKeySerializer())],
@@ -158,14 +158,14 @@ export function getInscriptionMetadataGpaBuilder(
     .registerFields<{
       key: KeyArgs;
       bump: number;
-      state: InscriptionStateArgs;
+      dataType: DataTypeArgs;
       inscriptionRank: number | bigint;
       inscriptionBump: OptionOrNullable<number>;
       updateAuthorities: Array<PublicKey>;
     }>({
       key: [0, getKeySerializer()],
       bump: [1, u8()],
-      state: [2, getInscriptionStateSerializer()],
+      dataType: [2, getDataTypeSerializer()],
       inscriptionRank: [3, u64()],
       inscriptionBump: [11, option(u8())],
       updateAuthorities: [null, array(publicKeySerializer())],

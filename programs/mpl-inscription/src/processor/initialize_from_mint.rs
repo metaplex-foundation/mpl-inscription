@@ -25,8 +25,8 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
     }
 
     // Check that the account isn't already initialized.
-    if (ctx.accounts.metadata_account.owner != &system_program::ID)
-        || !ctx.accounts.metadata_account.data_is_empty()
+    if (ctx.accounts.inscription_metadata_account.owner != &system_program::ID)
+        || !ctx.accounts.inscription_metadata_account.data_is_empty()
     {
         return Err(MplInscriptionError::AlreadyInitialized.into());
     }
@@ -66,7 +66,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
     // Verify that the derived address is correct for the metadata account.
     let bump = assert_derivation(
         &crate::ID,
-        ctx.accounts.metadata_account,
+        ctx.accounts.inscription_metadata_account,
         &[
             PREFIX.as_bytes(),
             crate::ID.as_ref(),
@@ -75,7 +75,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         MplInscriptionError::DerivedKeyInvalid,
     )?;
 
-    // The payer and authority must sign.
+    // The payer must sign as well as the authority, if present.
     let authority = match ctx.accounts.authority {
         Some(authority) => {
             assert_signer(authority)?;
@@ -162,7 +162,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
     // Initialize the inscription metadata account.
     create_or_allocate_account_raw(
         crate::ID,
-        ctx.accounts.metadata_account,
+        ctx.accounts.inscription_metadata_account,
         ctx.accounts.system_program,
         ctx.accounts.payer,
         serialized_metadata.len(),
@@ -176,7 +176,10 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
 
     // Write the inscription metadata to the metadata account.
     sol_memcpy(
-        &mut ctx.accounts.metadata_account.try_borrow_mut_data()?,
+        &mut ctx
+            .accounts
+            .inscription_metadata_account
+            .try_borrow_mut_data()?,
         serialized_metadata,
         serialized_metadata.len(),
     );

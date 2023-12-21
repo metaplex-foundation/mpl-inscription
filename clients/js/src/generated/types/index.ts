@@ -7,5 +7,4 @@
  */
 
 export * from './dataType';
-export * from './inscriptionState';
 export * from './key';

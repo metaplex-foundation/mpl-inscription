@@ -2,10 +2,12 @@
 import { generateSigner } from '@metaplex-foundation/umi';
 import test from 'ava';
 import {
+  DataType,
   InscriptionMetadata,
   Key,
   MPL_INSCRIPTION_PROGRAM_ID,
   fetchInscriptionMetadata,
+  fetchInscriptionShard,
   findInscriptionMetadataPda,
   initialize,
 } from '../src';
@@ -16,29 +18,34 @@ test('it can initialize an Inscription account', async (t) => {
   const umi = await createUmi();
   const inscriptionAccount = generateSigner(umi);
 
-  const metadataAccount = await findInscriptionMetadataPda(umi, {
+  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount.publicKey,
   });
+
+  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
   // When we create a new account.
   await initialize(umi, {
     inscriptionAccount,
-    metadataAccount,
-    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    inscriptionMetadataAccount,
+    inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.
   const inscriptionMetadata = await fetchInscriptionMetadata(
     umi,
-    metadataAccount
+    inscriptionMetadataAccount
   );
 
-  // eslint-disable-next-line no-console
-  console.log(inscriptionMetadata);
+  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.InscriptionMetadataAccount,
-    bump: metadataAccount[1],
+    bump: inscriptionMetadataAccount[1],
+    dataType: DataType.Uninitialized,
+    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
   });
 
@@ -61,29 +68,34 @@ test('it can initialize multiple Inscription accounts', async (t) => {
   ];
 
   for (let i = 0; i < inscriptionAccount.length; i += 1) {
-    const metadataAccount = await findInscriptionMetadataPda(umi, {
+    const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
       inscriptionAccount: inscriptionAccount[i].publicKey,
     });
+
+    const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+    const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
     // When we create a new account.
     await initialize(umi, {
       inscriptionAccount: inscriptionAccount[i],
-      metadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+      inscriptionMetadataAccount,
+      inscriptionShardAccount,
     }).sendAndConfirm(umi);
 
     // Then an account was created with the correct data.
     const inscriptionMetadata = await fetchInscriptionMetadata(
       umi,
-      metadataAccount
+      inscriptionMetadataAccount
     );
 
-    // eslint-disable-next-line no-console
-    console.log(inscriptionMetadata);
+    const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+    t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
     t.like(inscriptionMetadata, <InscriptionMetadata>{
       key: Key.InscriptionMetadataAccount,
-      bump: metadataAccount[1],
+      bump: inscriptionMetadataAccount[1],
+      dataType: DataType.Uninitialized,
+      inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
       updateAuthorities: [umi.identity.publicKey],
     });
 
@@ -103,30 +115,35 @@ test('it can initialize an Inscription account with separate authority', async (
   const inscriptionAccount = generateSigner(umi);
   const authority = generateSigner(umi);
 
-  const metadataAccount = await findInscriptionMetadataPda(umi, {
+  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount.publicKey,
   });
+
+  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
   // When we create a new account.
   await initialize(umi, {
     inscriptionAccount,
-    metadataAccount,
-    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    inscriptionMetadataAccount,
+    inscriptionShardAccount,
     authority,
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.
   const inscriptionMetadata = await fetchInscriptionMetadata(
     umi,
-    metadataAccount
+    inscriptionMetadataAccount
   );
 
-  // eslint-disable-next-line no-console
-  console.log(inscriptionMetadata);
+  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.InscriptionMetadataAccount,
-    bump: metadataAccount[1],
+    bump: inscriptionMetadataAccount[1],
+    dataType: DataType.Uninitialized,
+    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
   });
 

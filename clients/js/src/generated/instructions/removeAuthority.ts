@@ -29,7 +29,7 @@ import {
 // Accounts.
 export type RemoveAuthorityInstructionAccounts = {
   /** The account to store the metadata's metadata in. */
-  metadataAccount: PublicKey | Pda;
+  inscriptionMetadataAccount: PublicKey | Pda;
   /** The account paying for the transaction and rent. */
   payer?: Signer;
   /** The authority of the inscription account to be removed. */
@@ -75,10 +75,10 @@ export function removeAuthority(
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    metadataAccount: {
+    inscriptionMetadataAccount: {
       index: 0,
       isWritable: true,
-      value: input.metadataAccount ?? null,
+      value: input.inscriptionMetadataAccount ?? null,
     },
     payer: { index: 1, isWritable: true, value: input.payer ?? null },
     authority: { index: 2, isWritable: false, value: input.authority ?? null },

@@ -14,7 +14,7 @@
           ]
         },
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -73,7 +73,7 @@
           ]
         },
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -148,7 +148,7 @@
           ]
         },
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -257,7 +257,7 @@
           ]
         },
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -300,7 +300,7 @@
       "name": "AddAuthority",
       "accounts": [
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -350,7 +350,7 @@
       "name": "RemoveAuthority",
       "accounts": [
         {
-          "name": "metadataAccount",
+          "name": "inscriptionMetadataAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -448,9 +448,9 @@
             "type": "u8"
           },
           {
-            "name": "state",
+            "name": "dataType",
             "type": {
-              "defined": "InscriptionState"
+              "defined": "DataType"
             }
           },
           {
@@ -557,35 +557,18 @@
       }
     },
     {
-      "name": "InscriptionState",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Raw"
-          },
-          {
-            "name": "Validated"
-          },
-          {
-            "name": "Curated"
-          }
-        ]
-      }
-    },
-    {
       "name": "DataType",
       "type": {
         "kind": "enum",
         "variants": [
           {
+            "name": "Uninitialized"
+          },
+          {
             "name": "Binary"
           },
           {
             "name": "Json"
-          },
-          {
-            "name": "Png"
           }
         ]
       }

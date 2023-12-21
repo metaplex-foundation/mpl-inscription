@@ -14,15 +14,16 @@ pub(crate) fn process_remove_authority<'a>(accounts: &'a [AccountInfo<'a>]) -> P
     let ctx = &RemoveAuthorityAccounts::context(accounts)?;
 
     // Check that the account isn't already initialized.
-    if (ctx.accounts.metadata_account.owner != &crate::ID)
-        || ctx.accounts.metadata_account.data_is_empty()
+    if (ctx.accounts.inscription_metadata_account.owner != &crate::ID)
+        || ctx.accounts.inscription_metadata_account.data_is_empty()
     {
         return Err(MplInscriptionError::NotInitialized.into());
     }
-    let mut inscription_metadata =
-        InscriptionMetadata::try_from_slice(&ctx.accounts.metadata_account.data.borrow())?;
+    let mut inscription_metadata = InscriptionMetadata::try_from_slice(
+        &ctx.accounts.inscription_metadata_account.data.borrow(),
+    )?;
 
-    // The payer and authority must sign.
+    // The payer must sign as well as the authority, if present.
     let authority = match ctx.accounts.authority {
         Some(authority) => {
             assert_signer(authority)?;
@@ -56,7 +57,7 @@ pub(crate) fn process_remove_authority<'a>(accounts: &'a [AccountInfo<'a>]) -> P
 
     // Resize the account to fit the new authority.
     resize_or_reallocate_account_raw(
-        ctx.accounts.metadata_account,
+        ctx.accounts.inscription_metadata_account,
         ctx.accounts.payer,
         ctx.accounts.system_program,
         serialized_data.len(),
@@ -64,7 +65,10 @@ pub(crate) fn process_remove_authority<'a>(accounts: &'a [AccountInfo<'a>]) -> P
 
     // Write the inscription metadata to the metadata account.
     sol_memcpy(
-        &mut ctx.accounts.metadata_account.try_borrow_mut_data()?,
+        &mut ctx
+            .accounts
+            .inscription_metadata_account
+            .try_borrow_mut_data()?,
         &serialized_data,
         serialized_data.len(),
     );

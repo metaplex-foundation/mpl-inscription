@@ -13,7 +13,7 @@ pub struct Initialize {
     /// The account to store the metadata in.
     pub inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
-    pub metadata_account: solana_program::pubkey::Pubkey,
+    pub inscription_metadata_account: solana_program::pubkey::Pubkey,
     /// The shard account for the inscription counter.
     pub inscription_shard_account: solana_program::pubkey::Pubkey,
     /// The account that will pay for the transaction and rent.
@@ -39,7 +39,7 @@ impl Initialize {
             true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.metadata_account,
+            self.inscription_metadata_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -89,7 +89,7 @@ impl InitializeInstructionData {
 #[derive(Default)]
 pub struct InitializeBuilder {
     inscription_account: Option<solana_program::pubkey::Pubkey>,
-    metadata_account: Option<solana_program::pubkey::Pubkey>,
+    inscription_metadata_account: Option<solana_program::pubkey::Pubkey>,
     inscription_shard_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
@@ -112,11 +112,11 @@ impl InitializeBuilder {
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
-    pub fn metadata_account(
+    pub fn inscription_metadata_account(
         &mut self,
-        metadata_account: solana_program::pubkey::Pubkey,
+        inscription_metadata_account: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
-        self.metadata_account = Some(metadata_account);
+        self.inscription_metadata_account = Some(inscription_metadata_account);
         self
     }
     /// The shard account for the inscription counter.
@@ -172,7 +172,9 @@ impl InitializeBuilder {
             inscription_account: self
                 .inscription_account
                 .expect("inscription_account is not set"),
-            metadata_account: self.metadata_account.expect("metadata_account is not set"),
+            inscription_metadata_account: self
+                .inscription_metadata_account
+                .expect("inscription_metadata_account is not set"),
             inscription_shard_account: self
                 .inscription_shard_account
                 .expect("inscription_shard_account is not set"),
@@ -192,7 +194,7 @@ pub struct InitializeCpiAccounts<'a, 'b> {
     /// The account to store the metadata in.
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
-    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The shard account for the inscription counter.
     pub inscription_shard_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
@@ -210,7 +212,7 @@ pub struct InitializeCpi<'a, 'b> {
     /// The account to store the metadata in.
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
-    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The shard account for the inscription counter.
     pub inscription_shard_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
@@ -229,7 +231,7 @@ impl<'a, 'b> InitializeCpi<'a, 'b> {
         Self {
             __program: program,
             inscription_account: accounts.inscription_account,
-            metadata_account: accounts.metadata_account,
+            inscription_metadata_account: accounts.inscription_metadata_account,
             inscription_shard_account: accounts.inscription_shard_account,
             payer: accounts.payer,
             authority: accounts.authority,
@@ -275,7 +277,7 @@ impl<'a, 'b> InitializeCpi<'a, 'b> {
             true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.metadata_account.key,
+            *self.inscription_metadata_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -318,7 +320,7 @@ impl<'a, 'b> InitializeCpi<'a, 'b> {
         let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.inscription_account.clone());
-        account_infos.push(self.metadata_account.clone());
+        account_infos.push(self.inscription_metadata_account.clone());
         account_infos.push(self.inscription_shard_account.clone());
         account_infos.push(self.payer.clone());
         if let Some(authority) = self.authority {
@@ -347,7 +349,7 @@ impl<'a, 'b> InitializeCpiBuilder<'a, 'b> {
         let instruction = Box::new(InitializeCpiBuilderInstruction {
             __program: program,
             inscription_account: None,
-            metadata_account: None,
+            inscription_metadata_account: None,
             inscription_shard_account: None,
             payer: None,
             authority: None,
@@ -367,11 +369,11 @@ impl<'a, 'b> InitializeCpiBuilder<'a, 'b> {
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
-    pub fn metadata_account(
+    pub fn inscription_metadata_account(
         &mut self,
-        metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+        inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.metadata_account = Some(metadata_account);
+        self.instruction.inscription_metadata_account = Some(inscription_metadata_account);
         self
     }
     /// The shard account for the inscription counter.
@@ -457,10 +459,10 @@ impl<'a, 'b> InitializeCpiBuilder<'a, 'b> {
                 .inscription_account
                 .expect("inscription_account is not set"),
 
-            metadata_account: self
+            inscription_metadata_account: self
                 .instruction
-                .metadata_account
-                .expect("metadata_account is not set"),
+                .inscription_metadata_account
+                .expect("inscription_metadata_account is not set"),
 
             inscription_shard_account: self
                 .instruction
@@ -486,7 +488,7 @@ impl<'a, 'b> InitializeCpiBuilder<'a, 'b> {
 struct InitializeCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    inscription_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     inscription_shard_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,

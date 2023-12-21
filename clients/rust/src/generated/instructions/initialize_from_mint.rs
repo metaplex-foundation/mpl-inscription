@@ -13,7 +13,7 @@ pub struct InitializeFromMint {
     /// The account to store the metadata in.
     pub mint_inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
-    pub metadata_account: solana_program::pubkey::Pubkey,
+    pub inscription_metadata_account: solana_program::pubkey::Pubkey,
     /// The mint that will be used to derive the PDA.
     pub mint_account: solana_program::pubkey::Pubkey,
     /// The metadata for the mint.
@@ -43,7 +43,7 @@ impl InitializeFromMint {
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.metadata_account,
+            self.inscription_metadata_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
@@ -103,7 +103,7 @@ impl InitializeFromMintInstructionData {
 #[derive(Default)]
 pub struct InitializeFromMintBuilder {
     mint_inscription_account: Option<solana_program::pubkey::Pubkey>,
-    metadata_account: Option<solana_program::pubkey::Pubkey>,
+    inscription_metadata_account: Option<solana_program::pubkey::Pubkey>,
     mint_account: Option<solana_program::pubkey::Pubkey>,
     token_metadata_account: Option<solana_program::pubkey::Pubkey>,
     inscription_shard_account: Option<solana_program::pubkey::Pubkey>,
@@ -128,11 +128,11 @@ impl InitializeFromMintBuilder {
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
-    pub fn metadata_account(
+    pub fn inscription_metadata_account(
         &mut self,
-        metadata_account: solana_program::pubkey::Pubkey,
+        inscription_metadata_account: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
-        self.metadata_account = Some(metadata_account);
+        self.inscription_metadata_account = Some(inscription_metadata_account);
         self
     }
     /// The mint that will be used to derive the PDA.
@@ -203,7 +203,9 @@ impl InitializeFromMintBuilder {
             mint_inscription_account: self
                 .mint_inscription_account
                 .expect("mint_inscription_account is not set"),
-            metadata_account: self.metadata_account.expect("metadata_account is not set"),
+            inscription_metadata_account: self
+                .inscription_metadata_account
+                .expect("inscription_metadata_account is not set"),
             mint_account: self.mint_account.expect("mint_account is not set"),
             token_metadata_account: self
                 .token_metadata_account
@@ -227,7 +229,7 @@ pub struct InitializeFromMintCpiAccounts<'a, 'b> {
     /// The account to store the metadata in.
     pub mint_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
-    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The mint that will be used to derive the PDA.
     pub mint_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The metadata for the mint.
@@ -249,7 +251,7 @@ pub struct InitializeFromMintCpi<'a, 'b> {
     /// The account to store the metadata in.
     pub mint_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
-    pub metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The mint that will be used to derive the PDA.
     pub mint_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The metadata for the mint.
@@ -272,7 +274,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
         Self {
             __program: program,
             mint_inscription_account: accounts.mint_inscription_account,
-            metadata_account: accounts.metadata_account,
+            inscription_metadata_account: accounts.inscription_metadata_account,
             mint_account: accounts.mint_account,
             token_metadata_account: accounts.token_metadata_account,
             inscription_shard_account: accounts.inscription_shard_account,
@@ -320,7 +322,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.metadata_account.key,
+            *self.inscription_metadata_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
@@ -373,7 +375,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
         let mut account_infos = Vec::with_capacity(8 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.mint_inscription_account.clone());
-        account_infos.push(self.metadata_account.clone());
+        account_infos.push(self.inscription_metadata_account.clone());
         account_infos.push(self.mint_account.clone());
         account_infos.push(self.token_metadata_account.clone());
         account_infos.push(self.inscription_shard_account.clone());
@@ -404,7 +406,7 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
         let instruction = Box::new(InitializeFromMintCpiBuilderInstruction {
             __program: program,
             mint_inscription_account: None,
-            metadata_account: None,
+            inscription_metadata_account: None,
             mint_account: None,
             token_metadata_account: None,
             inscription_shard_account: None,
@@ -426,11 +428,11 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
-    pub fn metadata_account(
+    pub fn inscription_metadata_account(
         &mut self,
-        metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+        inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.metadata_account = Some(metadata_account);
+        self.instruction.inscription_metadata_account = Some(inscription_metadata_account);
         self
     }
     /// The mint that will be used to derive the PDA.
@@ -534,10 +536,10 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
                 .mint_inscription_account
                 .expect("mint_inscription_account is not set"),
 
-            metadata_account: self
+            inscription_metadata_account: self
                 .instruction
-                .metadata_account
-                .expect("metadata_account is not set"),
+                .inscription_metadata_account
+                .expect("inscription_metadata_account is not set"),
 
             mint_account: self
                 .instruction
@@ -573,7 +575,7 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
 struct InitializeFromMintCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     mint_inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    inscription_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     mint_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     token_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     inscription_shard_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,

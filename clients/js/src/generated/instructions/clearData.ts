@@ -31,7 +31,7 @@ export type ClearDataInstructionAccounts = {
   /** The account to store the metadata in. */
   inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
-  metadataAccount: PublicKey | Pda;
+  inscriptionMetadataAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** The authority of the inscription account. */
@@ -79,10 +79,10 @@ export function clearData(
       isWritable: true,
       value: input.inscriptionAccount ?? null,
     },
-    metadataAccount: {
+    inscriptionMetadataAccount: {
       index: 1,
       isWritable: true,
-      value: input.metadataAccount ?? null,
+      value: input.inscriptionMetadataAccount ?? null,
     },
     payer: { index: 2, isWritable: true, value: input.payer ?? null },
     authority: { index: 3, isWritable: false, value: input.authority ?? null },

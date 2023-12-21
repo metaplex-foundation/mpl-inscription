@@ -19,19 +19,20 @@ pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResul
     }
 
     // Check that the account is already initialized.
-    if (ctx.accounts.metadata_account.owner != &crate::ID)
-        || ctx.accounts.metadata_account.data_is_empty()
+    if (ctx.accounts.inscription_metadata_account.owner != &crate::ID)
+        || ctx.accounts.inscription_metadata_account.data_is_empty()
     {
         return Err(MplInscriptionError::NotInitialized.into());
     }
 
-    let inscription_metadata =
-        InscriptionMetadata::try_from_slice(&ctx.accounts.metadata_account.data.borrow())?;
+    let inscription_metadata = InscriptionMetadata::try_from_slice(
+        &ctx.accounts.inscription_metadata_account.data.borrow(),
+    )?;
 
     // Verify that the derived address is correct for the metadata account.
     let bump = assert_derivation(
         &crate::ID,
-        ctx.accounts.metadata_account,
+        ctx.accounts.inscription_metadata_account,
         &[
             PREFIX.as_bytes(),
             crate::ID.as_ref(),
@@ -44,7 +45,7 @@ pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResul
         return Err(MplInscriptionError::DerivedKeyInvalid.into());
     }
 
-    // The payer and authority must sign.
+    // The payer must sign as well as the authority, if present.
     let authority = match ctx.accounts.authority {
         Some(authority) => {
             assert_signer(authority)?;
@@ -67,7 +68,10 @@ pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResul
 
     // Close both accounts
     close_account_raw(ctx.accounts.payer, ctx.accounts.inscription_account)?;
-    close_account_raw(ctx.accounts.payer, ctx.accounts.metadata_account)?;
+    close_account_raw(
+        ctx.accounts.payer,
+        ctx.accounts.inscription_metadata_account,
+    )?;
 
     Ok(())
 }
