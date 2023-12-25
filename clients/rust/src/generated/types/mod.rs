@@ -5,8 +5,10 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+pub(crate) mod associated_inscription;
 pub(crate) mod data_type;
 pub(crate) mod key;
 
+pub use self::associated_inscription::*;
 pub use self::data_type::*;
 pub use self::key::*;

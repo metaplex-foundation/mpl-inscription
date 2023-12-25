@@ -2,6 +2,7 @@
 import { generateSigner } from '@metaplex-foundation/umi';
 import test from 'ava';
 import {
+  AssociatedInscription,
   DataType,
   InscriptionMetadata,
   Key,
@@ -47,6 +48,7 @@ test('it can initialize an Inscription account', async (t) => {
     dataType: DataType.Uninitialized,
     inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
+    associatedInscriptions: [] as AssociatedInscription[],
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
@@ -97,6 +99,7 @@ test('it can initialize multiple Inscription accounts', async (t) => {
       dataType: DataType.Uninitialized,
       inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
       updateAuthorities: [umi.identity.publicKey],
+      associatedInscriptions: [] as AssociatedInscription[],
     });
 
     const jsonData = await umi.rpc.getAccount(inscriptionAccount[i].publicKey);
@@ -145,6 +148,7 @@ test('it can initialize an Inscription account with separate authority', async (
     dataType: DataType.Uninitialized,
     inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
+    associatedInscriptions: [] as AssociatedInscription[],
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);

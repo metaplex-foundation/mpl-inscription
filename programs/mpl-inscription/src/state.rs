@@ -24,6 +24,14 @@ pub enum DataType {
 }
 
 #[repr(C)]
+#[derive(Clone, BorshSerialize, BorshDeserialize, Debug)]
+pub struct AssociatedInscription {
+    pub tag: String,
+    pub bump: u8,
+    pub data_type: DataType,
+}
+
+#[repr(C)]
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug, ShankAccount)]
 pub struct InscriptionMetadata {
     pub key: Key,
@@ -32,6 +40,7 @@ pub struct InscriptionMetadata {
     pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
+    pub associated_inscriptions: Vec<AssociatedInscription>,
 }
 
 impl Default for InscriptionMetadata {
@@ -43,6 +52,7 @@ impl Default for InscriptionMetadata {
             inscription_rank: u64::MAX,
             inscription_bump: None,
             update_authorities: vec![],
+            associated_inscriptions: vec![],
         }
     }
 }

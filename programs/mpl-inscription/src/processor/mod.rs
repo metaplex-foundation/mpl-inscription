@@ -7,6 +7,7 @@ mod clear_data;
 mod close;
 mod create_shard;
 mod initialize;
+mod initialize_associated_inscription;
 mod initialize_from_mint;
 mod remove_authority;
 mod write_data;
@@ -16,6 +17,7 @@ use clear_data::*;
 use close::*;
 use create_shard::*;
 use initialize::*;
+use initialize_associated_inscription::*;
 use initialize_from_mint::*;
 use remove_authority::*;
 use write_data::*;
@@ -61,6 +63,10 @@ impl Processor {
             MplInscriptionInstruction::CreateShard(args) => {
                 msg!("Instruction: CreateShard");
                 process_create_shard(accounts, args)
+            }
+            MplInscriptionInstruction::InitializeAssociatedInscription(args) => {
+                msg!("Instruction: InitializeAssociatedInscription");
+                process_initialize_associated_inscription(accounts, args)
             }
         }
     }

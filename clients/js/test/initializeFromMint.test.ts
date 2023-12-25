@@ -8,6 +8,7 @@ import {
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
 import {
+  AssociatedInscription,
   DataType,
   InscriptionMetadata,
   Key,
@@ -75,6 +76,7 @@ test('it can initialize a Mint Inscription account', async (t) => {
     dataType: DataType.Uninitialized,
     inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
+    associatedInscriptions: [] as AssociatedInscription[],
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);
@@ -194,6 +196,7 @@ test('it can initialize a Mint Inscription account with separate authority', asy
     dataType: DataType.Uninitialized,
     inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
+    associatedInscriptions: [] as AssociatedInscription[],
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);

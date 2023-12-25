@@ -33,18 +33,45 @@ pub(crate) fn process_write_data<'a>(
     )?;
 
     // Verify that the derived address is correct for the metadata account.
-    let bump = assert_derivation(
-        &crate::ID,
-        ctx.accounts.inscription_metadata_account,
-        &[
-            PREFIX.as_bytes(),
-            crate::ID.as_ref(),
-            ctx.accounts.inscription_account.key.as_ref(),
-        ],
-        MplInscriptionError::DerivedKeyInvalid,
-    )?;
-    if bump != inscription_metadata.bump {
-        return Err(MplInscriptionError::DerivedKeyInvalid.into());
+    match args.associated_tag {
+        Some(tag) => {
+            let bump = assert_derivation(
+                &crate::ID,
+                ctx.accounts.inscription_account,
+                &[
+                    PREFIX.as_bytes(),
+                    tag.as_bytes(),
+                    ctx.accounts.inscription_metadata_account.key.as_ref(),
+                ],
+                MplInscriptionError::DerivedKeyInvalid,
+            )?;
+
+            // Find the tag in the associated inscriptions and check the bump.
+            if !inscription_metadata
+                .associated_inscriptions
+                .iter()
+                .any(|associated_inscription| {
+                    associated_inscription.tag == tag && associated_inscription.bump == bump
+                })
+            {
+                return Err(MplInscriptionError::DerivedKeyInvalid.into());
+            }
+        }
+        None => {
+            let bump = assert_derivation(
+                &crate::ID,
+                ctx.accounts.inscription_metadata_account,
+                &[
+                    PREFIX.as_bytes(),
+                    crate::ID.as_ref(),
+                    ctx.accounts.inscription_account.key.as_ref(),
+                ],
+                MplInscriptionError::DerivedKeyInvalid,
+            )?;
+            if bump != inscription_metadata.bump {
+                return Err(MplInscriptionError::DerivedKeyInvalid.into());
+            }
+        }
     }
 
     // The payer must sign as well as the authority, if present.

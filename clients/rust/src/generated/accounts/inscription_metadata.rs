@@ -5,6 +5,7 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+use crate::generated::types::AssociatedInscription;
 use crate::generated::types::DataType;
 use crate::generated::types::Key;
 use borsh::BorshDeserialize;
@@ -20,6 +21,7 @@ pub struct InscriptionMetadata {
     pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
+    pub associated_inscriptions: Vec<AssociatedInscription>,
 }
 
 impl InscriptionMetadata {

@@ -146,6 +146,7 @@ test('it can make an inscription immutable', async (t) => {
         value: Buffer.from(
             '{"description": "This will fail!"'
         ),
+        associatedTag: null,
     }).sendAndConfirm(umi);
 
     await t.throwsAsync(promise, { name: "InvalidAuthority" });

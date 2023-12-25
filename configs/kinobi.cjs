@@ -32,7 +32,7 @@ kinobi.update(
         k.programSeed(),
         k.variableSeed("Shard Number", k.numberTypeNode('u8', 'le')),
       ],
-    }
+    },
   })
 );
 

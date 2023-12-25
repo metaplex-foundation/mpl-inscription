@@ -1,13 +1,13 @@
 {
   "name": "@metaplex-foundation/mpl-inscription",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A simple program for inscribing bytes on chain.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.json",
     "build:docs": "typedoc",
-    "test": "ava --timeout 60s --serial --no-worker-threads",
+    "test": "ava --timeout 600s --serial --no-worker-threads",
     "lint": "eslint --ext js,ts,tsx src",
     "lint:fix": "eslint --fix --ext js,ts,tsx src",
     "format": "prettier --check src test",

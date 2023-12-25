@@ -8,8 +8,6 @@
 
 import {
   Context,
-  Option,
-  OptionOrNullable,
   Pda,
   PublicKey,
   Signer,
@@ -18,12 +16,9 @@ import {
 } from '@metaplex-foundation/umi';
 import {
   Serializer,
-  bytes,
   mapSerializer,
-  option,
   string,
   struct,
-  u32,
   u8,
 } from '@metaplex-foundation/umi/serializers';
 import {
@@ -33,11 +28,11 @@ import {
 } from '../shared';
 
 // Accounts.
-export type WriteDataInstructionAccounts = {
-  /** The account to store the metadata in. */
-  inscriptionAccount: PublicKey | Pda;
+export type InitializeAssociatedInscriptionInstructionAccounts = {
   /** The account to store the inscription account's metadata in. */
   inscriptionMetadataAccount: PublicKey | Pda;
+  /** The account to create and store the new associated data in. */
+  associatedInscriptionAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** The authority of the inscription account. */
@@ -47,45 +42,47 @@ export type WriteDataInstructionAccounts = {
 };
 
 // Data.
-export type WriteDataInstructionData = {
+export type InitializeAssociatedInscriptionInstructionData = {
   discriminator: number;
-  associatedTag: Option<string>;
-  value: Uint8Array;
+  associationTag: string;
 };
 
-export type WriteDataInstructionDataArgs = {
-  associatedTag: OptionOrNullable<string>;
-  value: Uint8Array;
+export type InitializeAssociatedInscriptionInstructionDataArgs = {
+  associationTag: string;
 };
 
-export function getWriteDataInstructionDataSerializer(): Serializer<
-  WriteDataInstructionDataArgs,
-  WriteDataInstructionData
+export function getInitializeAssociatedInscriptionInstructionDataSerializer(): Serializer<
+  InitializeAssociatedInscriptionInstructionDataArgs,
+  InitializeAssociatedInscriptionInstructionData
 > {
   return mapSerializer<
-    WriteDataInstructionDataArgs,
+    InitializeAssociatedInscriptionInstructionDataArgs,
     any,
-    WriteDataInstructionData
+    InitializeAssociatedInscriptionInstructionData
   >(
-    struct<WriteDataInstructionData>(
+    struct<InitializeAssociatedInscriptionInstructionData>(
       [
         ['discriminator', u8()],
-        ['associatedTag', option(string())],
-        ['value', bytes({ size: u32() })],
+        ['associationTag', string()],
       ],
-      { description: 'WriteDataInstructionData' }
+      { description: 'InitializeAssociatedInscriptionInstructionData' }
     ),
-    (value) => ({ ...value, discriminator: 3 })
-  ) as Serializer<WriteDataInstructionDataArgs, WriteDataInstructionData>;
+    (value) => ({ ...value, discriminator: 8 })
+  ) as Serializer<
+    InitializeAssociatedInscriptionInstructionDataArgs,
+    InitializeAssociatedInscriptionInstructionData
+  >;
 }
 
 // Args.
-export type WriteDataInstructionArgs = WriteDataInstructionDataArgs;
+export type InitializeAssociatedInscriptionInstructionArgs =
+  InitializeAssociatedInscriptionInstructionDataArgs;
 
 // Instruction.
-export function writeData(
+export function initializeAssociatedInscription(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: WriteDataInstructionAccounts & WriteDataInstructionArgs
+  input: InitializeAssociatedInscriptionInstructionAccounts &
+    InitializeAssociatedInscriptionInstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -95,15 +92,15 @@ export function writeData(
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    inscriptionAccount: {
+    inscriptionMetadataAccount: {
       index: 0,
       isWritable: true,
-      value: input.inscriptionAccount ?? null,
+      value: input.inscriptionMetadataAccount ?? null,
     },
-    inscriptionMetadataAccount: {
+    associatedInscriptionAccount: {
       index: 1,
       isWritable: true,
-      value: input.inscriptionMetadataAccount ?? null,
+      value: input.associatedInscriptionAccount ?? null,
     },
     payer: { index: 2, isWritable: true, value: input.payer ?? null },
     authority: { index: 3, isWritable: false, value: input.authority ?? null },
@@ -115,7 +112,9 @@ export function writeData(
   };
 
   // Arguments.
-  const resolvedArgs: WriteDataInstructionArgs = { ...input };
+  const resolvedArgs: InitializeAssociatedInscriptionInstructionArgs = {
+    ...input,
+  };
 
   // Default values.
   if (!resolvedAccounts.payer.value) {
@@ -142,9 +141,10 @@ export function writeData(
   );
 
   // Data.
-  const data = getWriteDataInstructionDataSerializer().serialize(
-    resolvedArgs as WriteDataInstructionDataArgs
-  );
+  const data =
+    getInitializeAssociatedInscriptionInstructionDataSerializer().serialize(
+      resolvedArgs as InitializeAssociatedInscriptionInstructionDataArgs
+    );
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

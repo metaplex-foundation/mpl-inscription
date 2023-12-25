@@ -68,11 +68,20 @@ pub enum MplInscriptionInstruction {
     #[account(1, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(2, name="system_program", desc = "System program")]
     CreateShard(CreateShardArgs),
+
+    /// Initialize the Inscription and Metadata accounts
+    #[account(0, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
+    #[account(1, writable, name="associated_inscription_account", desc = "The account to create and store the new associated data in.")]
+    #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
+    #[account(4, name="system_program", desc = "System program")]
+    InitializeAssociatedInscription(AssociateInscriptionAccountArgs),
 }
 
 #[repr(C)]
 #[derive(PartialEq, Eq, Debug, Clone, BorshSerialize, BorshDeserialize)]
 pub struct WriteDataArgs {
+    pub associated_tag: Option<String>,
     pub value: Vec<u8>,
 }
 
@@ -86,4 +95,10 @@ pub struct AddAuthorityArgs {
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
 pub struct CreateShardArgs {
     pub shard_number: u8,
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Eq, Debug, Clone)]
+pub struct AssociateInscriptionAccountArgs {
+    pub association_tag: String,
 }

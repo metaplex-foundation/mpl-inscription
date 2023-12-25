@@ -32,10 +32,13 @@ import {
   u8,
 } from '@metaplex-foundation/umi/serializers';
 import {
+  AssociatedInscription,
+  AssociatedInscriptionArgs,
   DataType,
   DataTypeArgs,
   Key,
   KeyArgs,
+  getAssociatedInscriptionSerializer,
   getDataTypeSerializer,
   getKeySerializer,
 } from '../types';
@@ -49,6 +52,7 @@ export type InscriptionMetadataAccountData = {
   inscriptionRank: bigint;
   inscriptionBump: Option<number>;
   updateAuthorities: Array<PublicKey>;
+  associatedInscriptions: Array<AssociatedInscription>;
 };
 
 export type InscriptionMetadataAccountDataArgs = {
@@ -58,6 +62,7 @@ export type InscriptionMetadataAccountDataArgs = {
   inscriptionRank: number | bigint;
   inscriptionBump: OptionOrNullable<number>;
   updateAuthorities: Array<PublicKey>;
+  associatedInscriptions: Array<AssociatedInscriptionArgs>;
 };
 
 export function getInscriptionMetadataAccountDataSerializer(): Serializer<
@@ -72,6 +77,7 @@ export function getInscriptionMetadataAccountDataSerializer(): Serializer<
       ['inscriptionRank', u64()],
       ['inscriptionBump', option(u8())],
       ['updateAuthorities', array(publicKeySerializer())],
+      ['associatedInscriptions', array(getAssociatedInscriptionSerializer())],
     ],
     { description: 'InscriptionMetadataAccountData' }
   ) as Serializer<
@@ -162,6 +168,7 @@ export function getInscriptionMetadataGpaBuilder(
       inscriptionRank: number | bigint;
       inscriptionBump: OptionOrNullable<number>;
       updateAuthorities: Array<PublicKey>;
+      associatedInscriptions: Array<AssociatedInscriptionArgs>;
     }>({
       key: [0, getKeySerializer()],
       bump: [1, u8()],
@@ -169,6 +176,10 @@ export function getInscriptionMetadataGpaBuilder(
       inscriptionRank: [3, u64()],
       inscriptionBump: [11, option(u8())],
       updateAuthorities: [null, array(publicKeySerializer())],
+      associatedInscriptions: [
+        null,
+        array(getAssociatedInscriptionSerializer()),
+      ],
     })
     .deserializeUsing<InscriptionMetadata>((account) =>
       deserializeInscriptionMetadata(account)

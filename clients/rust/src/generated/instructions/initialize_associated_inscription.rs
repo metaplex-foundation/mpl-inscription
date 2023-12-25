@@ -9,11 +9,11 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct WriteData {
-    /// The account to store the metadata in.
-    pub inscription_account: solana_program::pubkey::Pubkey,
+pub struct InitializeAssociatedInscription {
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
+    /// The account to create and store the new associated data in.
+    pub associated_inscription_account: solana_program::pubkey::Pubkey,
     /// The account that will pay for the transaction and rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// The authority of the inscription account.
@@ -22,26 +22,26 @@ pub struct WriteData {
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl WriteData {
+impl InitializeAssociatedInscription {
     pub fn instruction(
         &self,
-        args: WriteDataInstructionArgs,
+        args: InitializeAssociatedInscriptionInstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: WriteDataInstructionArgs,
+        args: InitializeAssociatedInscriptionInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.inscription_account,
+            self.inscription_metadata_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.inscription_metadata_account,
+            self.associated_inscription_account,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -62,7 +62,9 @@ impl WriteData {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = WriteDataInstructionData::new().try_to_vec().unwrap();
+        let mut data = InitializeAssociatedInscriptionInstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -75,48 +77,37 @@ impl WriteData {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct WriteDataInstructionData {
+struct InitializeAssociatedInscriptionInstructionData {
     discriminator: u8,
 }
 
-impl WriteDataInstructionData {
+impl InitializeAssociatedInscriptionInstructionData {
     fn new() -> Self {
-        Self { discriminator: 3 }
+        Self { discriminator: 8 }
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct WriteDataInstructionArgs {
-    pub associated_tag: Option<String>,
-    pub value: Vec<u8>,
+pub struct InitializeAssociatedInscriptionInstructionArgs {
+    pub association_tag: String,
 }
 
 /// Instruction builder.
 #[derive(Default)]
-pub struct WriteDataBuilder {
-    inscription_account: Option<solana_program::pubkey::Pubkey>,
+pub struct InitializeAssociatedInscriptionBuilder {
     inscription_metadata_account: Option<solana_program::pubkey::Pubkey>,
+    associated_inscription_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    associated_tag: Option<String>,
-    value: Option<Vec<u8>>,
+    association_tag: Option<String>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl WriteDataBuilder {
+impl InitializeAssociatedInscriptionBuilder {
     pub fn new() -> Self {
         Self::default()
-    }
-    /// The account to store the metadata in.
-    #[inline(always)]
-    pub fn inscription_account(
-        &mut self,
-        inscription_account: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
-        self.inscription_account = Some(inscription_account);
-        self
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
@@ -125,6 +116,15 @@ impl WriteDataBuilder {
         inscription_metadata_account: solana_program::pubkey::Pubkey,
     ) -> &mut Self {
         self.inscription_metadata_account = Some(inscription_metadata_account);
+        self
+    }
+    /// The account to create and store the new associated data in.
+    #[inline(always)]
+    pub fn associated_inscription_account(
+        &mut self,
+        associated_inscription_account: solana_program::pubkey::Pubkey,
+    ) -> &mut Self {
+        self.associated_inscription_account = Some(associated_inscription_account);
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -147,15 +147,9 @@ impl WriteDataBuilder {
         self.system_program = Some(system_program);
         self
     }
-    /// `[optional argument]`
     #[inline(always)]
-    pub fn associated_tag(&mut self, associated_tag: String) -> &mut Self {
-        self.associated_tag = Some(associated_tag);
-        self
-    }
-    #[inline(always)]
-    pub fn value(&mut self, value: Vec<u8>) -> &mut Self {
-        self.value = Some(value);
+    pub fn association_tag(&mut self, association_tag: String) -> &mut Self {
+        self.association_tag = Some(association_tag);
         self
     }
     /// Add an aditional account to the instruction.
@@ -178,34 +172,36 @@ impl WriteDataBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = WriteData {
-            inscription_account: self
-                .inscription_account
-                .expect("inscription_account is not set"),
+        let accounts = InitializeAssociatedInscription {
             inscription_metadata_account: self
                 .inscription_metadata_account
                 .expect("inscription_metadata_account is not set"),
+            associated_inscription_account: self
+                .associated_inscription_account
+                .expect("associated_inscription_account is not set"),
             payer: self.payer.expect("payer is not set"),
             authority: self.authority,
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = WriteDataInstructionArgs {
-            associated_tag: self.associated_tag.clone(),
-            value: self.value.clone().expect("value is not set"),
+        let args = InitializeAssociatedInscriptionInstructionArgs {
+            association_tag: self
+                .association_tag
+                .clone()
+                .expect("association_tag is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `write_data` CPI accounts.
-pub struct WriteDataCpiAccounts<'a, 'b> {
-    /// The account to store the metadata in.
-    pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
+/// `initialize_associated_inscription` CPI accounts.
+pub struct InitializeAssociatedInscriptionCpiAccounts<'a, 'b> {
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account to create and store the new associated data in.
+    pub associated_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
@@ -214,14 +210,14 @@ pub struct WriteDataCpiAccounts<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `write_data` CPI instruction.
-pub struct WriteDataCpi<'a, 'b> {
+/// `initialize_associated_inscription` CPI instruction.
+pub struct InitializeAssociatedInscriptionCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account to store the metadata in.
-    pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account to create and store the new associated data in.
+    pub associated_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account that will pay for the transaction and rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
@@ -229,19 +225,19 @@ pub struct WriteDataCpi<'a, 'b> {
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: WriteDataInstructionArgs,
+    pub __args: InitializeAssociatedInscriptionInstructionArgs,
 }
 
-impl<'a, 'b> WriteDataCpi<'a, 'b> {
+impl<'a, 'b> InitializeAssociatedInscriptionCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: WriteDataCpiAccounts<'a, 'b>,
-        args: WriteDataInstructionArgs,
+        accounts: InitializeAssociatedInscriptionCpiAccounts<'a, 'b>,
+        args: InitializeAssociatedInscriptionInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
-            inscription_account: accounts.inscription_account,
             inscription_metadata_account: accounts.inscription_metadata_account,
+            associated_inscription_account: accounts.associated_inscription_account,
             payer: accounts.payer,
             authority: accounts.authority,
             system_program: accounts.system_program,
@@ -283,11 +279,11 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
     ) -> solana_program::entrypoint::ProgramResult {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.inscription_account.key,
+            *self.inscription_metadata_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.inscription_metadata_account.key,
+            *self.associated_inscription_account.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -316,7 +312,9 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = WriteDataInstructionData::new().try_to_vec().unwrap();
+        let mut data = InitializeAssociatedInscriptionInstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -327,8 +325,8 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
         };
         let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.inscription_account.clone());
         account_infos.push(self.inscription_metadata_account.clone());
+        account_infos.push(self.associated_inscription_account.clone());
         account_infos.push(self.payer.clone());
         if let Some(authority) = self.authority {
             account_infos.push(authority.clone());
@@ -346,34 +344,24 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
     }
 }
 
-/// `write_data` CPI instruction builder.
-pub struct WriteDataCpiBuilder<'a, 'b> {
-    instruction: Box<WriteDataCpiBuilderInstruction<'a, 'b>>,
+/// `initialize_associated_inscription` CPI instruction builder.
+pub struct InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
+    instruction: Box<InitializeAssociatedInscriptionCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
+impl<'a, 'b> InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(WriteDataCpiBuilderInstruction {
+        let instruction = Box::new(InitializeAssociatedInscriptionCpiBuilderInstruction {
             __program: program,
-            inscription_account: None,
             inscription_metadata_account: None,
+            associated_inscription_account: None,
             payer: None,
             authority: None,
             system_program: None,
-            associated_tag: None,
-            value: None,
+            association_tag: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
-    }
-    /// The account to store the metadata in.
-    #[inline(always)]
-    pub fn inscription_account(
-        &mut self,
-        inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
-        self.instruction.inscription_account = Some(inscription_account);
-        self
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
@@ -382,6 +370,15 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
         inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.inscription_metadata_account = Some(inscription_metadata_account);
+        self
+    }
+    /// The account to create and store the new associated data in.
+    #[inline(always)]
+    pub fn associated_inscription_account(
+        &mut self,
+        associated_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.associated_inscription_account = Some(associated_inscription_account);
         self
     }
     /// The account that will pay for the transaction and rent.
@@ -409,15 +406,9 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
         self.instruction.system_program = Some(system_program);
         self
     }
-    /// `[optional argument]`
     #[inline(always)]
-    pub fn associated_tag(&mut self, associated_tag: String) -> &mut Self {
-        self.instruction.associated_tag = Some(associated_tag);
-        self
-    }
-    #[inline(always)]
-    pub fn value(&mut self, value: Vec<u8>) -> &mut Self {
-        self.instruction.value = Some(value);
+    pub fn association_tag(&mut self, association_tag: String) -> &mut Self {
+        self.instruction.association_tag = Some(association_tag);
         self
     }
     /// Add an additional account to the instruction.
@@ -461,22 +452,25 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = WriteDataInstructionArgs {
-            associated_tag: self.instruction.associated_tag.clone(),
-            value: self.instruction.value.clone().expect("value is not set"),
-        };
-        let instruction = WriteDataCpi {
-            __program: self.instruction.__program,
-
-            inscription_account: self
+        let args = InitializeAssociatedInscriptionInstructionArgs {
+            association_tag: self
                 .instruction
-                .inscription_account
-                .expect("inscription_account is not set"),
+                .association_tag
+                .clone()
+                .expect("association_tag is not set"),
+        };
+        let instruction = InitializeAssociatedInscriptionCpi {
+            __program: self.instruction.__program,
 
             inscription_metadata_account: self
                 .instruction
                 .inscription_metadata_account
                 .expect("inscription_metadata_account is not set"),
+
+            associated_inscription_account: self
+                .instruction
+                .associated_inscription_account
+                .expect("associated_inscription_account is not set"),
 
             payer: self.instruction.payer.expect("payer is not set"),
 
@@ -495,15 +489,14 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
     }
 }
 
-struct WriteDataCpiBuilderInstruction<'a, 'b> {
+struct InitializeAssociatedInscriptionCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     inscription_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    associated_inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    associated_tag: Option<String>,
-    value: Option<Vec<u8>>,
+    association_tag: Option<String>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,
