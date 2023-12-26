@@ -8,6 +8,8 @@
 
 import {
   Context,
+  Option,
+  OptionOrNullable,
   Pda,
   PublicKey,
   Signer,
@@ -17,6 +19,8 @@ import {
 import {
   Serializer,
   mapSerializer,
+  option,
+  string,
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
@@ -41,9 +45,14 @@ export type ClearDataInstructionAccounts = {
 };
 
 // Data.
-export type ClearDataInstructionData = { discriminator: number };
+export type ClearDataInstructionData = {
+  discriminator: number;
+  associatedTag: Option<string>;
+};
 
-export type ClearDataInstructionDataArgs = {};
+export type ClearDataInstructionDataArgs = {
+  associatedTag: OptionOrNullable<string>;
+};
 
 export function getClearDataInstructionDataSerializer(): Serializer<
   ClearDataInstructionDataArgs,
@@ -54,17 +63,24 @@ export function getClearDataInstructionDataSerializer(): Serializer<
     any,
     ClearDataInstructionData
   >(
-    struct<ClearDataInstructionData>([['discriminator', u8()]], {
-      description: 'ClearDataInstructionData',
-    }),
+    struct<ClearDataInstructionData>(
+      [
+        ['discriminator', u8()],
+        ['associatedTag', option(string())],
+      ],
+      { description: 'ClearDataInstructionData' }
+    ),
     (value) => ({ ...value, discriminator: 4 })
   ) as Serializer<ClearDataInstructionDataArgs, ClearDataInstructionData>;
 }
 
+// Args.
+export type ClearDataInstructionArgs = ClearDataInstructionDataArgs;
+
 // Instruction.
 export function clearData(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: ClearDataInstructionAccounts
+  input: ClearDataInstructionAccounts & ClearDataInstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -93,6 +109,9 @@ export function clearData(
     },
   };
 
+  // Arguments.
+  const resolvedArgs: ClearDataInstructionArgs = { ...input };
+
   // Default values.
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
@@ -118,7 +137,9 @@ export function clearData(
   );
 
   // Data.
-  const data = getClearDataInstructionDataSerializer().serialize({});
+  const data = getClearDataInstructionDataSerializer().serialize(
+    resolvedArgs as ClearDataInstructionDataArgs
+  );
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

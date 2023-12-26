@@ -290,7 +290,14 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "clearDataArgs",
+          "type": {
+            "defined": "ClearDataArgs"
+          }
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 4
@@ -578,8 +585,26 @@
             }
           },
           {
+            "name": "offset",
+            "type": "u64"
+          },
+          {
             "name": "value",
             "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClearDataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "associatedTag",
+            "type": {
+              "option": "string"
+            }
           }
         ]
       }

@@ -13,6 +13,7 @@ import {
 import test from 'ava';
 import {
   MPL_INSCRIPTION_PROGRAM_ID,
+  clearData,
   findAssociatedInscriptionPda,
   findInscriptionMetadataPda,
   findMintInscriptionPda,
@@ -25,7 +26,7 @@ import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
 
 const fs = require('fs');
 
-test('it can write JSON data to an inscription account', async (t) => {
+test('it can clear JSON data from an inscription account', async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
   const inscriptionAccount = generateSigner(umi);
@@ -58,22 +59,20 @@ test('it can write JSON data to an inscription account', async (t) => {
     })
   );
 
+  builder = builder.add(
+    clearData( umi, {
+      inscriptionAccount: inscriptionAccount.publicKey,
+      inscriptionMetadataAccount,
+      associatedTag: null,
+    })
+  )
+
   await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
-  // Then an account was created with the correct data.
+  // Then an account was cleared with no remaining data.
   const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
   if (jsonData.exists) {
-    const jsonString = Buffer.from(jsonData.data).toString('utf8');
-    const parsedData = JSON.parse(jsonString);
-
-    t.assert(parsedData.description);
-    t.is(parsedData.description, 'A bread! But on-chain!');
-    t.assert(parsedData.external_url);
-    t.is(parsedData.external_url, 'https://breadheads.io');
-
-    t.like(jsonData, {
-      owner: MPL_INSCRIPTION_PROGRAM_ID,
-    });
+    t.is(jsonData.data.length, 0);
   }
 });
 
@@ -126,27 +125,29 @@ test('it can write JSON data to a mint inscription account', async (t) => {
         '{"description": "A bread! But on-chain!", "external_url": "https://breadheads.io"}'
       ),
       associatedTag: null,
-      offset: 0,
+      offset: 0
     })
   );
 
+  builder = builder.add(
+    clearData( umi, {
+      inscriptionAccount: inscriptionAccount[0],
+      inscriptionMetadataAccount,
+      associatedTag: null,
+    })
+  )
+
   await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
-  // Then an account was created with the correct data.
+  // Then an account was cleared with no remaining data.
   const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);
   if (jsonData.exists) {
-    const jsonString = Buffer.from(jsonData.data).toString('utf8');
-    const parsedData = JSON.parse(jsonString);
-
-    t.assert(parsedData.description);
-    t.is(parsedData.description, 'A bread! But on-chain!');
-    t.assert(parsedData.external_url);
-    t.is(parsedData.external_url, 'https://breadheads.io');
-
-    t.like(jsonData, {
-      owner: MPL_INSCRIPTION_PROGRAM_ID,
-    });
+    t.is(jsonData.data.length, 0);
   }
+
+  t.like(jsonData, {
+    owner: MPL_INSCRIPTION_PROGRAM_ID,
+  });
 });
 
 test('it can write JSON data to an inscription account with a separate authority', async (t) => {
@@ -181,103 +182,30 @@ test('it can write JSON data to an inscription account with a separate authority
         '{"description": "A bread! But on-chain!", "external_url": "https://breadheads.io"}'
       ),
       associatedTag: null,
-      offset: 0,
+      offset: 0
     })
   );
 
+  builder = builder.add(
+    clearData( umi, {
+      inscriptionAccount: inscriptionAccount.publicKey,
+      inscriptionMetadataAccount,
+      authority,
+      associatedTag: null,
+    })
+  )
+
   await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
-  // Then an account was created with the correct data.
+  // Then an account was cleared with no remaining data.
   const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
   if (jsonData.exists) {
-    const jsonString = Buffer.from(jsonData.data).toString('utf8');
-    const parsedData = JSON.parse(jsonString);
-
-    t.assert(parsedData.description);
-    t.is(parsedData.description, 'A bread! But on-chain!');
-    t.assert(parsedData.external_url);
-    t.is(parsedData.external_url, 'https://breadheads.io');
-
-    t.like(jsonData, {
-      owner: MPL_INSCRIPTION_PROGRAM_ID,
-    });
+    t.is(jsonData.data.length, 0);
   }
-});
 
-test('it can write JSON data to an inscription account in multiple batches', async (t) => {
-  // Given a Umi instance and a new signer.
-  const umi = await createUmi();
-  const inscriptionAccount = generateSigner(umi);
-
-  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
-    inscriptionAccount: inscriptionAccount.publicKey,
+  t.like(jsonData, {
+    owner: MPL_INSCRIPTION_PROGRAM_ID,
   });
-
-  let builder = new TransactionBuilder();
-
-  // When we create a new account.
-  builder = builder.add(
-    initialize(umi, {
-      inscriptionAccount,
-      inscriptionMetadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
-    })
-  );
-
-  // And set the value.
-  builder = builder.add(
-    writeData(umi, {
-      inscriptionAccount: inscriptionAccount.publicKey,
-      inscriptionMetadataAccount,
-      value: Buffer.from(
-        '{"description": "A bread! But on-chain!"'
-      ),
-      associatedTag: null,
-      offset: 0,
-    })
-  );
-
-  builder = builder.add(
-    writeData(umi, {
-      inscriptionAccount: inscriptionAccount.publicKey,
-      inscriptionMetadataAccount,
-      value: Buffer.from(
-        ', "external_url":'
-      ),
-      associatedTag: null,
-      offset: '{"description": "A bread! But on-chain!"'.length,
-    })
-  );
-
-  builder = builder.add(
-    writeData(umi, {
-      inscriptionAccount: inscriptionAccount.publicKey,
-      inscriptionMetadataAccount,
-      value: Buffer.from(
-        ' "https://breadheads.io"}'
-      ),
-      associatedTag: null,
-      offset: '{"description": "A bread! But on-chain!", "external_url":'.length,
-    })
-  );
-
-  await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
-
-  // Then an account was created with the correct data.
-  const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
-  if (jsonData.exists) {
-    const jsonString = Buffer.from(jsonData.data).toString('utf8');
-    const parsedData = JSON.parse(jsonString);
-
-    t.assert(parsedData.description);
-    t.is(parsedData.description, 'A bread! But on-chain!');
-    t.assert(parsedData.external_url);
-    t.is(parsedData.external_url, 'https://breadheads.io');
-
-    t.like(jsonData, {
-      owner: MPL_INSCRIPTION_PROGRAM_ID,
-    });
-  }
 });
 
 test('it can write Image data to an associated inscription account', async (t) => {
@@ -324,7 +252,7 @@ test('it can write Image data to an associated inscription account', async (t) =
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(writeData(umi, {
+    promises.push(await writeData(umi, {
       inscriptionAccount: associatedInscriptionAccount,
       inscriptionMetadataAccount,
       value: chunk,
@@ -335,15 +263,21 @@ test('it can write Image data to an associated inscription account', async (t) =
 
   await Promise.all(promises);
 
-  // Then an account was created with the correct data.
-  const imageData = await umi.rpc.getAccount(associatedInscriptionAccount[0]);
-  if (imageData.exists) {
-    t.deepEqual(Buffer.from(imageData.data), imageBytes);
+  await clearData( umi, {
+    inscriptionAccount: associatedInscriptionAccount,
+    inscriptionMetadataAccount,
+    associatedTag: 'image/png'
+  }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
-    t.like(imageData, {
-      owner: MPL_INSCRIPTION_PROGRAM_ID,
-    });
+  // Then an account was cleared with no remaining data.
+  const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
+  if (jsonData.exists) {
+    t.is(jsonData.data.length, 0);
   }
+
+  t.like(jsonData, {
+    owner: MPL_INSCRIPTION_PROGRAM_ID,
+  });
 });
 
 test('it can write Image data to an associated mint inscription account', async (t) => {
@@ -410,7 +344,7 @@ test('it can write Image data to an associated mint inscription account', async 
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(writeData(umi, {
+    promises.push(await writeData(umi, {
       inscriptionAccount: associatedInscriptionAccount,
       inscriptionMetadataAccount,
       value: chunk,

@@ -24,6 +24,7 @@ import {
   string,
   struct,
   u32,
+  u64,
   u8,
 } from '@metaplex-foundation/umi/serializers';
 import {
@@ -50,11 +51,13 @@ export type WriteDataInstructionAccounts = {
 export type WriteDataInstructionData = {
   discriminator: number;
   associatedTag: Option<string>;
+  offset: bigint;
   value: Uint8Array;
 };
 
 export type WriteDataInstructionDataArgs = {
   associatedTag: OptionOrNullable<string>;
+  offset: number | bigint;
   value: Uint8Array;
 };
 
@@ -71,6 +74,7 @@ export function getWriteDataInstructionDataSerializer(): Serializer<
       [
         ['discriminator', u8()],
         ['associatedTag', option(string())],
+        ['offset', u64()],
         ['value', bytes({ size: u32() })],
       ],
       { description: 'WriteDataInstructionData' }

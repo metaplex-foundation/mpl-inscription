@@ -97,21 +97,24 @@ pub(crate) fn process_write_data<'a>(
     }
 
     let old_size = ctx.accounts.inscription_account.data_len();
-    let new_size = old_size
+    let write_end = args
+        .offset
         .checked_add(args.value.len())
         .ok_or(MplInscriptionError::NumericalOverflow)?;
 
-    // Resize the account to fit the new authority.
-    resize_or_reallocate_account_raw(
-        ctx.accounts.inscription_account,
-        ctx.accounts.payer,
-        ctx.accounts.system_program,
-        new_size,
-    )?;
+    // Resize the account to fit the new data if necessary.
+    if write_end > old_size {
+        resize_or_reallocate_account_raw(
+            ctx.accounts.inscription_account,
+            ctx.accounts.payer,
+            ctx.accounts.system_program,
+            write_end,
+        )?;
+    }
 
     // Write the inscription metadata to the metadata account.
     sol_memcpy(
-        &mut ctx.accounts.inscription_account.try_borrow_mut_data()?[old_size..],
+        &mut ctx.accounts.inscription_account.try_borrow_mut_data()?[args.offset..],
         &args.value,
         args.value.len(),
     );

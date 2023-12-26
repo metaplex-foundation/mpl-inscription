@@ -89,6 +89,7 @@ impl WriteDataInstructionData {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WriteDataInstructionArgs {
     pub associated_tag: Option<String>,
+    pub offset: u64,
     pub value: Vec<u8>,
 }
 
@@ -101,6 +102,7 @@ pub struct WriteDataBuilder {
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     associated_tag: Option<String>,
+    offset: Option<u64>,
     value: Option<Vec<u8>>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
@@ -154,6 +156,11 @@ impl WriteDataBuilder {
         self
     }
     #[inline(always)]
+    pub fn offset(&mut self, offset: u64) -> &mut Self {
+        self.offset = Some(offset);
+        self
+    }
+    #[inline(always)]
     pub fn value(&mut self, value: Vec<u8>) -> &mut Self {
         self.value = Some(value);
         self
@@ -193,6 +200,7 @@ impl WriteDataBuilder {
         };
         let args = WriteDataInstructionArgs {
             associated_tag: self.associated_tag.clone(),
+            offset: self.offset.clone().expect("offset is not set"),
             value: self.value.clone().expect("value is not set"),
         };
 
@@ -361,6 +369,7 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
             authority: None,
             system_program: None,
             associated_tag: None,
+            offset: None,
             value: None,
             __remaining_accounts: Vec::new(),
         });
@@ -416,6 +425,11 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
+    pub fn offset(&mut self, offset: u64) -> &mut Self {
+        self.instruction.offset = Some(offset);
+        self
+    }
+    #[inline(always)]
     pub fn value(&mut self, value: Vec<u8>) -> &mut Self {
         self.instruction.value = Some(value);
         self
@@ -463,6 +477,7 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
     ) -> solana_program::entrypoint::ProgramResult {
         let args = WriteDataInstructionArgs {
             associated_tag: self.instruction.associated_tag.clone(),
+            offset: self.instruction.offset.clone().expect("offset is not set"),
             value: self.instruction.value.clone().expect("value is not set"),
         };
         let instruction = WriteDataCpi {
@@ -503,6 +518,7 @@ struct WriteDataCpiBuilderInstruction<'a, 'b> {
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     associated_tag: Option<String>,
+    offset: Option<u64>,
     value: Option<Vec<u8>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(

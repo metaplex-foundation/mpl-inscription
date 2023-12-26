@@ -48,9 +48,9 @@ impl Processor {
                 msg!("Instruction: WriteData");
                 process_write_data(accounts, args)
             }
-            MplInscriptionInstruction::ClearData => {
+            MplInscriptionInstruction::ClearData(args) => {
                 msg!("Instruction: ClearData");
-                process_clear_data(accounts)
+                process_clear_data(accounts, args)
             }
             MplInscriptionInstruction::AddAuthority(args) => {
                 msg!("Instruction: AddAuthority");

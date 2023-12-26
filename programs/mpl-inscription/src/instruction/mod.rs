@@ -47,7 +47,7 @@ pub enum MplInscriptionInstruction {
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
-    ClearData,
+    ClearData(ClearDataArgs),
 
     /// Add an update authority to the Inscription
     #[account(0, writable, name="inscription_metadata_account", desc = "The account to store the metadata's metadata in.")]
@@ -82,7 +82,14 @@ pub enum MplInscriptionInstruction {
 #[derive(PartialEq, Eq, Debug, Clone, BorshSerialize, BorshDeserialize)]
 pub struct WriteDataArgs {
     pub associated_tag: Option<String>,
+    pub offset: usize,
     pub value: Vec<u8>,
+}
+
+#[repr(C)]
+#[derive(PartialEq, Eq, Debug, Clone, BorshSerialize, BorshDeserialize)]
+pub struct ClearDataArgs {
+    pub associated_tag: Option<String>,
 }
 
 #[repr(C)]
