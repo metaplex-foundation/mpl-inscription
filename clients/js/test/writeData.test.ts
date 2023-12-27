@@ -13,6 +13,7 @@ import {
 import test from 'ava';
 import {
   MPL_INSCRIPTION_PROGRAM_ID,
+  allocate,
   findAssociatedInscriptionPda,
   findInscriptionMetadataPda,
   findMintInscriptionPda,
@@ -403,6 +404,87 @@ test('it can write Image data to an associated mint inscription account', async 
 
   // Open the image file to fetch the raw bytes.
   const imageBytes: Buffer = await fs.promises.readFile('test/bread.png');
+
+  // And set the value.
+  const promises = [];
+  const chunkSize = 500;
+  for (let i = 0; i < imageBytes.length; i += chunkSize) {
+    const chunk = imageBytes.slice(i, i + chunkSize);
+    // eslint-disable-next-line no-await-in-loop
+    promises.push(writeData(umi, {
+      inscriptionAccount: associatedInscriptionAccount,
+      inscriptionMetadataAccount,
+      value: chunk,
+      associatedTag: 'image/png',
+      offset: i,
+    }).sendAndConfirm(umi));
+  }
+
+  await Promise.all(promises);
+
+  // Then an account was created with the correct data.
+  const imageData = await umi.rpc.getAccount(associatedInscriptionAccount[0]);
+  if (imageData.exists) {
+    t.deepEqual(Buffer.from(imageData.data), imageBytes);
+
+    t.like(imageData, {
+      owner: MPL_INSCRIPTION_PROGRAM_ID,
+    });
+  }
+});
+
+test('it can write Image data to an associated inscription account, with prealloc', async (t) => {
+  // Given a Umi instance and a new signer.
+  const umi = await createUmi();
+  const inscriptionAccount = generateSigner(umi);
+
+  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
+    inscriptionAccount: inscriptionAccount.publicKey,
+  });
+
+  let builder = new TransactionBuilder();
+
+  // When we create a new account.
+  builder = builder.add(
+    initialize(umi, {
+      inscriptionAccount,
+      inscriptionMetadataAccount,
+      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    })
+  );
+
+  const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
+    associated_tag: 'image/png',
+    inscriptionMetadataAccount,
+  });
+
+  builder = builder.add(
+    initializeAssociatedInscription(umi, {
+      inscriptionMetadataAccount,
+      associatedInscriptionAccount,
+      associationTag: 'image/png'
+    })
+  );
+
+  await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
+
+  // Open the image file to fetch the raw bytes.
+  const imageBytes: Buffer = await fs.promises.readFile('test/large_bread.png');
+  const resizes = Math.floor(imageBytes.length / 10240) + 1;
+  for (let i = 0; i < resizes; i+=1) {
+    // eslint-disable-next-line no-await-in-loop
+    await allocate(umi, {
+      inscriptionAccount: associatedInscriptionAccount,
+      inscriptionMetadataAccount,
+      associatedTag: 'image/png',
+      targetSize: imageBytes.length,
+    }).sendAndConfirm(umi);
+  }
+
+  const sizedAccount = await umi.rpc.getAccount(associatedInscriptionAccount[0]);
+  if (sizedAccount.exists) {
+    t.is(sizedAccount.data.length, imageBytes.length);
+  }
 
   // And set the value.
   const promises = [];

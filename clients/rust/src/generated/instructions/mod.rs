@@ -6,6 +6,7 @@
 //!
 
 pub(crate) mod add_authority;
+pub(crate) mod allocate;
 pub(crate) mod clear_data;
 pub(crate) mod close;
 pub(crate) mod create_shard;
@@ -16,6 +17,7 @@ pub(crate) mod remove_authority;
 pub(crate) mod write_data;
 
 pub use self::add_authority::*;
+pub use self::allocate::*;
 pub use self::clear_data::*;
 pub use self::close::*;
 pub use self::create_shard::*;

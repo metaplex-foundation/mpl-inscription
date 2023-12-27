@@ -7,6 +7,7 @@
  */
 
 export * from './addAuthority';
+export * from './allocate';
 export * from './clearData';
 export * from './close';
 export * from './createShard';
