@@ -7,6 +7,7 @@ mod allocate;
 mod clear_data;
 mod close;
 mod create_shard;
+mod delegate;
 mod initialize;
 mod initialize_associated_inscription;
 mod initialize_from_mint;
@@ -18,6 +19,7 @@ use allocate::*;
 use clear_data::*;
 use close::*;
 use create_shard::*;
+use delegate::*;
 use initialize::*;
 use initialize_associated_inscription::*;
 use initialize_from_mint::*;
@@ -73,6 +75,10 @@ impl Processor {
             MplInscriptionInstruction::Allocate(args) => {
                 msg!("Instruction: Allocate");
                 process_allocate(accounts, args)
+            }
+            MplInscriptionInstruction::Delegate => {
+                msg!("Instruction: Delegate");
+                process_delegate(accounts)
             }
         }
     }

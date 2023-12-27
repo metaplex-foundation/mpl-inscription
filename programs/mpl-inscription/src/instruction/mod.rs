@@ -84,6 +84,28 @@ pub enum MplInscriptionInstruction {
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     Allocate(AllocateArgs),
+
+    /// Create an Inscription Delegate for delegating inscription authority.
+    #[account(0, writable, name="delegate_record", desc="Delegate record account")]
+    #[account(1, name="delegate", desc="Owner of the delegated account")]
+    #[account(2, name="metadata", desc="Metadata account")]
+    #[account(3, name="mint", desc="Mint of metadata")]
+    #[account(4, name="token", desc="Token account of mint")]
+    #[account(5, signer, name="authority", desc="Update authority or token owner")]
+    #[account(6, signer, writable, name="payer", desc="Payer")]
+    #[account(7, name="system_program", desc="System Program")]
+    Delegate,
+
+    // / Revoke an Inscription Delegate for delegating inscription authority.
+    // #[account(0, writable, name="delegate_record", desc="Delegate record account")]
+    // #[account(1, name="delegate", desc="Owner of the delegated account")]
+    // #[account(2, name="metadata", desc="Metadata account")]
+    // #[account(3, name="mint", desc="Mint of metadata")]
+    // #[account(4, name="token", desc="Token account of mint")]
+    // #[account(5, signer, name="authority", desc="Update authority or token owner")]
+    // #[account(6, signer, writable, name="payer", desc="Payer")]
+    // #[account(7, name="system_program", desc="System Program")]
+    // Revoke,
 }
 
 #[repr(C)]
