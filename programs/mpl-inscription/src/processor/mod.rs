@@ -3,6 +3,7 @@ use borsh::BorshDeserialize;
 use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, msg, pubkey::Pubkey};
 
 mod add_authority;
+mod allocate;
 mod clear_data;
 mod close;
 mod create_shard;
@@ -13,6 +14,7 @@ mod remove_authority;
 mod write_data;
 
 use add_authority::*;
+use allocate::*;
 use clear_data::*;
 use close::*;
 use create_shard::*;
@@ -67,6 +69,10 @@ impl Processor {
             MplInscriptionInstruction::InitializeAssociatedInscription(args) => {
                 msg!("Instruction: InitializeAssociatedInscription");
                 process_initialize_associated_inscription(accounts, args)
+            }
+            MplInscriptionInstruction::Allocate(args) => {
+                msg!("Instruction: Allocate");
+                process_allocate(accounts, args)
             }
         }
     }

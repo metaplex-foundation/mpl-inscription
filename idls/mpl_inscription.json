@@ -494,6 +494,64 @@
         "type": "u8",
         "value": 8
       }
+    },
+    {
+      "name": "Allocate",
+      "accounts": [
+        {
+          "name": "inscriptionAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the metadata in."
+          ]
+        },
+        {
+          "name": "inscriptionMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the inscription account's metadata in."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true,
+          "docs": [
+            "The authority of the inscription account."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "allocateArgs",
+          "type": {
+            "defined": "AllocateArgs"
+          }
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 9
+      }
     }
   ],
   "accounts": [
@@ -605,6 +663,24 @@
             "type": {
               "option": "string"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AllocateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "associatedTag",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "targetSize",
+            "type": "u64"
           }
         ]
       }

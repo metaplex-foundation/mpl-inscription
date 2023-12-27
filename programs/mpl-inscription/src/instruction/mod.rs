@@ -5,7 +5,7 @@ use solana_program::pubkey::Pubkey;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, ShankContext, ShankInstruction)]
 #[rustfmt::skip]
 pub enum MplInscriptionInstruction {
-    /// Initialize the Inscription and Metadata accounts
+    /// Initialize the Inscription and Metadata accounts.
     #[account(0, writable, signer, name="inscription_account", desc = "The account to store the metadata in.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, writable, name="inscription_shard_account", desc="The shard account for the inscription counter.")]
@@ -14,7 +14,7 @@ pub enum MplInscriptionInstruction {
     #[account(5, name="system_program", desc = "System program")]
     Initialize,
 
-    /// Initialize the Inscription and Metadata accounts as a Mint PDA
+    /// Initialize the Inscription and Metadata accounts as a Mint PDA.
     #[account(0, writable, name="mint_inscription_account", desc = "The account to store the metadata in.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, name="mint_account", desc="The mint that will be used to derive the PDA.")]
@@ -25,7 +25,7 @@ pub enum MplInscriptionInstruction {
     #[account(7, name="system_program", desc = "System program")]
     InitializeFromMint,
 
-    /// Close the Inscription and Metadata accounts
+    /// Close the Inscription and Metadata accounts.
     #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
@@ -33,7 +33,7 @@ pub enum MplInscriptionInstruction {
     #[account(4, name="system_program", desc = "System program")]
     Close,
 
-    /// Write data to the inscription account
+    /// Write data to the inscription account.
     #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
@@ -41,7 +41,7 @@ pub enum MplInscriptionInstruction {
     #[account(4, name="system_program", desc = "System program")]
     WriteData(WriteDataArgs),
 
-    /// Clear the inscription account
+    /// Clear the inscription account.
     #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
@@ -49,33 +49,41 @@ pub enum MplInscriptionInstruction {
     #[account(4, name="system_program", desc = "System program")]
     ClearData(ClearDataArgs),
 
-    /// Add an update authority to the Inscription
+    /// Add an update authority to the Inscription.
     #[account(0, writable, name="inscription_metadata_account", desc = "The account to store the metadata's metadata in.")]
     #[account(1, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(2, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(3, name="system_program", desc = "System program")]
     AddAuthority(AddAuthorityArgs),
 
-    /// Remove an update authority from the Inscription account
+    /// Remove an update authority from the Inscription account.
     #[account(0, writable, name="inscription_metadata_account", desc = "The account to store the metadata's metadata in.")]
     #[account(1, writable, signer, name="payer", desc="The account paying for the transaction and rent.")]
     #[account(2, optional, signer, name="authority", desc="The authority of the inscription account to be removed.")]
     #[account(3, name="system_program", desc = "System program")]
     RemoveAuthority,
 
-    /// Create an Inscription Shard account for counting inscriptions
+    /// Create an Inscription Shard account for counting inscriptions.
     #[account(0, writable, name="shard_account", desc = "The account to store the shard data in.")]
     #[account(1, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(2, name="system_program", desc = "System program")]
     CreateShard(CreateShardArgs),
 
-    /// Initialize the Inscription and Metadata accounts
+    /// Initialize the Inscription and Metadata accounts.
     #[account(0, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(1, writable, name="associated_inscription_account", desc = "The account to create and store the new associated data in.")]
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     InitializeAssociatedInscription(AssociateInscriptionAccountArgs),
+
+    /// Allocate additional space for the inscription account.
+    #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
+    #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
+    #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
+    #[account(4, name="system_program", desc = "System program")]
+    Allocate(AllocateArgs),
 }
 
 #[repr(C)]
@@ -90,6 +98,13 @@ pub struct WriteDataArgs {
 #[derive(PartialEq, Eq, Debug, Clone, BorshSerialize, BorshDeserialize)]
 pub struct ClearDataArgs {
     pub associated_tag: Option<String>,
+}
+
+#[repr(C)]
+#[derive(PartialEq, Eq, Debug, Clone, BorshSerialize, BorshDeserialize)]
+pub struct AllocateArgs {
+    pub associated_tag: Option<String>,
+    pub target_size: usize,
 }
 
 #[repr(C)]
