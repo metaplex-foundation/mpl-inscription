@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.0.0
     version: 1.0.0(@metaplex-foundation/umi@0.8.10)
   '@metaplex-foundation/mpl-inscription':
-    specifier: ^0.4.0
-    version: 0.4.0(@metaplex-foundation/umi@0.8.10)
+    specifier: ^0.5.1
+    version: 0.5.1(@metaplex-foundation/umi@0.8.10)
   '@metaplex-foundation/mpl-token-metadata':
     specifier: ^3.1.2
     version: 3.1.2(@metaplex-foundation/umi@0.8.10)
@@ -26,11 +26,14 @@ dependencies:
   commander:
     specifier: ^11.1.0
     version: 11.1.0
+  p-map:
+    specifier: npm:@esm2cjs/p-map@^5.5.0
+    version: /@esm2cjs/p-map@5.5.0
 
 devDependencies:
   '@types/node':
-    specifier: ^20.10.4
-    version: 20.10.4
+    specifier: ^20.10.5
+    version: 20.10.5
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
@@ -44,6 +47,38 @@ packages:
       regenerator-runtime: 0.14.1
     dev: false
 
+  /@esm2cjs/aggregate-error@4.0.1:
+    resolution: {integrity: sha512-bcKpYqFlH6BJhIV0ru9zymGCNZ7WB6F9YdBADaBPkMM2hewT0xYSHni728KYddb11XrVGHEC0s3TrtD+Mj+W7w==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@esm2cjs/clean-stack': 4.2.0
+      '@esm2cjs/indent-string': 5.0.0
+    dev: false
+
+  /@esm2cjs/clean-stack@4.2.0:
+    resolution: {integrity: sha512-GdtbXpzo98WA7ZgqAxI4KY1O5sZ4jkorAKcpClLyyQwkfShMRRgz7ElUJ/Qj/jJvqJs70FLMlaGr5g9uZRRRbw==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@esm2cjs/escape-string-regexp': 5.0.0
+    dev: false
+
+  /@esm2cjs/escape-string-regexp@5.0.0:
+    resolution: {integrity: sha512-10eGSwdRLZ3eTZXZKxX4/+Kz2Lf1wLZcNbrZR4NQKSjfrne8q/p2YW8yQ34M3UMNQNK0XoXYiYTxm9U+YicvOA==}
+    engines: {node: '>=12'}
+    dev: false
+
+  /@esm2cjs/indent-string@5.0.0:
+    resolution: {integrity: sha512-vulgkPAkBMW4gOLurzjCQQAd0rp9Gogjl3TSkB+XxrxD+GpgG6SJIG3UedZQsAl+wQtW8h/a3m4EQjQgrA099w==}
+    engines: {node: '>=12'}
+    dev: false
+
+  /@esm2cjs/p-map@5.5.0:
+    resolution: {integrity: sha512-C+Nq0nRLWKEXOhQxaz15Emg0erhkOlTy/A+dOM7vn9/pNcJj55zwecRwwAZ5/mmYPBhwQCkqZLMEWVbTQbyZTA==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@esm2cjs/aggregate-error': 4.0.1
+    dev: false
+
   /@metaplex-foundation/digital-asset-standard-api@1.0.0(@metaplex-foundation/umi@0.8.10):
     resolution: {integrity: sha512-RShZFkLa3SKl8Rs13okG9vG3N3ZfRrcHBImEEds3Rb8mghHWGU3IL2+X9FdIRMnE44jNJ3vZlVeEBU3kIZPBvw==}
     peerDependencies:
@@ -52,8 +87,8 @@ packages:
       '@metaplex-foundation/umi': 0.8.10
     dev: false
 
-  /@metaplex-foundation/mpl-inscription@0.4.0(@metaplex-foundation/umi@0.8.10):
-    resolution: {integrity: sha512-Tck+4//r9HKWVeajWnU6SXfvFlx6osHzf+Wv0kLuYa4OW9FJvE2Ichq+MJEIagJ+zeFckruTejbYfh1JuenjMA==}
+  /@metaplex-foundation/mpl-inscription@0.5.1(@metaplex-foundation/umi@0.8.10):
+    resolution: {integrity: sha512-GaACW27OhI4TuP0xosDs3mkKc0lyEEedYjXYBlt4OwTwCmHwjBVjZ+W4UBD89h1SLGPpK6vVxClrUDJcYr4H9g==}
     peerDependencies:
       '@metaplex-foundation/umi': ^0.8.2
     dependencies:
@@ -283,22 +318,22 @@ packages:
   /@types/connect@3.4.38:
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
     dependencies:
-      '@types/node': 20.10.4
+      '@types/node': 20.10.5
     dev: false
 
   /@types/node@12.20.55:
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
     dev: false
 
-  /@types/node@20.10.4:
-    resolution: {integrity: sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==}
+  /@types/node@20.10.5:
+    resolution: {integrity: sha512-nNPsNE65wjMxEKI93yOP+NPGGBJz/PoN3kZsVLee0XMiJolxSekEVD8wRwBUBqkwc7UWop0edW50yrCQW4CyRw==}
     dependencies:
       undici-types: 5.26.5
 
   /@types/ws@7.4.7:
     resolution: {integrity: sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==}
     dependencies:
-      '@types/node': 20.10.4
+      '@types/node': 20.10.5
     dev: false
 
   /JSONStream@1.3.5:
@@ -494,7 +529,7 @@ packages:
       '@babel/runtime': 7.23.6
       eventemitter3: 4.0.7
       uuid: 8.3.2
-      ws: 8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.16.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 5.0.10
@@ -566,8 +601,8 @@ packages:
         optional: true
     dev: false
 
-  /ws@8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
-    resolution: {integrity: sha512-W5OZiCjXEmk0yZ66ZN82beM5Sz7l7coYxpRkzS+p9PP+ToQry8szKh+61eNktr7EA9DOwvFGhfC605jDHbP6QQ==}
+  /ws@8.16.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    resolution: {integrity: sha512-HS0c//TP7Ina87TfiPUz1rQzMhHrl/SG2guqRcTOIUYD2q8uhUdNHZYJUaQ8aTGPzCh+c6oawMKW35nFl1dxyQ==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
