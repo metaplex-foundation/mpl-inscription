@@ -5,8 +5,12 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+pub(crate) mod associated_inscription_account;
 pub(crate) mod inscription_metadata;
 pub(crate) mod inscription_shard;
+pub(crate) mod mint_inscription;
 
+pub use self::associated_inscription_account::*;
 pub use self::inscription_metadata::*;
 pub use self::inscription_shard::*;
+pub use self::mint_inscription::*;

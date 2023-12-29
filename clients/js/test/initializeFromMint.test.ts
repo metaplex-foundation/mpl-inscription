@@ -3,7 +3,6 @@ import test from 'ava';
 import {
   TokenStandard,
   createV1,
-  fetchDigitalAsset,
   mintV1,
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
@@ -16,10 +15,11 @@ import {
   fetchInscriptionMetadata,
   fetchInscriptionShard,
   findInscriptionMetadataPda,
+  findInscriptionShardPda,
   findMintInscriptionPda,
   initializeFromMint,
 } from '../src';
-import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
+import { createUmi } from './_setup';
 
 test('it can initialize a Mint Inscription account', async (t) => {
   // Given a Umi instance and a new signer.
@@ -47,18 +47,15 @@ test('it can initialize a Mint Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
-  const asset = await fetchDigitalAsset(umi, mint.publicKey);
+  // const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   // When we create a new account.
   await initializeFromMint(umi, {
-    mintInscriptionAccount: inscriptionAccount,
-    inscriptionMetadataAccount,
     mintAccount: mint.publicKey,
-    tokenMetadataAccount: asset.metadata.publicKey,
-    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.
@@ -108,26 +105,16 @@ test('it cannot initialize a Mint Inscription account if it is not the update au
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
-  const inscriptionAccount = await findMintInscriptionPda(umi, {
-    mint: mint.publicKey,
-  });
-  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
-    inscriptionAccount: inscriptionAccount[0],
-  });
-
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
-  const asset = await fetchDigitalAsset(umi, mint.publicKey);
+  // const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   // When we create a new account.
   const promise = initializeFromMint(umi, {
-    mintInscriptionAccount: inscriptionAccount,
-    inscriptionMetadataAccount,
     mintAccount: mint.publicKey,
     authority,
-    tokenMetadataAccount: asset.metadata.publicKey,
-    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
   await t.throwsAsync(promise, { name: 'InvalidAuthority' });
@@ -154,7 +141,7 @@ test('it can initialize a Mint Inscription account with separate authority', asy
     creators: [{address: authority.publicKey, verified: false, share: 100}],
   }).sendAndConfirm(umi);
 
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
   await mintV1(umi, {
@@ -169,16 +156,12 @@ test('it can initialize a Mint Inscription account with separate authority', asy
   const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount[0],
   });
-  const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   // When we create a new account.
   await initializeFromMint(umi, {
-    mintInscriptionAccount: inscriptionAccount,
-    inscriptionMetadataAccount,
     mintAccount: mint.publicKey,
-    tokenMetadataAccount: asset.metadata.publicKey,
     authority,
-    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
   // Then an account was created with the correct data.

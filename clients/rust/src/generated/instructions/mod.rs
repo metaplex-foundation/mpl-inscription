@@ -10,9 +10,7 @@ pub(crate) mod allocate;
 pub(crate) mod clear_data;
 pub(crate) mod close;
 pub(crate) mod create_shard;
-pub(crate) mod initialize;
 pub(crate) mod initialize_associated_inscription;
-pub(crate) mod initialize_from_mint;
 pub(crate) mod remove_authority;
 pub(crate) mod write_data;
 
@@ -21,8 +19,6 @@ pub use self::allocate::*;
 pub use self::clear_data::*;
 pub use self::close::*;
 pub use self::create_shard::*;
-pub use self::initialize::*;
 pub use self::initialize_associated_inscription::*;
-pub use self::initialize_from_mint::*;
 pub use self::remove_authority::*;
 pub use self::write_data::*;

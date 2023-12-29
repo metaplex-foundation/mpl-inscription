@@ -6,7 +6,6 @@ import {
 import {
   TokenStandard,
   createV1,
-  fetchDigitalAsset,
   mintV1,
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
@@ -22,7 +21,7 @@ import {
   initializeFromMint,
   writeData,
 } from '../src';
-import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
+import { createUmi } from './_setup';
 
 const fs = require('fs');
 
@@ -41,8 +40,6 @@ test('it can write JSON data to an inscription account', async (t) => {
   builder = builder.add(
     initialize(umi, {
       inscriptionAccount,
-      inscriptionMetadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
 
@@ -103,18 +100,13 @@ test('it can write JSON data to a mint inscription account', async (t) => {
   const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount[0],
   });
-  const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   let builder = new TransactionBuilder();
 
   // When we create a new account.
   builder = builder.add(
     initializeFromMint(umi, {
-      mintInscriptionAccount: inscriptionAccount[0],
-      inscriptionMetadataAccount,
       mintAccount: mint.publicKey,
-      tokenMetadataAccount: asset.metadata.publicKey,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
 
@@ -166,8 +158,6 @@ test('it can write JSON data to an inscription account with a separate authority
   builder = builder.add(
     initialize(umi, {
       inscriptionAccount,
-      inscriptionMetadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
       authority,
     })
   );
@@ -220,8 +210,6 @@ test('it can write JSON data to an inscription account in multiple batches', asy
   builder = builder.add(
     initialize(umi, {
       inscriptionAccount,
-      inscriptionMetadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
 
@@ -296,8 +284,6 @@ test('it can write Image data to an associated inscription account', async (t) =
   builder = builder.add(
     initialize(umi, {
       inscriptionAccount,
-      inscriptionMetadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
 
@@ -372,18 +358,13 @@ test('it can write Image data to an associated mint inscription account', async 
   const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount[0],
   });
-  const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   let builder = new TransactionBuilder();
 
   // When we create a new account.
   builder = builder.add(
     initializeFromMint(umi, {
-      mintInscriptionAccount: inscriptionAccount[0],
-      inscriptionMetadataAccount,
       mintAccount: mint.publicKey,
-      tokenMetadataAccount: asset.metadata.publicKey,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
 
@@ -448,8 +429,6 @@ test('it can write Image data to an associated inscription account, with preallo
   builder = builder.add(
     initialize(umi, {
       inscriptionAccount,
-      inscriptionMetadataAccount,
-      inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
     })
   );
 

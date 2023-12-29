@@ -7,13 +7,12 @@ import {
     MPL_INSCRIPTION_PROGRAM_ID,
     addAuthority,
     fetchInscriptionMetadata,
-    fetchInscriptionShard,
     findInscriptionMetadataPda,
     initialize,
     removeAuthority,
     writeData,
 } from '../src';
-import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
+import { createUmi } from './_setup';
 
 test('it can add an authority to an inscription', async (t) => {
     // Given a Umi instance and a new signer.
@@ -25,14 +24,9 @@ test('it can add an authority to an inscription', async (t) => {
         inscriptionAccount: inscriptionAccount.publicKey,
     });
 
-    const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
-    const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
-
     // When we create a new account.
     await initialize(umi, {
         inscriptionAccount,
-        inscriptionMetadataAccount,
-        inscriptionShardAccount,
     }).sendAndConfirm(umi);
 
     // Then an account was created with the correct data.
@@ -41,14 +35,10 @@ test('it can add an authority to an inscription', async (t) => {
         inscriptionMetadataAccount
     );
 
-    const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
-    t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
-
     t.like(inscriptionMetadata, <InscriptionMetadata>{
         key: Key.InscriptionMetadataAccount,
         bump: inscriptionMetadataAccount[1],
         dataType: DataType.Uninitialized,
-        inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
         updateAuthorities: [umi.identity.publicKey],
     });
 
@@ -74,7 +64,6 @@ test('it can add an authority to an inscription', async (t) => {
         key: Key.InscriptionMetadataAccount,
         bump: inscriptionMetadataAccount[1],
         dataType: DataType.Uninitialized,
-        inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
         updateAuthorities: [umi.identity.publicKey, authority.publicKey],
     });
 });
@@ -88,14 +77,9 @@ test('it can make an inscription immutable', async (t) => {
         inscriptionAccount: inscriptionAccount.publicKey,
     });
 
-    const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
-    const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
-
     // When we create a new account.
     await initialize(umi, {
         inscriptionAccount,
-        inscriptionMetadataAccount,
-        inscriptionShardAccount,
     }).sendAndConfirm(umi);
 
     // Then an account was created with the correct data.
@@ -104,14 +88,10 @@ test('it can make an inscription immutable', async (t) => {
         inscriptionMetadataAccount
     );
 
-    const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
-    t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
-
     t.like(inscriptionMetadata, <InscriptionMetadata>{
         key: Key.InscriptionMetadataAccount,
         bump: inscriptionMetadataAccount[1],
         dataType: DataType.Uninitialized,
-        inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
         updateAuthorities: [umi.identity.publicKey],
     });
 
@@ -136,7 +116,6 @@ test('it can make an inscription immutable', async (t) => {
         key: Key.InscriptionMetadataAccount,
         bump: inscriptionMetadataAccount[1],
         dataType: DataType.Uninitialized,
-        inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
         updateAuthorities: [] as PublicKey[],
     });
 
