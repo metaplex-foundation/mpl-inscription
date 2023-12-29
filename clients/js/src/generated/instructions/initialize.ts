@@ -20,9 +20,11 @@ import {
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
+import { findInscriptionMetadataPda } from '../accounts';
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
+  expectPublicKey,
   getAccountMetasAndSigners,
 } from '../shared';
 
@@ -31,7 +33,7 @@ export type InitializeInstructionAccounts = {
   /** The account to store the metadata in. */
   inscriptionAccount: Signer;
   /** The account to store the inscription account's metadata in. */
-  inscriptionMetadataAccount: PublicKey | Pda;
+  inscriptionMetadataAccount?: PublicKey | Pda;
   /** The shard account for the inscription counter. */
   inscriptionShardAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
@@ -65,7 +67,7 @@ export function getInitializeInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function initialize(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: InitializeInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -101,6 +103,14 @@ export function initialize(
   };
 
   // Default values.
+  if (!resolvedAccounts.inscriptionMetadataAccount.value) {
+    resolvedAccounts.inscriptionMetadataAccount.value =
+      findInscriptionMetadataPda(context, {
+        inscriptionAccount: expectPublicKey(
+          resolvedAccounts.inscriptionAccount.value
+        ),
+      });
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }

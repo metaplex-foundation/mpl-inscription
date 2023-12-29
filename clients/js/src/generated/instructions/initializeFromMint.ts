@@ -6,6 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
+import { findMetadataPda } from '@metaplex-foundation/mpl-token-metadata';
 import {
   Context,
   Pda,
@@ -23,6 +24,7 @@ import {
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
+  expectPublicKey,
   getAccountMetasAndSigners,
 } from '../shared';
 
@@ -35,7 +37,7 @@ export type InitializeFromMintInstructionAccounts = {
   /** The mint that will be used to derive the PDA. */
   mintAccount: PublicKey | Pda;
   /** The metadata for the mint. */
-  tokenMetadataAccount: PublicKey | Pda;
+  tokenMetadataAccount?: PublicKey | Pda;
   /** The shard account for the inscription counter. */
   inscriptionShardAccount: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
@@ -72,7 +74,7 @@ export function getInitializeFromMintInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function initializeFromMint(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: InitializeFromMintInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -118,6 +120,11 @@ export function initializeFromMint(
   };
 
   // Default values.
+  if (!resolvedAccounts.tokenMetadataAccount.value) {
+    resolvedAccounts.tokenMetadataAccount.value = findMetadataPda(context, {
+      mint: expectPublicKey(resolvedAccounts.mintAccount.value),
+    });
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }

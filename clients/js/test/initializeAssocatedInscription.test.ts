@@ -3,7 +3,6 @@ import test from 'ava';
 import {
   TokenStandard,
   createV1,
-  fetchDigitalAsset,
   mintV1,
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
@@ -16,12 +15,13 @@ import {
   fetchInscriptionShard,
   findAssociatedInscriptionPda,
   findInscriptionMetadataPda,
+  findInscriptionShardPda,
   findMintInscriptionPda,
   initialize,
   initializeAssociatedInscription,
   initializeFromMint,
 } from '../src';
-import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
+import { createUmi } from './_setup';
 
 test('it can initialize an Associated Inscription account', async (t) => {
   // Given a Umi instance and a new signer.
@@ -32,13 +32,12 @@ test('it can initialize an Associated Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount.publicKey,
   });
 
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
   // When we create a new account.
   await initialize(umi, {
     inscriptionAccount,
-    inscriptionMetadataAccount,
     inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
@@ -53,7 +52,7 @@ test('it can initialize an Associated Inscription account', async (t) => {
   // Create an Associated Inscription account.
   await initializeAssociatedInscription(umi, {
     inscriptionMetadataAccount,
-    associatedInscriptionAccount,
+    // associatedInscriptionAccount,
     associationTag: 'image/png'
   }).sendAndConfirm(umi);
 
@@ -111,18 +110,15 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
-  const asset = await fetchDigitalAsset(umi, mint.publicKey);
+  // const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
   // When we create a new account.
   await initializeFromMint(umi, {
-    mintInscriptionAccount: inscriptionAccount,
-    inscriptionMetadataAccount,
     mintAccount: mint.publicKey,
-    tokenMetadataAccount: asset.metadata.publicKey,
-    inscriptionShardAccount: await fetchIdempotentInscriptionShard(umi),
+    inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
   const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
@@ -136,7 +132,7 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
   // Create an Associated Inscription account.
   await initializeAssociatedInscription(umi, {
     inscriptionMetadataAccount,
-    associatedInscriptionAccount,
+    // associatedInscriptionAccount,
     associationTag: 'image/png'
   }).sendAndConfirm(umi);
 
