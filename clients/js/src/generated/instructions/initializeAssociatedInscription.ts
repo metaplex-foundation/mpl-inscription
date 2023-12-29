@@ -21,9 +21,12 @@ import {
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
+import { findAssociatedInscriptionAccountPda } from '../accounts';
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
+  expectPublicKey,
+  expectSome,
   getAccountMetasAndSigners,
 } from '../shared';
 
@@ -32,7 +35,7 @@ export type InitializeAssociatedInscriptionInstructionAccounts = {
   /** The account to store the inscription account's metadata in. */
   inscriptionMetadataAccount: PublicKey | Pda;
   /** The account to create and store the new associated data in. */
-  associatedInscriptionAccount: PublicKey | Pda;
+  associatedInscriptionAccount?: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
   payer?: Signer;
   /** The authority of the inscription account. */
@@ -80,7 +83,7 @@ export type InitializeAssociatedInscriptionInstructionArgs =
 
 // Instruction.
 export function initializeAssociatedInscription(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: InitializeAssociatedInscriptionInstructionAccounts &
     InitializeAssociatedInscriptionInstructionArgs
 ): TransactionBuilder {
@@ -117,6 +120,15 @@ export function initializeAssociatedInscription(
   };
 
   // Default values.
+  if (!resolvedAccounts.associatedInscriptionAccount.value) {
+    resolvedAccounts.associatedInscriptionAccount.value =
+      findAssociatedInscriptionAccountPda(context, {
+        associationTag: expectSome(resolvedArgs.associationTag),
+        inscriptionMetadataAccount: expectPublicKey(
+          resolvedAccounts.inscriptionMetadataAccount.value
+        ),
+      });
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }

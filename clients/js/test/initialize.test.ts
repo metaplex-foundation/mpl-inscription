@@ -10,9 +10,10 @@ import {
   fetchInscriptionMetadata,
   fetchInscriptionShard,
   findInscriptionMetadataPda,
+  findInscriptionShardPda,
   initialize,
 } from '../src';
-import { createUmi, fetchIdempotentInscriptionShard } from './_setup';
+import { createUmi } from './_setup';
 
 test('it can initialize an Inscription account', async (t) => {
   // Given a Umi instance and a new signer.
@@ -23,13 +24,12 @@ test('it can initialize an Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount.publicKey,
   });
 
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
   // When we create a new account.
   await initialize(umi, {
     inscriptionAccount,
-    inscriptionMetadataAccount,
     inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
@@ -74,13 +74,12 @@ test('it can initialize multiple Inscription accounts', async (t) => {
       inscriptionAccount: inscriptionAccount[i].publicKey,
     });
 
-    const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+    const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
     const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
     // When we create a new account.
     await initialize(umi, {
       inscriptionAccount: inscriptionAccount[i],
-      inscriptionMetadataAccount,
       inscriptionShardAccount,
     }).sendAndConfirm(umi);
 
@@ -122,13 +121,12 @@ test('it can initialize an Inscription account with separate authority', async (
     inscriptionAccount: inscriptionAccount.publicKey,
   });
 
-  const inscriptionShardAccount = await fetchIdempotentInscriptionShard(umi);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
   const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
 
   // When we create a new account.
   await initialize(umi, {
     inscriptionAccount,
-    inscriptionMetadataAccount,
     inscriptionShardAccount,
     authority,
   }).sendAndConfirm(umi);
