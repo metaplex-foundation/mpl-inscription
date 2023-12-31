@@ -193,6 +193,18 @@ kinobi.accept(new k.RenderJavaScriptVisitor(jsDir, {
   },
 }));
 
+// Go back to rendering the instructions for the rust SDK
+kinobi.update(
+  new k.UpdateInstructionsVisitor({
+    initialize: {
+      internal: false,
+    },
+    initializeFromMint: {
+      internal: false,
+    }
+  })
+);
+
 // Render Rust.
 const crateDir = path.join(clientDir, "rust");
 const rustDir = path.join(clientDir, "rust", "src", "generated");
