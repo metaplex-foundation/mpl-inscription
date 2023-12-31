@@ -6,5 +6,17 @@ mod initialize_from_mint;
 
 pub use generated::programs::MPL_INSCRIPTION_ID as ID;
 pub use generated::*;
-pub use initialize::*;
-pub use initialize_from_mint::*;
+
+mod manual {
+    pub mod instructions {
+        pub(crate) mod initialize {
+            pub use crate::initialize::*;
+        }
+        pub(crate) mod initialize_from_mint {
+            pub use crate::initialize_from_mint::*;
+        }
+    }
+}
+pub use manual::*;
+// pub use initialize::*;
+// pub use initialize_from_mint::*;
