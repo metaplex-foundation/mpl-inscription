@@ -1863,6 +1863,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kaigan"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ade400c53c86236d5b03b681e6c4e3d1d8da674e78a3916480886614674f017"
+dependencies = [
+ "borsh 0.10.3",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2082,10 +2091,11 @@ dependencies = [
 
 [[package]]
 name = "mpl-inscription"
-version = "0.5.1"
+version = "0.5.5"
 dependencies = [
  "assert_matches",
  "borsh 0.10.3",
+ "kaigan",
  "num-derive 0.3.3",
  "num-traits",
  "serde",

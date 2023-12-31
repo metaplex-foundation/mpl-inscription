@@ -6,5 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
+export * from './associatedInscriptionAccount';
 export * from './inscriptionMetadata';
 export * from './inscriptionShard';
+export * from './mintInscription';
