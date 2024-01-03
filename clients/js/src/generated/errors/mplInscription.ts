@@ -201,6 +201,32 @@ export class InvalidShardAccountError extends ProgramError {
 codeToErrorMap.set(0xd, InvalidShardAccountError);
 nameToErrorMap.set('InvalidShardAccount', InvalidShardAccountError);
 
+/** InvalidCollectionNFT: The provided NFT is not a collection NFT. */
+export class InvalidCollectionNFTError extends ProgramError {
+  readonly name: string = 'InvalidCollectionNFT';
+
+  readonly code: number = 0xe; // 14
+
+  constructor(program: Program, cause?: Error) {
+    super('The provided NFT is not a collection NFT.', program, cause);
+  }
+}
+codeToErrorMap.set(0xe, InvalidCollectionNFTError);
+nameToErrorMap.set('InvalidCollectionNFT', InvalidCollectionNFTError);
+
+/** InvalidDelegate: The provided delegate is invalid. */
+export class InvalidDelegateError extends ProgramError {
+  readonly name: string = 'InvalidDelegate';
+
+  readonly code: number = 0xf; // 15
+
+  constructor(program: Program, cause?: Error) {
+    super('The provided delegate is invalid.', program, cause);
+  }
+}
+codeToErrorMap.set(0xf, InvalidDelegateError);
+nameToErrorMap.set('InvalidDelegate', InvalidDelegateError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

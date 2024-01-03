@@ -63,6 +63,14 @@ pub enum MplInscriptionError {
     /// 13 - Invalid Shard Account
     #[error("The shard account is invalid.")]
     InvalidShardAccount,
+
+    /// 14 - Invalid Collection NFT
+    #[error("The provided NFT is not a collection NFT.")]
+    InvalidCollectionNFT,
+
+    /// 15 Invalid Delegate
+    #[error("The provided delegate is invalid.")]
+    InvalidDelegate,
 }
 
 impl PrintProgramError for MplInscriptionError {

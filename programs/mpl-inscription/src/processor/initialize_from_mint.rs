@@ -1,5 +1,5 @@
 use borsh::{BorshDeserialize, BorshSerialize};
-use mpl_token_metadata::accounts::Metadata;
+use mpl_token_metadata::{accounts::Metadata, types::Collection};
 use mpl_utils::{
     assert_derivation, assert_owned_by, assert_signer, create_or_allocate_account_raw,
 };
@@ -85,8 +85,34 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
     };
     assert_signer(ctx.accounts.payer)?;
 
-    if token_metadata.update_authority != *authority.key {
-        return Err(MplInscriptionError::InvalidAuthority.into());
+    let mut update_authorities = vec![token_metadata.update_authority];
+    match (ctx.accounts.delegate_record, token_metadata.collection) {
+        (
+            Some(delegate_record),
+            Some(Collection {
+                verified: true,
+                key: collection_mint,
+            }),
+        ) => {
+            assert_derivation(
+                &crate::ID,
+                delegate_record,
+                &[
+                    PREFIX.as_bytes(),
+                    crate::ID.as_ref(),
+                    collection_mint.as_ref(),
+                    token_metadata.update_authority.as_ref(),
+                    authority.key.as_ref(),
+                ],
+                MplInscriptionError::InvalidDelegate,
+            )?;
+            update_authorities.push(*authority.key);
+        }
+        _ => {
+            if token_metadata.update_authority != *authority.key {
+                return Err(MplInscriptionError::InvalidAuthority.into());
+            }
+        }
     }
 
     if ctx.accounts.system_program.key != &system_program::ID {
@@ -113,7 +139,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         key: Key::MintInscriptionMetadataAccount,
         bump,
         inscription_bump: Some(inscription_bump),
-        update_authorities: vec![token_metadata.update_authority],
+        update_authorities,
         ..InscriptionMetadata::default()
     };
 

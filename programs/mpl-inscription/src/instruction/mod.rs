@@ -23,6 +23,7 @@ pub enum MplInscriptionInstruction {
     #[account(5, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(6, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(7, name="system_program", desc = "System program")]
+    #[account(8, optional, name="delegate_record", desc = "The delegate record account.")]
     InitializeFromMint,
 
     /// Close the Inscription and Metadata accounts.
@@ -39,6 +40,7 @@ pub enum MplInscriptionInstruction {
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
+    #[account(5, optional, name="delegate_record", desc = "The delegate record account.")]
     WriteData(WriteDataArgs),
 
     /// Clear the inscription account.
@@ -47,6 +49,7 @@ pub enum MplInscriptionInstruction {
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
+    #[account(5, optional, name="delegate_record", desc = "The delegate record account.")]
     ClearData(ClearDataArgs),
 
     /// Add an update authority to the Inscription.
@@ -75,6 +78,7 @@ pub enum MplInscriptionInstruction {
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
+    #[account(5, optional, name="delegate_record", desc = "The delegate record account.")]
     InitializeAssociatedInscription(AssociateInscriptionAccountArgs),
 
     /// Allocate additional space for the inscription account.
@@ -83,12 +87,13 @@ pub enum MplInscriptionInstruction {
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
+    #[account(5, optional, name="delegate_record", desc = "The delegate record account.")]
     Allocate(AllocateArgs),
 
     /// Create an Inscription Delegate for delegating inscription authority.
     #[account(0, writable, name="delegate_record", desc="Delegate record account")]
-    #[account(1, name="delegate", desc="Owner of the delegated account")]
-    #[account(2, name="metadata", desc="Metadata account")]
+    #[account(1, name="delegate", desc="The account to delegate to")]
+    #[account(2, name="metadata", desc="Metadata account of the Collection NFT")]
     #[account(3, name="mint", desc="Mint of metadata")]
     #[account(4, name="token", desc="Token account of mint")]
     #[account(5, signer, name="authority", desc="Update authority or token owner")]

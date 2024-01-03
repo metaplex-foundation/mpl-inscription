@@ -52,6 +52,12 @@ pub enum MplInscriptionError {
     /// 13 (0xD) - The shard account is invalid.
     #[error("The shard account is invalid.")]
     InvalidShardAccount,
+    /// 14 (0xE) - The provided NFT is not a collection NFT.
+    #[error("The provided NFT is not a collection NFT.")]
+    InvalidCollectionNFT,
+    /// 15 (0xF) - The provided delegate is invalid.
+    #[error("The provided delegate is invalid.")]
+    InvalidDelegate,
 }
 
 impl solana_program::program_error::PrintProgramError for MplInscriptionError {

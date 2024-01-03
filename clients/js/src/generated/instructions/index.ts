@@ -11,6 +11,7 @@ export * from './allocate';
 export * from './clearData';
 export * from './close';
 export * from './createShard';
+export * from './delegate';
 export * from './initializeAssociatedInscription';
 export * from './removeAuthority';
 export * from './writeData';

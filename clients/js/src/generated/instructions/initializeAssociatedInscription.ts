@@ -42,6 +42,8 @@ export type InitializeAssociatedInscriptionInstructionAccounts = {
   authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
+  /** The delegate record account. */
+  delegateRecord?: PublicKey | Pda;
 };
 
 // Data.
@@ -111,6 +113,11 @@ export function initializeAssociatedInscription(
       index: 4,
       isWritable: false,
       value: input.systemProgram ?? null,
+    },
+    delegateRecord: {
+      index: 5,
+      isWritable: false,
+      value: input.delegateRecord ?? null,
     },
   };
 

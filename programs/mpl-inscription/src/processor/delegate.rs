@@ -44,6 +44,10 @@ pub(crate) fn process_delegate<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRe
         return Err(MplInscriptionError::MintMismatch.into());
     }
 
+    if metadata.collection_details.is_none() {
+        return Err(MplInscriptionError::InvalidCollectionNFT.into());
+    }
+
     // process the delegation creation (the derivation is checked
     // by the create helper)
     create_pda_account(

@@ -128,6 +128,15 @@
           "docs": [
             "System program"
           ]
+        },
+        {
+          "name": "delegateRecord",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The delegate record account."
+          ]
         }
       ],
       "args": [],
@@ -230,6 +239,15 @@
           "docs": [
             "System program"
           ]
+        },
+        {
+          "name": "delegateRecord",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The delegate record account."
+          ]
         }
       ],
       "args": [
@@ -287,6 +305,15 @@
           "isSigner": false,
           "docs": [
             "System program"
+          ]
+        },
+        {
+          "name": "delegateRecord",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The delegate record account."
           ]
         }
       ],
@@ -480,6 +507,15 @@
           "docs": [
             "System program"
           ]
+        },
+        {
+          "name": "delegateRecord",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The delegate record account."
+          ]
         }
       ],
       "args": [
@@ -538,6 +574,15 @@
           "docs": [
             "System program"
           ]
+        },
+        {
+          "name": "delegateRecord",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The delegate record account."
+          ]
         }
       ],
       "args": [
@@ -551,6 +596,80 @@
       "discriminant": {
         "type": "u8",
         "value": 9
+      }
+    },
+    {
+      "name": "Delegate",
+      "accounts": [
+        {
+          "name": "delegateRecord",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Delegate record account"
+          ]
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The account to delegate to"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the Collection NFT"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Mint of metadata"
+          ]
+        },
+        {
+          "name": "token",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Token account of mint"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "Update authority or token owner"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Payer"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 10
       }
     }
   ],
@@ -851,6 +970,16 @@
       "code": 13,
       "name": "InvalidShardAccount",
       "msg": "The shard account is invalid."
+    },
+    {
+      "code": 14,
+      "name": "InvalidCollectionNFT",
+      "msg": "The provided NFT is not a collection NFT."
+    },
+    {
+      "code": 15,
+      "name": "InvalidDelegate",
+      "msg": "The provided delegate is invalid."
     }
   ],
   "metadata": {

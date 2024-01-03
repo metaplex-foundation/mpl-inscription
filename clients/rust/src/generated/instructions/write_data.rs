@@ -20,6 +20,8 @@ pub struct WriteData {
     pub authority: Option<solana_program::pubkey::Pubkey>,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
+    /// The delegate record account.
+    pub delegate_record: Option<solana_program::pubkey::Pubkey>,
 }
 
 impl WriteData {
@@ -35,7 +37,7 @@ impl WriteData {
         args: WriteDataInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.inscription_account,
             false,
@@ -61,6 +63,17 @@ impl WriteData {
             self.system_program,
             false,
         ));
+        if let Some(delegate_record) = self.delegate_record {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                delegate_record,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.extend_from_slice(remaining_accounts);
         let mut data = WriteDataInstructionData::new().try_to_vec().unwrap();
         let mut args = args.try_to_vec().unwrap();
@@ -101,6 +114,7 @@ pub struct WriteDataBuilder {
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
+    delegate_record: Option<solana_program::pubkey::Pubkey>,
     associated_tag: Option<String>,
     offset: Option<u64>,
     value: Option<Vec<u8>>,
@@ -147,6 +161,16 @@ impl WriteDataBuilder {
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
+        self
+    }
+    /// `[optional account]`
+    /// The delegate record account.
+    #[inline(always)]
+    pub fn delegate_record(
+        &mut self,
+        delegate_record: Option<solana_program::pubkey::Pubkey>,
+    ) -> &mut Self {
+        self.delegate_record = delegate_record;
         self
     }
     /// `[optional argument]`
@@ -197,6 +221,7 @@ impl WriteDataBuilder {
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+            delegate_record: self.delegate_record,
         };
         let args = WriteDataInstructionArgs {
             associated_tag: self.associated_tag.clone(),
@@ -220,6 +245,8 @@ pub struct WriteDataCpiAccounts<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The delegate record account.
+    pub delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 }
 
 /// `write_data` CPI instruction.
@@ -236,6 +263,8 @@ pub struct WriteDataCpi<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The delegate record account.
+    pub delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The arguments for the instruction.
     pub __args: WriteDataInstructionArgs,
 }
@@ -253,6 +282,7 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
             payer: accounts.payer,
             authority: accounts.authority,
             system_program: accounts.system_program,
+            delegate_record: accounts.delegate_record,
             __args: args,
         }
     }
@@ -289,7 +319,7 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.inscription_account.key,
             false,
@@ -317,6 +347,17 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
             *self.system_program.key,
             false,
         ));
+        if let Some(delegate_record) = self.delegate_record {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                *delegate_record.key,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -333,7 +374,7 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.inscription_account.clone());
         account_infos.push(self.inscription_metadata_account.clone());
@@ -342,6 +383,9 @@ impl<'a, 'b> WriteDataCpi<'a, 'b> {
             account_infos.push(authority.clone());
         }
         account_infos.push(self.system_program.clone());
+        if let Some(delegate_record) = self.delegate_record {
+            account_infos.push(delegate_record.clone());
+        }
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -368,6 +412,7 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
             payer: None,
             authority: None,
             system_program: None,
+            delegate_record: None,
             associated_tag: None,
             offset: None,
             value: None,
@@ -416,6 +461,16 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
         system_program: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
+        self
+    }
+    /// `[optional account]`
+    /// The delegate record account.
+    #[inline(always)]
+    pub fn delegate_record(
+        &mut self,
+        delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    ) -> &mut Self {
+        self.instruction.delegate_record = delegate_record;
         self
     }
     /// `[optional argument]`
@@ -501,6 +556,8 @@ impl<'a, 'b> WriteDataCpiBuilder<'a, 'b> {
                 .instruction
                 .system_program
                 .expect("system_program is not set"),
+
+            delegate_record: self.instruction.delegate_record,
             __args: args,
         };
         instruction.invoke_signed_with_remaining_accounts(
@@ -517,6 +574,7 @@ struct WriteDataCpiBuilderInstruction<'a, 'b> {
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     associated_tag: Option<String>,
     offset: Option<u64>,
     value: Option<Vec<u8>>,

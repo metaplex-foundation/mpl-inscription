@@ -26,6 +26,8 @@ pub struct InitializeFromMint {
     pub authority: Option<solana_program::pubkey::Pubkey>,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
+    /// The delegate record account.
+    pub delegate_record: Option<solana_program::pubkey::Pubkey>,
 }
 
 impl InitializeFromMint {
@@ -37,7 +39,7 @@ impl InitializeFromMint {
         &self,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(8 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(9 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.mint_inscription_account,
             false,
@@ -75,6 +77,17 @@ impl InitializeFromMint {
             self.system_program,
             false,
         ));
+        if let Some(delegate_record) = self.delegate_record {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                delegate_record,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.extend_from_slice(remaining_accounts);
         let data = InitializeFromMintInstructionData::new()
             .try_to_vec()
@@ -110,6 +123,7 @@ pub struct InitializeFromMintBuilder {
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
+    delegate_record: Option<solana_program::pubkey::Pubkey>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
@@ -179,6 +193,16 @@ impl InitializeFromMintBuilder {
         self.system_program = Some(system_program);
         self
     }
+    /// `[optional account]`
+    /// The delegate record account.
+    #[inline(always)]
+    pub fn delegate_record(
+        &mut self,
+        delegate_record: Option<solana_program::pubkey::Pubkey>,
+    ) -> &mut Self {
+        self.delegate_record = delegate_record;
+        self
+    }
     /// Add an aditional account to the instruction.
     #[inline(always)]
     pub fn add_remaining_account(
@@ -218,6 +242,7 @@ impl InitializeFromMintBuilder {
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+            delegate_record: self.delegate_record,
         };
 
         accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
@@ -242,6 +267,8 @@ pub struct InitializeFromMintCpiAccounts<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The delegate record account.
+    pub delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 }
 
 /// `initialize_from_mint` CPI instruction.
@@ -264,6 +291,8 @@ pub struct InitializeFromMintCpi<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The delegate record account.
+    pub delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 }
 
 impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
@@ -281,6 +310,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             payer: accounts.payer,
             authority: accounts.authority,
             system_program: accounts.system_program,
+            delegate_record: accounts.delegate_record,
         }
     }
     #[inline(always)]
@@ -316,7 +346,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(8 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(9 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.mint_inscription_account.key,
             false,
@@ -356,6 +386,17 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             *self.system_program.key,
             false,
         ));
+        if let Some(delegate_record) = self.delegate_record {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                *delegate_record.key,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -372,7 +413,7 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(8 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(9 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.mint_inscription_account.clone());
         account_infos.push(self.inscription_metadata_account.clone());
@@ -384,6 +425,9 @@ impl<'a, 'b> InitializeFromMintCpi<'a, 'b> {
             account_infos.push(authority.clone());
         }
         account_infos.push(self.system_program.clone());
+        if let Some(delegate_record) = self.delegate_record {
+            account_infos.push(delegate_record.clone());
+        }
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -413,6 +457,7 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
             payer: None,
             authority: None,
             system_program: None,
+            delegate_record: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -485,6 +530,16 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
         system_program: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
+        self
+    }
+    /// `[optional account]`
+    /// The delegate record account.
+    #[inline(always)]
+    pub fn delegate_record(
+        &mut self,
+        delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    ) -> &mut Self {
+        self.instruction.delegate_record = delegate_record;
         self
     }
     /// Add an additional account to the instruction.
@@ -564,6 +619,8 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
                 .instruction
                 .system_program
                 .expect("system_program is not set"),
+
+            delegate_record: self.instruction.delegate_record,
         };
         instruction.invoke_signed_with_remaining_accounts(
             signers_seeds,
@@ -582,6 +639,7 @@ struct InitializeFromMintCpiBuilderInstruction<'a, 'b> {
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

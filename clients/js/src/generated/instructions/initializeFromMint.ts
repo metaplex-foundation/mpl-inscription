@@ -46,6 +46,8 @@ export type InitializeFromMintInstructionAccounts = {
   authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
+  /** The delegate record account. */
+  delegateRecord?: PublicKey | Pda;
 };
 
 // Data.
@@ -116,6 +118,11 @@ export function initializeFromMint(
       index: 7,
       isWritable: false,
       value: input.systemProgram ?? null,
+    },
+    delegateRecord: {
+      index: 8,
+      isWritable: false,
+      value: input.delegateRecord ?? null,
     },
   };
 

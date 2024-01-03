@@ -20,6 +20,8 @@ pub struct ClearData {
     pub authority: Option<solana_program::pubkey::Pubkey>,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
+    /// The delegate record account.
+    pub delegate_record: Option<solana_program::pubkey::Pubkey>,
 }
 
 impl ClearData {
@@ -35,7 +37,7 @@ impl ClearData {
         args: ClearDataInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.inscription_account,
             false,
@@ -61,6 +63,17 @@ impl ClearData {
             self.system_program,
             false,
         ));
+        if let Some(delegate_record) = self.delegate_record {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                delegate_record,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         accounts.extend_from_slice(remaining_accounts);
         let mut data = ClearDataInstructionData::new().try_to_vec().unwrap();
         let mut args = args.try_to_vec().unwrap();
@@ -99,6 +112,7 @@ pub struct ClearDataBuilder {
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
+    delegate_record: Option<solana_program::pubkey::Pubkey>,
     associated_tag: Option<String>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
@@ -145,6 +159,16 @@ impl ClearDataBuilder {
         self.system_program = Some(system_program);
         self
     }
+    /// `[optional account]`
+    /// The delegate record account.
+    #[inline(always)]
+    pub fn delegate_record(
+        &mut self,
+        delegate_record: Option<solana_program::pubkey::Pubkey>,
+    ) -> &mut Self {
+        self.delegate_record = delegate_record;
+        self
+    }
     /// `[optional argument]`
     #[inline(always)]
     pub fn associated_tag(&mut self, associated_tag: String) -> &mut Self {
@@ -183,6 +207,7 @@ impl ClearDataBuilder {
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+            delegate_record: self.delegate_record,
         };
         let args = ClearDataInstructionArgs {
             associated_tag: self.associated_tag.clone(),
@@ -204,6 +229,8 @@ pub struct ClearDataCpiAccounts<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The delegate record account.
+    pub delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 }
 
 /// `clear_data` CPI instruction.
@@ -220,6 +247,8 @@ pub struct ClearDataCpi<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The delegate record account.
+    pub delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// The arguments for the instruction.
     pub __args: ClearDataInstructionArgs,
 }
@@ -237,6 +266,7 @@ impl<'a, 'b> ClearDataCpi<'a, 'b> {
             payer: accounts.payer,
             authority: accounts.authority,
             system_program: accounts.system_program,
+            delegate_record: accounts.delegate_record,
             __args: args,
         }
     }
@@ -273,7 +303,7 @@ impl<'a, 'b> ClearDataCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.inscription_account.key,
             false,
@@ -301,6 +331,17 @@ impl<'a, 'b> ClearDataCpi<'a, 'b> {
             *self.system_program.key,
             false,
         ));
+        if let Some(delegate_record) = self.delegate_record {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                *delegate_record.key,
+                false,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::MPL_INSCRIPTION_ID,
+                false,
+            ));
+        }
         remaining_accounts.iter().for_each(|remaining_account| {
             accounts.push(solana_program::instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
@@ -317,7 +358,7 @@ impl<'a, 'b> ClearDataCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.inscription_account.clone());
         account_infos.push(self.inscription_metadata_account.clone());
@@ -326,6 +367,9 @@ impl<'a, 'b> ClearDataCpi<'a, 'b> {
             account_infos.push(authority.clone());
         }
         account_infos.push(self.system_program.clone());
+        if let Some(delegate_record) = self.delegate_record {
+            account_infos.push(delegate_record.clone());
+        }
         remaining_accounts
             .iter()
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
@@ -352,6 +396,7 @@ impl<'a, 'b> ClearDataCpiBuilder<'a, 'b> {
             payer: None,
             authority: None,
             system_program: None,
+            delegate_record: None,
             associated_tag: None,
             __remaining_accounts: Vec::new(),
         });
@@ -398,6 +443,16 @@ impl<'a, 'b> ClearDataCpiBuilder<'a, 'b> {
         system_program: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
+        self
+    }
+    /// `[optional account]`
+    /// The delegate record account.
+    #[inline(always)]
+    pub fn delegate_record(
+        &mut self,
+        delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    ) -> &mut Self {
+        self.instruction.delegate_record = delegate_record;
         self
     }
     /// `[optional argument]`
@@ -471,6 +526,8 @@ impl<'a, 'b> ClearDataCpiBuilder<'a, 'b> {
                 .instruction
                 .system_program
                 .expect("system_program is not set"),
+
+            delegate_record: self.instruction.delegate_record,
             __args: args,
         };
         instruction.invoke_signed_with_remaining_accounts(
@@ -487,6 +544,7 @@ struct ClearDataCpiBuilderInstruction<'a, 'b> {
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    delegate_record: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     associated_tag: Option<String>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
