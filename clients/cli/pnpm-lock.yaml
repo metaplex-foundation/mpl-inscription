@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.0.0
     version: 1.0.0(@metaplex-foundation/umi@0.8.10)
   '@metaplex-foundation/mpl-inscription':
-    specifier: ^0.5.1
-    version: 0.5.1(@metaplex-foundation/umi@0.8.10)
+    specifier: ^0.5.2
+    version: 0.5.2(@metaplex-foundation/umi@0.8.10)
   '@metaplex-foundation/mpl-token-metadata':
     specifier: ^3.1.2
     version: 3.1.2(@metaplex-foundation/umi@0.8.10)
@@ -23,6 +23,9 @@ dependencies:
   '@solana/web3.js':
     specifier: ^1.87.6
     version: 1.87.6
+  cli-progress:
+    specifier: ^3.12.0
+    version: 3.12.0
   commander:
     specifier: ^11.1.0
     version: 11.1.0
@@ -87,11 +90,12 @@ packages:
       '@metaplex-foundation/umi': 0.8.10
     dev: false
 
-  /@metaplex-foundation/mpl-inscription@0.5.1(@metaplex-foundation/umi@0.8.10):
-    resolution: {integrity: sha512-GaACW27OhI4TuP0xosDs3mkKc0lyEEedYjXYBlt4OwTwCmHwjBVjZ+W4UBD89h1SLGPpK6vVxClrUDJcYr4H9g==}
+  /@metaplex-foundation/mpl-inscription@0.5.2(@metaplex-foundation/umi@0.8.10):
+    resolution: {integrity: sha512-Sb6OuT+EUGp1XK4pGSm81Zfns8JRe+rakmEqNGGDC+1ph7gDhZivEoIJ4hhqCTlT2j0ssNPOEDHq7oUvMcTZUA==}
     peerDependencies:
       '@metaplex-foundation/umi': ^0.8.2
     dependencies:
+      '@metaplex-foundation/mpl-token-metadata': 3.1.2(@metaplex-foundation/umi@0.8.10)
       '@metaplex-foundation/mpl-toolbox': 0.8.1(@metaplex-foundation/umi@0.8.10)
       '@metaplex-foundation/umi': 0.8.10
     dev: false
@@ -351,6 +355,11 @@ packages:
       humanize-ms: 1.2.1
     dev: false
 
+  /ansi-regex@5.0.1:
+    resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
+    engines: {node: '>=8'}
+    dev: false
+
   /base-x@3.0.9:
     resolution: {integrity: sha512-H7JU6iBHTal1gp56aKoaa//YUxEaAOUiydvrV/pILqIHXTtqxSkATOnDA2u+jZ/61sD+L/412+7kzXRtWukhpQ==}
     dependencies:
@@ -408,6 +417,13 @@ packages:
       node-gyp-build: 4.7.1
     dev: false
 
+  /cli-progress@3.12.0:
+    resolution: {integrity: sha512-tRkV3HJ1ASwm19THiiLIXLO7Im7wlTuKnvkYaTkyoAPefqjNg7W7DHKUlGRxy9vxDvbyCYQkQozvptuMkGCg8A==}
+    engines: {node: '>=4'}
+    dependencies:
+      string-width: 4.2.3
+    dev: false
+
   /commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
@@ -420,6 +436,10 @@ packages:
   /delay@5.0.0:
     resolution: {integrity: sha512-ReEBKkIfe4ya47wlPYf/gu5ib6yUG0/Aez0JQZQz94kiWtRQvZIQbTiehsnwHvLSWJnQdhVeqYue7Id1dKr0qw==}
     engines: {node: '>=10'}
+    dev: false
+
+  /emoji-regex@8.0.0:
+    resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
     dev: false
 
   /es6-promise@4.2.8:
@@ -457,6 +477,11 @@ packages:
 
   /ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+    dev: false
+
+  /is-fullwidth-code-point@3.0.0:
+    resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
+    engines: {node: '>=8'}
     dev: false
 
   /isomorphic-ws@4.0.1(ws@7.5.9):
@@ -537,6 +562,22 @@ packages:
 
   /safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
+    dev: false
+
+  /string-width@4.2.3:
+    resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
+    engines: {node: '>=8'}
+    dependencies:
+      emoji-regex: 8.0.0
+      is-fullwidth-code-point: 3.0.0
+      strip-ansi: 6.0.1
+    dev: false
+
+  /strip-ansi@6.0.1:
+    resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
+    engines: {node: '>=8'}
+    dependencies:
+      ansi-regex: 5.0.1
     dev: false
 
   /superstruct@0.14.2:
