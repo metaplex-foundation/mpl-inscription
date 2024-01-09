@@ -3,9 +3,12 @@
     "types": ["mocha", "chai", "node"],
     "typeRoots": ["./node_modules/@types"],
     "lib": ["es2015"],
-    "module": "commonjs",
+    "module": "node16",
     "target": "ES2020",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
+  },
+  "ts-node": {
+    "esm": true,
   }
 }
