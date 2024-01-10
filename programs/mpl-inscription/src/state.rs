@@ -36,24 +36,28 @@ pub struct AssociatedInscription {
 #[derive(Clone, BorshSerialize, BorshDeserialize, Debug, ShankAccount)]
 pub struct InscriptionMetadata {
     pub key: Key,
+    pub inscription_account: Pubkey,
     pub bump: u8,
     pub data_type: DataType,
     pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
     pub associated_inscriptions: Vec<AssociatedInscription>,
+    pub _padding: [u8; 8],
 }
 
 impl Default for InscriptionMetadata {
     fn default() -> Self {
         Self {
             key: Key::InscriptionMetadataAccount,
+            inscription_account: Pubkey::default(),
             bump: 0,
             data_type: DataType::Uninitialized,
             inscription_rank: u64::MAX,
             inscription_bump: None,
             update_authorities: vec![],
             associated_inscriptions: vec![],
+            _padding: [0; 8],
         }
     }
 }

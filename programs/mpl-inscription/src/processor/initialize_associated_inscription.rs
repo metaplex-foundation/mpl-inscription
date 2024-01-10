@@ -40,6 +40,17 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
         &ctx.accounts.inscription_metadata_account.data.borrow(),
     )?;
 
+    let _metadata_bump = assert_derivation(
+        &crate::ID,
+        ctx.accounts.inscription_metadata_account,
+        &[
+            PREFIX.as_bytes(),
+            crate::ID.as_ref(),
+            inscription_metadata.inscription_account.as_ref(),
+        ],
+        MplInscriptionError::DerivedKeyInvalid,
+    )?;
+
     // Verify that the derived address is correct for the metadata account.
     let inscription_bump = assert_derivation(
         &crate::ID,
