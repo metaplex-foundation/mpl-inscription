@@ -13,7 +13,7 @@ crate-type = ["cdylib", "lib"]
 
 [features]
 test-sbf = []
-serde = ["dep:serde", "dep:serde_with"]
+serde = ["dep:serde", "dep:serde_with", "kaigan/serde"]
 
 [dependencies]
 borsh = "^0.10"
