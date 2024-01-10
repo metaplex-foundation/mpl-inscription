@@ -73,6 +73,7 @@ pub(crate) fn process_initialize<'a>(accounts: &'a [AccountInfo<'a>]) -> Program
 
     // Initialize the inscription metadata.
     let mut inscription_metadata = InscriptionMetadata {
+        inscription_account: *ctx.accounts.inscription_account.key,
         bump,
         update_authorities: vec![*authority.key],
         ..InscriptionMetadata::default()

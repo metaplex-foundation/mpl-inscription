@@ -77,6 +77,7 @@ test('it can initialize a Mint Inscription account', async (t) => {
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.MintInscriptionMetadataAccount,
+    inscriptionAccount: inscriptionAccount[0],
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
     inscriptionRank:
@@ -200,6 +201,7 @@ test('it can initialize a Mint Inscription account with separate authority', asy
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.MintInscriptionMetadataAccount,
+    inscriptionAccount: inscriptionAccount[0],
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
     inscriptionRank:

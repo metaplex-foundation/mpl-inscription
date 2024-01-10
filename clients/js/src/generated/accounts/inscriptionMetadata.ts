@@ -47,22 +47,26 @@ export type InscriptionMetadata = Account<InscriptionMetadataAccountData>;
 
 export type InscriptionMetadataAccountData = {
   key: Key;
+  inscriptionAccount: PublicKey;
   bump: number;
   dataType: DataType;
   inscriptionRank: bigint;
   inscriptionBump: Option<number>;
   updateAuthorities: Array<PublicKey>;
   associatedInscriptions: Array<AssociatedInscription>;
+  padding: Array<number>;
 };
 
 export type InscriptionMetadataAccountDataArgs = {
   key: KeyArgs;
+  inscriptionAccount: PublicKey;
   bump: number;
   dataType: DataTypeArgs;
   inscriptionRank: number | bigint;
   inscriptionBump: OptionOrNullable<number>;
   updateAuthorities: Array<PublicKey>;
   associatedInscriptions: Array<AssociatedInscriptionArgs>;
+  padding: Array<number>;
 };
 
 export function getInscriptionMetadataAccountDataSerializer(): Serializer<
@@ -72,12 +76,14 @@ export function getInscriptionMetadataAccountDataSerializer(): Serializer<
   return struct<InscriptionMetadataAccountData>(
     [
       ['key', getKeySerializer()],
+      ['inscriptionAccount', publicKeySerializer()],
       ['bump', u8()],
       ['dataType', getDataTypeSerializer()],
       ['inscriptionRank', u64()],
       ['inscriptionBump', option(u8())],
       ['updateAuthorities', array(publicKeySerializer())],
       ['associatedInscriptions', array(getAssociatedInscriptionSerializer())],
+      ['padding', array(u8(), { size: 8 })],
     ],
     { description: 'InscriptionMetadataAccountData' }
   ) as Serializer<
@@ -163,23 +169,27 @@ export function getInscriptionMetadataGpaBuilder(
   return gpaBuilder(context, programId)
     .registerFields<{
       key: KeyArgs;
+      inscriptionAccount: PublicKey;
       bump: number;
       dataType: DataTypeArgs;
       inscriptionRank: number | bigint;
       inscriptionBump: OptionOrNullable<number>;
       updateAuthorities: Array<PublicKey>;
       associatedInscriptions: Array<AssociatedInscriptionArgs>;
+      padding: Array<number>;
     }>({
       key: [0, getKeySerializer()],
-      bump: [1, u8()],
-      dataType: [2, getDataTypeSerializer()],
-      inscriptionRank: [3, u64()],
-      inscriptionBump: [11, option(u8())],
+      inscriptionAccount: [1, publicKeySerializer()],
+      bump: [33, u8()],
+      dataType: [34, getDataTypeSerializer()],
+      inscriptionRank: [35, u64()],
+      inscriptionBump: [43, option(u8())],
       updateAuthorities: [null, array(publicKeySerializer())],
       associatedInscriptions: [
         null,
         array(getAssociatedInscriptionSerializer()),
       ],
+      padding: [null, array(u8(), { size: 8 })],
     })
     .deserializeUsing<InscriptionMetadata>((account) =>
       deserializeInscriptionMetadata(account)
