@@ -31,7 +31,7 @@ pub enum MplInscriptionInstruction {
     #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
-    Close,
+    Close(CloseArgs),
 
     /// Write data to the inscription account.
     #[account(0, writable, name="inscription_account", desc = "The account to store the metadata in.")]
@@ -84,6 +84,12 @@ pub enum MplInscriptionInstruction {
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     Allocate(AllocateArgs),
+}
+
+#[repr(C)]
+#[derive(PartialEq, Eq, Debug, Clone, BorshSerialize, BorshDeserialize)]
+pub struct CloseArgs {
+    pub associated_tag: Option<String>,
 }
 
 #[repr(C)]

@@ -42,9 +42,9 @@ impl Processor {
                 msg!("Instruction: InitializeFromMint");
                 process_initialize_from_mint(accounts)
             }
-            MplInscriptionInstruction::Close => {
+            MplInscriptionInstruction::Close(args) => {
                 msg!("Instruction: Close");
-                process_close(accounts)
+                process_close(accounts, args)
             }
             MplInscriptionInstruction::WriteData(args) => {
                 msg!("Instruction: WriteData");

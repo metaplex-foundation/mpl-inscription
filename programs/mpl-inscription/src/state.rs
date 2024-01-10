@@ -3,6 +3,7 @@ use shank::ShankAccount;
 use solana_program::pubkey::Pubkey;
 
 pub const PREFIX: &str = "Inscription";
+pub const ASSOCIATION: &str = "Association";
 pub const SHARD_COUNT: u8 = 32;
 pub const SHARD_PREFIX: &str = "Shard";
 

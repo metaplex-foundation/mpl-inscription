@@ -63,6 +63,18 @@ pub enum MplInscriptionError {
     /// 13 - Invalid Shard Account
     #[error("The shard account is invalid.")]
     InvalidShardAccount,
+
+    /// 14 - Association Tag Cannot Be Blank
+    #[error("The association tag cannot be blank.")]
+    AssociationTagCannotBeBlank,
+
+    /// 15 - Association Tag Too Long
+    #[error("The association tag is too long.")]
+    AssociationTagTooLong,
+
+    /// 16 - Authority Already Exists
+    #[error("The authority already exists.")]
+    AuthorityAlreadyExists,
 }
 
 impl PrintProgramError for MplInscriptionError {

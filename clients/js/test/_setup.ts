@@ -3,14 +3,14 @@ import { createUmi as basecreateUmi } from '@metaplex-foundation/umi-bundle-test
 import { Umi } from '@metaplex-foundation/umi';
 import pMap from 'p-map';
 import {
-  MplInscription,
+  mplInscription,
   createShard,
   findInscriptionShardPda,
   safeFetchInscriptionShard,
 } from '../src';
 
 export const createUmi = async () => {
-  const umi = (await basecreateUmi()).use(MplInscription());
+  const umi = (await basecreateUmi()).use(mplInscription());
   
   // Use pMap to parallelize the creation of all 32 shards.
   await pMap(Array(32).fill(0), async (_, shardNumber) => {

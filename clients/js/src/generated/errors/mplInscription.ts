@@ -201,6 +201,48 @@ export class InvalidShardAccountError extends ProgramError {
 codeToErrorMap.set(0xd, InvalidShardAccountError);
 nameToErrorMap.set('InvalidShardAccount', InvalidShardAccountError);
 
+/** AssociationTagCannotBeBlank: The association tag cannot be blank. */
+export class AssociationTagCannotBeBlankError extends ProgramError {
+  readonly name: string = 'AssociationTagCannotBeBlank';
+
+  readonly code: number = 0xe; // 14
+
+  constructor(program: Program, cause?: Error) {
+    super('The association tag cannot be blank.', program, cause);
+  }
+}
+codeToErrorMap.set(0xe, AssociationTagCannotBeBlankError);
+nameToErrorMap.set(
+  'AssociationTagCannotBeBlank',
+  AssociationTagCannotBeBlankError
+);
+
+/** AssociationTagTooLong: The association tag is too long. */
+export class AssociationTagTooLongError extends ProgramError {
+  readonly name: string = 'AssociationTagTooLong';
+
+  readonly code: number = 0xf; // 15
+
+  constructor(program: Program, cause?: Error) {
+    super('The association tag is too long.', program, cause);
+  }
+}
+codeToErrorMap.set(0xf, AssociationTagTooLongError);
+nameToErrorMap.set('AssociationTagTooLong', AssociationTagTooLongError);
+
+/** AuthorityAlreadyExists: The authority already exists. */
+export class AuthorityAlreadyExistsError extends ProgramError {
+  readonly name: string = 'AuthorityAlreadyExists';
+
+  readonly code: number = 0x10; // 16
+
+  constructor(program: Program, cause?: Error) {
+    super('The authority already exists.', program, cause);
+  }
+}
+codeToErrorMap.set(0x10, AuthorityAlreadyExistsError);
+nameToErrorMap.set('AuthorityAlreadyExists', AuthorityAlreadyExistsError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

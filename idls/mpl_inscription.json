@@ -181,7 +181,14 @@
           ]
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "closeArgs",
+          "type": {
+            "defined": "CloseArgs"
+          }
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 2
@@ -632,6 +639,20 @@
   ],
   "types": [
     {
+      "name": "CloseArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "associatedTag",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "WriteDataArgs",
       "type": {
         "kind": "struct",
@@ -851,6 +872,21 @@
       "code": 13,
       "name": "InvalidShardAccount",
       "msg": "The shard account is invalid."
+    },
+    {
+      "code": 14,
+      "name": "AssociationTagCannotBeBlank",
+      "msg": "The association tag cannot be blank."
+    },
+    {
+      "code": 15,
+      "name": "AssociationTagTooLong",
+      "msg": "The association tag is too long."
+    },
+    {
+      "code": 16,
+      "name": "AuthorityAlreadyExists",
+      "msg": "The authority already exists."
     }
   ],
   "metadata": {

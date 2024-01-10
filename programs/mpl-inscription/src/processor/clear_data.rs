@@ -4,21 +4,24 @@ use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, syste
 
 use crate::{
     error::MplInscriptionError,
-    instruction::{accounts::WriteDataAccounts, ClearDataArgs},
-    state::{InscriptionMetadata, PREFIX},
+    instruction::{accounts::ClearDataAccounts, ClearDataArgs},
+    state::{InscriptionMetadata, ASSOCIATION, PREFIX},
 };
 
 pub(crate) fn process_clear_data<'a>(
     accounts: &'a [AccountInfo<'a>],
     args: ClearDataArgs,
 ) -> ProgramResult {
-    let ctx = &mut WriteDataAccounts::context(accounts)?;
+    let ctx = &mut ClearDataAccounts::context(accounts)?;
 
     // Check that the inscription account is already initialized.
-    if (ctx.accounts.inscription_account.owner != &crate::ID)
-        || ctx.accounts.inscription_account.data_is_empty()
-    {
+    if ctx.accounts.inscription_account.owner != &crate::ID {
         return Err(MplInscriptionError::NotInitialized.into());
+    }
+
+    // The account is already cleared.
+    if ctx.accounts.inscription_account.data_is_empty() {
+        return Ok(());
     }
 
     // Check that the metadata account is already initialized.
@@ -32,11 +35,22 @@ pub(crate) fn process_clear_data<'a>(
     // Verify that the derived address is correct for the metadata account.
     match args.associated_tag {
         Some(tag) => {
+            // We don't allow empty tags.
+            if tag.is_empty() {
+                return Err(MplInscriptionError::AssociationTagCannotBeBlank.into());
+            }
+
+            // A tag can't be greater than the seed size.
+            if tag.len() > 32 {
+                return Err(MplInscriptionError::AssociationTagTooLong.into());
+            }
+
             let bump = assert_derivation(
                 &crate::ID,
                 ctx.accounts.inscription_account,
                 &[
                     PREFIX.as_bytes(),
+                    ASSOCIATION.as_bytes(),
                     tag.as_bytes(),
                     ctx.accounts.inscription_metadata_account.key.as_ref(),
                 ],
