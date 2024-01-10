@@ -47,8 +47,13 @@ test('it can initialize a Mint Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   // const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
@@ -64,14 +69,18 @@ test('it can initialize a Mint Inscription account', async (t) => {
     inscriptionMetadataAccount
   );
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.MintInscriptionMetadataAccount,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
-    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
   });
@@ -105,8 +114,13 @@ test('it cannot initialize a Mint Inscription account if it is not the update au
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   // const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
@@ -119,7 +133,10 @@ test('it cannot initialize a Mint Inscription account if it is not the update au
 
   await t.throwsAsync(promise, { name: 'InvalidAuthority' });
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count, shardDataAfter.count);
 });
 
@@ -138,11 +155,16 @@ test('it can initialize a Mint Inscription account with separate authority', asy
     sellerFeeBasisPoints: percentAmount(5.5),
     tokenStandard: TokenStandard.NonFungible,
     updateAuthority: authority,
-    creators: [{address: authority.publicKey, verified: false, share: 100}],
+    creators: [{ address: authority.publicKey, verified: false, share: 100 }],
   }).sendAndConfirm(umi);
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   await mintV1(umi, {
     mint: mint.publicKey,
@@ -170,14 +192,18 @@ test('it can initialize a Mint Inscription account with separate authority', asy
     inscriptionMetadataAccount
   );
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.MintInscriptionMetadataAccount,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
-    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
   });

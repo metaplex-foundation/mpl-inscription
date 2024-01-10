@@ -52,6 +52,15 @@ pub enum MplInscriptionError {
     /// 13 (0xD) - The shard account is invalid.
     #[error("The shard account is invalid.")]
     InvalidShardAccount,
+    /// 14 (0xE) - The association tag cannot be blank.
+    #[error("The association tag cannot be blank.")]
+    AssociationTagCannotBeBlank,
+    /// 15 (0xF) - The association tag is too long.
+    #[error("The association tag is too long.")]
+    AssociationTagTooLong,
+    /// 16 (0x10) - The authority already exists.
+    #[error("The authority already exists.")]
+    AuthorityAlreadyExists,
 }
 
 impl solana_program::program_error::PrintProgramError for MplInscriptionError {

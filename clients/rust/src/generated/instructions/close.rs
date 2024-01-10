@@ -23,12 +23,16 @@ pub struct Close {
 }
 
 impl Close {
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        self.instruction_with_remaining_accounts(&[])
+    pub fn instruction(
+        &self,
+        args: CloseInstructionArgs,
+    ) -> solana_program::instruction::Instruction {
+        self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
+        args: CloseInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
@@ -58,7 +62,9 @@ impl Close {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let data = CloseInstructionData::new().try_to_vec().unwrap();
+        let mut data = CloseInstructionData::new().try_to_vec().unwrap();
+        let mut args = args.try_to_vec().unwrap();
+        data.append(&mut args);
 
         solana_program::instruction::Instruction {
             program_id: crate::MPL_INSCRIPTION_ID,
@@ -79,6 +85,12 @@ impl CloseInstructionData {
     }
 }
 
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CloseInstructionArgs {
+    pub associated_tag: Option<String>,
+}
+
 /// Instruction builder.
 #[derive(Default)]
 pub struct CloseBuilder {
@@ -87,6 +99,7 @@ pub struct CloseBuilder {
     payer: Option<solana_program::pubkey::Pubkey>,
     authority: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
+    associated_tag: Option<String>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
@@ -132,6 +145,12 @@ impl CloseBuilder {
         self.system_program = Some(system_program);
         self
     }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn associated_tag(&mut self, associated_tag: String) -> &mut Self {
+        self.associated_tag = Some(associated_tag);
+        self
+    }
     /// Add an aditional account to the instruction.
     #[inline(always)]
     pub fn add_remaining_account(
@@ -165,8 +184,11 @@ impl CloseBuilder {
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
+        let args = CloseInstructionArgs {
+            associated_tag: self.associated_tag.clone(),
+        };
 
-        accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
+        accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
@@ -198,12 +220,15 @@ pub struct CloseCpi<'a, 'b> {
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The arguments for the instruction.
+    pub __args: CloseInstructionArgs,
 }
 
 impl<'a, 'b> CloseCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
         accounts: CloseCpiAccounts<'a, 'b>,
+        args: CloseInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
@@ -212,6 +237,7 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
             payer: accounts.payer,
             authority: accounts.authority,
             system_program: accounts.system_program,
+            __args: args,
         }
     }
     #[inline(always)]
@@ -282,7 +308,9 @@ impl<'a, 'b> CloseCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let data = CloseInstructionData::new().try_to_vec().unwrap();
+        let mut data = CloseInstructionData::new().try_to_vec().unwrap();
+        let mut args = self.__args.try_to_vec().unwrap();
+        data.append(&mut args);
 
         let instruction = solana_program::instruction::Instruction {
             program_id: crate::MPL_INSCRIPTION_ID,
@@ -324,6 +352,7 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
             payer: None,
             authority: None,
             system_program: None,
+            associated_tag: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -371,6 +400,12 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
         self.instruction.system_program = Some(system_program);
         self
     }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn associated_tag(&mut self, associated_tag: String) -> &mut Self {
+        self.instruction.associated_tag = Some(associated_tag);
+        self
+    }
     /// Add an additional account to the instruction.
     #[inline(always)]
     pub fn add_remaining_account(
@@ -412,6 +447,9 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
+        let args = CloseInstructionArgs {
+            associated_tag: self.instruction.associated_tag.clone(),
+        };
         let instruction = CloseCpi {
             __program: self.instruction.__program,
 
@@ -433,6 +471,7 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
                 .instruction
                 .system_program
                 .expect("system_program is not set"),
+            __args: args,
         };
         instruction.invoke_signed_with_remaining_accounts(
             signers_seeds,
@@ -448,6 +487,7 @@ struct CloseCpiBuilderInstruction<'a, 'b> {
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    associated_tag: Option<String>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

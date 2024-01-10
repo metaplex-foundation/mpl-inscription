@@ -117,7 +117,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         ..InscriptionMetadata::default()
     };
 
-    if (ctx.accounts.inscription_shard_account.owner == &system_program::ID)
+    if (ctx.accounts.inscription_shard_account.owner != &crate::ID)
         || ctx.accounts.inscription_shard_account.data_is_empty()
     {
         return Err(MplInscriptionError::InvalidShardAccount.into());

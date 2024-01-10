@@ -25,6 +25,7 @@ impl AssociatedInscriptionAccount {
         solana_program::pubkey::Pubkey::create_program_address(
             &[
                 "Inscription".as_bytes(),
+                "Association".as_bytes(),
                 association_tag.to_string().as_ref(),
                 inscription_metadata_account.as_ref(),
                 &[bump],
@@ -40,6 +41,7 @@ impl AssociatedInscriptionAccount {
         solana_program::pubkey::Pubkey::find_program_address(
             &[
                 "Inscription".as_bytes(),
+                "Association".as_bytes(),
                 association_tag.to_string().as_ref(),
                 inscription_metadata_account.as_ref(),
             ],

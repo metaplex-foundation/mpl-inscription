@@ -57,12 +57,12 @@ test('it can clear JSON data from an inscription account', async (t) => {
   );
 
   builder = builder.add(
-    clearData( umi, {
+    clearData(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
       associatedTag: null,
     })
-  )
+  );
 
   await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
@@ -118,17 +118,17 @@ test('it can write JSON data to a mint inscription account', async (t) => {
         '{"description": "A bread! But on-chain!", "external_url": "https://breadheads.io"}'
       ),
       associatedTag: null,
-      offset: 0
+      offset: 0,
     })
   );
 
   builder = builder.add(
-    clearData( umi, {
+    clearData(umi, {
       inscriptionAccount: inscriptionAccount[0],
       inscriptionMetadataAccount,
       associatedTag: null,
     })
-  )
+  );
 
   await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
@@ -173,18 +173,18 @@ test('it can write JSON data to an inscription account with a separate authority
         '{"description": "A bread! But on-chain!", "external_url": "https://breadheads.io"}'
       ),
       associatedTag: null,
-      offset: 0
+      offset: 0,
     })
   );
 
   builder = builder.add(
-    clearData( umi, {
+    clearData(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
       authority,
       associatedTag: null,
     })
-  )
+  );
 
   await builder.sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
@@ -226,7 +226,7 @@ test('it can write Image data to an associated inscription account', async (t) =
     initializeAssociatedInscription(umi, {
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png'
+      associationTag: 'image/png',
     })
   );
 
@@ -241,21 +241,23 @@ test('it can write Image data to an associated inscription account', async (t) =
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(await writeData(umi, {
-      inscriptionAccount: associatedInscriptionAccount,
-      inscriptionMetadataAccount,
-      value: chunk,
-      associatedTag: 'image/png',
-      offset: i,
-    }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } }));
+    promises.push(
+      await writeData(umi, {
+        inscriptionAccount: associatedInscriptionAccount,
+        inscriptionMetadataAccount,
+        value: chunk,
+        associatedTag: 'image/png',
+        offset: i,
+      }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } })
+    );
   }
 
   await Promise.all(promises);
 
-  await clearData( umi, {
+  await clearData(umi, {
     inscriptionAccount: associatedInscriptionAccount,
     inscriptionMetadataAccount,
-    associatedTag: 'image/png'
+    associatedTag: 'image/png',
   }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
   // Then an account was cleared with no remaining data.
@@ -314,7 +316,7 @@ test('it can write Image data to an associated mint inscription account', async 
     initializeAssociatedInscription(umi, {
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png'
+      associationTag: 'image/png',
     })
   );
 
@@ -329,13 +331,15 @@ test('it can write Image data to an associated mint inscription account', async 
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(await writeData(umi, {
-      inscriptionAccount: associatedInscriptionAccount,
-      inscriptionMetadataAccount,
-      value: chunk,
-      associatedTag: 'image/png',
-      offset: i,
-    }).sendAndConfirm(umi));
+    promises.push(
+      await writeData(umi, {
+        inscriptionAccount: associatedInscriptionAccount,
+        inscriptionMetadataAccount,
+        value: chunk,
+        associatedTag: 'image/png',
+        offset: i,
+      }).sendAndConfirm(umi)
+    );
   }
 
   await Promise.all(promises);

@@ -13,7 +13,7 @@ use crate::{
     instruction::{
         accounts::InitializeAssociatedInscriptionAccounts, AssociateInscriptionAccountArgs,
     },
-    state::{AssociatedInscription, DataType, InscriptionMetadata, PREFIX},
+    state::{AssociatedInscription, DataType, InscriptionMetadata, ASSOCIATION, PREFIX},
 };
 
 pub(crate) fn process_initialize_associated_inscription<'a>(
@@ -46,6 +46,7 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
         ctx.accounts.associated_inscription_account,
         &[
             PREFIX.as_bytes(),
+            ASSOCIATION.as_bytes(),
             args.association_tag.as_bytes(),
             ctx.accounts.inscription_metadata_account.key.as_ref(),
         ],
@@ -82,6 +83,7 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
         0,
         &[
             PREFIX.as_bytes(),
+            ASSOCIATION.as_bytes(),
             args.association_tag.as_bytes(),
             ctx.accounts.inscription_metadata_account.key.as_ref(),
             &[inscription_bump],

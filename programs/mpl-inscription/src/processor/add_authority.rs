@@ -50,6 +50,13 @@ pub(crate) fn process_add_authority<'a>(
     }
 
     // Add the new authority.
+    if inscription_metadata
+        .update_authorities
+        .contains(&args.new_authority)
+    {
+        return Err(MplInscriptionError::AuthorityAlreadyExists.into());
+    }
+
     inscription_metadata
         .update_authorities
         .push(args.new_authority);

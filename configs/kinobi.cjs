@@ -93,6 +93,7 @@ kinobi.update(
     associatedInscriptionAccount: {
       seeds: [
         k.stringConstantSeed("Inscription"),
+        k.stringConstantSeed("Association"),
         k.stringSeed("associationTag", "The association tag"),
         k.publicKeySeed("inscriptionMetadataAccount", "The address of the Inscription Metadata Account"),
       ],

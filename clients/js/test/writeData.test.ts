@@ -218,9 +218,7 @@ test('it can write JSON data to an inscription account in multiple batches', asy
     writeData(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
-      value: Buffer.from(
-        '{"description": "A bread! But on-chain!"'
-      ),
+      value: Buffer.from('{"description": "A bread! But on-chain!"'),
       associatedTag: null,
       offset: 0,
     })
@@ -230,9 +228,7 @@ test('it can write JSON data to an inscription account in multiple batches', asy
     writeData(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
-      value: Buffer.from(
-        ', "external_url":'
-      ),
+      value: Buffer.from(', "external_url":'),
       associatedTag: null,
       offset: '{"description": "A bread! But on-chain!"'.length,
     })
@@ -242,11 +238,10 @@ test('it can write JSON data to an inscription account in multiple batches', asy
     writeData(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
-      value: Buffer.from(
-        ' "https://breadheads.io"}'
-      ),
+      value: Buffer.from(' "https://breadheads.io"}'),
       associatedTag: null,
-      offset: '{"description": "A bread! But on-chain!", "external_url":'.length,
+      offset: '{"description": "A bread! But on-chain!", "external_url":'
+        .length,
     })
   );
 
@@ -296,7 +291,7 @@ test('it can write Image data to an associated inscription account', async (t) =
     initializeAssociatedInscription(umi, {
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png'
+      associationTag: 'image/png',
     })
   );
 
@@ -311,13 +306,15 @@ test('it can write Image data to an associated inscription account', async (t) =
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(writeData(umi, {
-      inscriptionAccount: associatedInscriptionAccount,
-      inscriptionMetadataAccount,
-      value: chunk,
-      associatedTag: 'image/png',
-      offset: i,
-    }).sendAndConfirm(umi));
+    promises.push(
+      writeData(umi, {
+        inscriptionAccount: associatedInscriptionAccount,
+        inscriptionMetadataAccount,
+        value: chunk,
+        associatedTag: 'image/png',
+        offset: i,
+      }).sendAndConfirm(umi)
+    );
   }
 
   await Promise.all(promises);
@@ -377,7 +374,7 @@ test('it can write Image data to an associated mint inscription account', async 
     initializeAssociatedInscription(umi, {
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png'
+      associationTag: 'image/png',
     })
   );
 
@@ -392,13 +389,15 @@ test('it can write Image data to an associated mint inscription account', async 
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(writeData(umi, {
-      inscriptionAccount: associatedInscriptionAccount,
-      inscriptionMetadataAccount,
-      value: chunk,
-      associatedTag: 'image/png',
-      offset: i,
-    }).sendAndConfirm(umi));
+    promises.push(
+      writeData(umi, {
+        inscriptionAccount: associatedInscriptionAccount,
+        inscriptionMetadataAccount,
+        value: chunk,
+        associatedTag: 'image/png',
+        offset: i,
+      }).sendAndConfirm(umi)
+    );
   }
 
   await Promise.all(promises);
@@ -441,7 +440,7 @@ test('it can write Image data to an associated inscription account, with preallo
     initializeAssociatedInscription(umi, {
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png'
+      associationTag: 'image/png',
     })
   );
 
@@ -450,7 +449,7 @@ test('it can write Image data to an associated inscription account, with preallo
   // Open the image file to fetch the raw bytes.
   const imageBytes: Buffer = await fs.promises.readFile('test/large_bread.png');
   const resizes = Math.floor(imageBytes.length / 10240) + 1;
-  for (let i = 0; i < resizes; i+=1) {
+  for (let i = 0; i < resizes; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     await allocate(umi, {
       inscriptionAccount: associatedInscriptionAccount,
@@ -460,7 +459,9 @@ test('it can write Image data to an associated inscription account, with preallo
     }).sendAndConfirm(umi);
   }
 
-  const sizedAccount = await umi.rpc.getAccount(associatedInscriptionAccount[0]);
+  const sizedAccount = await umi.rpc.getAccount(
+    associatedInscriptionAccount[0]
+  );
   if (sizedAccount.exists) {
     t.is(sizedAccount.data.length, imageBytes.length);
   }
@@ -471,13 +472,15 @@ test('it can write Image data to an associated inscription account, with preallo
   for (let i = 0; i < imageBytes.length; i += chunkSize) {
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
-    promises.push(writeData(umi, {
-      inscriptionAccount: associatedInscriptionAccount,
-      inscriptionMetadataAccount,
-      value: chunk,
-      associatedTag: 'image/png',
-      offset: i,
-    }).sendAndConfirm(umi));
+    promises.push(
+      writeData(umi, {
+        inscriptionAccount: associatedInscriptionAccount,
+        inscriptionMetadataAccount,
+        value: chunk,
+        associatedTag: 'image/png',
+        offset: i,
+      }).sendAndConfirm(umi)
+    );
   }
 
   await Promise.all(promises);

@@ -9,7 +9,7 @@ use solana_program::{
 use crate::{
     error::MplInscriptionError,
     instruction::{accounts::AllocateAccounts, AllocateArgs},
-    state::{InscriptionMetadata, PREFIX},
+    state::{InscriptionMetadata, ASSOCIATION, PREFIX},
 };
 
 pub(crate) fn process_allocate<'a>(
@@ -34,11 +34,22 @@ pub(crate) fn process_allocate<'a>(
     // Verify that the derived address is correct for the metadata account.
     match args.associated_tag {
         Some(tag) => {
+            // We don't allow empty tags.
+            if tag.is_empty() {
+                return Err(MplInscriptionError::AssociationTagCannotBeBlank.into());
+            }
+
+            // A tag can't be greater than the seed size.
+            if tag.len() > 32 {
+                return Err(MplInscriptionError::AssociationTagTooLong.into());
+            }
+
             let bump = assert_derivation(
                 &crate::ID,
                 ctx.accounts.inscription_account,
                 &[
                     PREFIX.as_bytes(),
+                    ASSOCIATION.as_bytes(),
                     tag.as_bytes(),
                     ctx.accounts.inscription_metadata_account.key.as_ref(),
                 ],

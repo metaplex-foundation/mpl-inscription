@@ -24,8 +24,12 @@ pub(crate) fn process_create_shard<'a>(
         return Err(MplInscriptionError::AlreadyInitialized.into());
     }
 
-    if args.shard_number > SHARD_COUNT {
+    if args.shard_number >= SHARD_COUNT {
         return Err(MplInscriptionError::InvalidShardAccount.into());
+    }
+
+    if ctx.accounts.system_program.key != &system_program::ID {
+        return Err(MplInscriptionError::InvalidSystemProgram.into());
     }
 
     let bump = assert_derivation(

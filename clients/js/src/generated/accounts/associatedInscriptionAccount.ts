@@ -143,6 +143,7 @@ export function findAssociatedInscriptionAccountPda(
   );
   return context.eddsa.findPda(programId, [
     string({ size: 'variable' }).serialize('Inscription'),
+    string({ size: 'variable' }).serialize('Association'),
     string({ size: 'variable' }).serialize(seeds.associationTag),
     publicKeySerializer().serialize(seeds.inscriptionMetadataAccount),
   ]);

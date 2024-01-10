@@ -8,6 +8,8 @@
 
 import {
   Context,
+  Option,
+  OptionOrNullable,
   Pda,
   PublicKey,
   Signer,
@@ -17,6 +19,8 @@ import {
 import {
   Serializer,
   mapSerializer,
+  option,
+  string,
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
@@ -41,26 +45,38 @@ export type CloseInstructionAccounts = {
 };
 
 // Data.
-export type CloseInstructionData = { discriminator: number };
+export type CloseInstructionData = {
+  discriminator: number;
+  associatedTag: Option<string>;
+};
 
-export type CloseInstructionDataArgs = {};
+export type CloseInstructionDataArgs = {
+  associatedTag: OptionOrNullable<string>;
+};
 
 export function getCloseInstructionDataSerializer(): Serializer<
   CloseInstructionDataArgs,
   CloseInstructionData
 > {
   return mapSerializer<CloseInstructionDataArgs, any, CloseInstructionData>(
-    struct<CloseInstructionData>([['discriminator', u8()]], {
-      description: 'CloseInstructionData',
-    }),
+    struct<CloseInstructionData>(
+      [
+        ['discriminator', u8()],
+        ['associatedTag', option(string())],
+      ],
+      { description: 'CloseInstructionData' }
+    ),
     (value) => ({ ...value, discriminator: 2 })
   ) as Serializer<CloseInstructionDataArgs, CloseInstructionData>;
 }
 
+// Args.
+export type CloseInstructionArgs = CloseInstructionDataArgs;
+
 // Instruction.
 export function close(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: CloseInstructionAccounts
+  input: CloseInstructionAccounts & CloseInstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -89,6 +105,9 @@ export function close(
     },
   };
 
+  // Arguments.
+  const resolvedArgs: CloseInstructionArgs = { ...input };
+
   // Default values.
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
@@ -114,7 +133,9 @@ export function close(
   );
 
   // Data.
-  const data = getCloseInstructionDataSerializer().serialize({});
+  const data = getCloseInstructionDataSerializer().serialize(
+    resolvedArgs as CloseInstructionDataArgs
+  );
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;
