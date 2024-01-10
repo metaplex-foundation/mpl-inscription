@@ -111,6 +111,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
     // Initialize the inscription metadata.
     let mut inscription_metadata = InscriptionMetadata {
         key: Key::MintInscriptionMetadataAccount,
+        inscription_account: *ctx.accounts.mint_inscription_account.key,
         bump,
         inscription_bump: Some(inscription_bump),
         update_authorities: vec![token_metadata.update_authority],

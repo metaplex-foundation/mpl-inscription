@@ -16,12 +16,18 @@ use solana_program::pubkey::Pubkey;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InscriptionMetadata {
     pub key: Key,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub inscription_account: Pubkey,
     pub bump: u8,
     pub data_type: DataType,
     pub inscription_rank: u64,
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
     pub associated_inscriptions: Vec<AssociatedInscription>,
+    pub padding: [u8; 8],
 }
 
 impl InscriptionMetadata {

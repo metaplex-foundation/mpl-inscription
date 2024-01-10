@@ -52,6 +52,7 @@ test('it can initialize an Inscription account', async (t) => {
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.InscriptionMetadataAccount,
+    inscriptionAccount: inscriptionAccount.publicKey,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
     inscriptionRank:
@@ -111,6 +112,7 @@ test('it can initialize multiple Inscription accounts', async (t) => {
 
     t.like(inscriptionMetadata, <InscriptionMetadata>{
       key: Key.InscriptionMetadataAccount,
+      inscriptionAccount: inscriptionAccount[i].publicKey,
       bump: inscriptionMetadataAccount[1],
       dataType: DataType.Uninitialized,
       inscriptionRank:
@@ -169,6 +171,7 @@ test('it can initialize an Inscription account with separate authority', async (
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.InscriptionMetadataAccount,
+    inscriptionAccount: inscriptionAccount.publicKey,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
     inscriptionRank:
