@@ -17,7 +17,7 @@ export async function download_nfts(rpc: string, keypair: string, mints: PublicK
 
     // Prune out any mints that have already been downloaded.
     mints = mints.filter((mint) => {
-        return !existsSync(`./cache/${mint.toString()}.json`) || !existsSync(`./cache/${mint.toString()}.png`);
+        return !existsSync(`./cache/${mint.toString()}.json`) || !existsSync(`./cache/${mint.toString()}.metadata`) || !existsSync(`./cache/${mint.toString()}.png`);
     });
 
     console.log(`Fetching ${mints.length} NFTs...`);
@@ -25,6 +25,14 @@ export async function download_nfts(rpc: string, keypair: string, mints: PublicK
     fetchNftBar.start(mints.length, 0);
     const nfts = await pMap(mints, async (mint, _i) => {
         const nft = await fetchDigitalAsset(umi, mint);
+        const metadata = {
+            name: nft.metadata.name,
+            symbol: nft.metadata.symbol,
+            mint: nft.metadata.mint,
+            uri: nft.metadata.uri,
+        };
+        const metadataFile = `./cache/${nft.metadata.mint}.metadata`;
+        writeFileSync(metadataFile, JSON.stringify(metadata, null, 2));
         fetchNftBar.increment();
         return nft;
     }, { concurrency });
@@ -38,7 +46,7 @@ export async function download_nfts(rpc: string, keypair: string, mints: PublicK
             fetchJsonBar.increment();
             return readFileSync(`./cache/${nft.metadata.mint}.json`);
         }
-        
+
         let retries = 5;
         while (retries > 0) {
             try {

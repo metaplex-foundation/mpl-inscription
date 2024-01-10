@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import { download_nfts } from './commands/download/nft.js';
 
 import { Command } from 'commander';
+import { test_createCollection } from './commands/test/createCollection.js';
 
 const program = new Command();
 
@@ -78,11 +79,17 @@ createCmd.command('shards')
     .option('-k --keypair <string>', 'Solana wallet location')
     .action(create_shards);
 
-program.parse(process.argv);
-
 const testCmd = program.command('test');
 
 testCmd.command('create_collection')
     .description('Create a test collection')
     .option('-r --rpc <string>', 'The endpoint to connect to.')
     .option('-k --keypair <string>', 'Solana wallet location')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .action(async (str, options) => {
+        const { rpc, keypair, concurrency } = options.opts();
+
+        await test_createCollection(rpc, keypair, 'cache', parseInt(concurrency));
+    });
+
+program.parse(process.argv);

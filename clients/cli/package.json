@@ -21,6 +21,7 @@
     "@metaplex-foundation/mpl-token-metadata": "^3.1.2",
     "@metaplex-foundation/umi": "^0.8.10",
     "@metaplex-foundation/umi-bundle-defaults": "^0.8.10",
+    "@metaplex-foundation/umi-uploader-nft-storage": "^0.9.0",
     "@solana/web3.js": "^1.87.6",
     "cli-progress": "^3.12.0",
     "commander": "^11.1.0",
@@ -29,6 +30,12 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
+    "eslint": "^8.0.1",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.5.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
