@@ -1,7 +1,6 @@
 #![cfg(feature = "test-sbf")]
 
 use borsh::BorshDeserialize;
-use mpl_inscription::{accounts::MyAccount, instructions::CreateBuilder};
 use solana_program_test::{tokio, ProgramTest};
 use solana_sdk::{
     signature::{Keypair, Signer},
