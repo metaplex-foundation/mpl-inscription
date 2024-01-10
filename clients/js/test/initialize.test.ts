@@ -24,8 +24,13 @@ test('it can initialize an Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount.publicKey,
   });
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   // When we create a new account.
   await initialize(umi, {
@@ -39,14 +44,18 @@ test('it can initialize an Inscription account', async (t) => {
     inscriptionMetadataAccount
   );
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.InscriptionMetadataAccount,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
-    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
   });
@@ -74,8 +83,13 @@ test('it can initialize multiple Inscription accounts', async (t) => {
       inscriptionAccount: inscriptionAccount[i].publicKey,
     });
 
-    const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-    const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+    const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+      shardNumber: 0,
+    });
+    const shardDataBefore = await fetchInscriptionShard(
+      umi,
+      inscriptionShardAccount
+    );
 
     // When we create a new account.
     await initialize(umi, {
@@ -89,14 +103,19 @@ test('it can initialize multiple Inscription accounts', async (t) => {
       inscriptionMetadataAccount
     );
 
-    const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+    const shardDataAfter = await fetchInscriptionShard(
+      umi,
+      inscriptionShardAccount
+    );
     t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
     t.like(inscriptionMetadata, <InscriptionMetadata>{
       key: Key.InscriptionMetadataAccount,
       bump: inscriptionMetadataAccount[1],
       dataType: DataType.Uninitialized,
-      inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+      inscriptionRank:
+        shardDataBefore.count * BigInt(32) +
+        BigInt(shardDataBefore.shardNumber),
       updateAuthorities: [umi.identity.publicKey],
       associatedInscriptions: [] as AssociatedInscription[],
     });
@@ -121,8 +140,13 @@ test('it can initialize an Inscription account with separate authority', async (
     inscriptionAccount: inscriptionAccount.publicKey,
   });
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   // When we create a new account.
   await initialize(umi, {
@@ -137,14 +161,18 @@ test('it can initialize an Inscription account with separate authority', async (
     inscriptionMetadataAccount
   );
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   t.like(inscriptionMetadata, <InscriptionMetadata>{
     key: Key.InscriptionMetadataAccount,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
-    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
   });

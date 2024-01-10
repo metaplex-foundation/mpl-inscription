@@ -12,7 +12,11 @@ import {
   publicKey,
 } from '@metaplex-foundation/umi';
 import { initializeFromMint as hiddenInitialize } from './generated/instructions/initializeFromMint';
-import { findInscriptionShardPda, findInscriptionMetadataPda, findMintInscriptionPda } from './generated';
+import {
+  findInscriptionShardPda,
+  findInscriptionMetadataPda,
+  findMintInscriptionPda,
+} from './generated';
 
 // Accounts.
 export type InitializeFromMintInstructionAccounts = {
@@ -42,41 +46,41 @@ export type InitializeFromMintInstructionDataArgs = {
   shard?: number;
 };
 
-
 // Instruction.
 export function initializeFromMint(
   context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
-  input: InitializeFromMintInstructionAccounts & InitializeFromMintInstructionDataArgs
+  input: InitializeFromMintInstructionAccounts &
+    InitializeFromMintInstructionDataArgs
 ): TransactionBuilder {
   let inscriptionAccount;
   if (input.mintInscriptionAccount) {
-      inscriptionAccount = input.mintInscriptionAccount;
+    inscriptionAccount = input.mintInscriptionAccount;
   } else {
-      inscriptionAccount = findMintInscriptionPda(context, {
-          mint: publicKey(input.mintAccount),
-      });
+    inscriptionAccount = findMintInscriptionPda(context, {
+      mint: publicKey(input.mintAccount),
+    });
   }
 
   let inscriptionMetadataAccount;
   if (input.inscriptionMetadataAccount) {
-      inscriptionMetadataAccount = input.inscriptionMetadataAccount;
+    inscriptionMetadataAccount = input.inscriptionMetadataAccount;
   } else {
-      inscriptionMetadataAccount = findInscriptionMetadataPda(context, {
-        inscriptionAccount: publicKey(inscriptionAccount),
-      });
+    inscriptionMetadataAccount = findInscriptionMetadataPda(context, {
+      inscriptionAccount: publicKey(inscriptionAccount),
+    });
   }
 
   let inscriptionShardAccount;
   if (input.inscriptionShardAccount) {
-      inscriptionShardAccount = input.inscriptionShardAccount;
+    inscriptionShardAccount = input.inscriptionShardAccount;
   } else {
-      let shardNumber;
-      if (input.shard) {
-          shardNumber = input.shard;
-      } else {
-          shardNumber = Math.floor(Math.random() * 32);
-      }
-      inscriptionShardAccount = findInscriptionShardPda(context, { shardNumber });
+    let shardNumber;
+    if (input.shard) {
+      shardNumber = input.shard;
+    } else {
+      shardNumber = Math.floor(Math.random() * 32);
+    }
+    inscriptionShardAccount = findInscriptionShardPda(context, { shardNumber });
   }
   return hiddenInitialize(context, {
     mintInscriptionAccount: inscriptionAccount,

@@ -63,7 +63,7 @@ test('it can create all of the shard accounts', async (t) => {
   }
 });
 
-test('it can\'t recreate a shard account', async (t) => {
+test("it can't recreate a shard account", async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
 

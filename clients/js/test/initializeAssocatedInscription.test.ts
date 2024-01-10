@@ -32,8 +32,13 @@ test('it can initialize an Associated Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount.publicKey,
   });
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   // When we create a new account.
   await initialize(umi, {
@@ -41,7 +46,10 @@ test('it can initialize an Associated Inscription account', async (t) => {
     inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
@@ -53,7 +61,7 @@ test('it can initialize an Associated Inscription account', async (t) => {
   await initializeAssociatedInscription(umi, {
     inscriptionMetadataAccount,
     // associatedInscriptionAccount,
-    associationTag: 'image/png'
+    associationTag: 'image/png',
   }).sendAndConfirm(umi);
 
   const inscriptionMetadata = await fetchInscriptionMetadata(
@@ -65,10 +73,15 @@ test('it can initialize an Associated Inscription account', async (t) => {
     key: Key.InscriptionMetadataAccount,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
-    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [
-      { tag: 'image/png', bump: associatedInscriptionAccount[1], dataType: DataType.Uninitialized }
+      {
+        tag: 'image/png',
+        bump: associatedInscriptionAccount[1],
+        dataType: DataType.Uninitialized,
+      },
     ],
   });
 
@@ -80,7 +93,10 @@ test('it can initialize an Associated Inscription account', async (t) => {
     });
   }
 
-  const shardDataLast = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataLast = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataAfter.count, shardDataLast.count);
 });
 
@@ -110,8 +126,13 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, { shardNumber: 0 });
-  const shardDataBefore = await fetchInscriptionShard(umi, inscriptionShardAccount);
+  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
 
   // const asset = await fetchDigitalAsset(umi, mint.publicKey);
 
@@ -121,7 +142,10 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
     inscriptionShardAccount,
   }).sendAndConfirm(umi);
 
-  const shardDataAfter = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
@@ -133,7 +157,7 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
   await initializeAssociatedInscription(umi, {
     inscriptionMetadataAccount,
     // associatedInscriptionAccount,
-    associationTag: 'image/png'
+    associationTag: 'image/png',
   }).sendAndConfirm(umi);
 
   const inscriptionMetadata = await fetchInscriptionMetadata(
@@ -145,10 +169,15 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
     key: Key.MintInscriptionMetadataAccount,
     bump: inscriptionMetadataAccount[1],
     dataType: DataType.Uninitialized,
-    inscriptionRank: (shardDataBefore.count * BigInt(32)) + BigInt(shardDataBefore.shardNumber),
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [
-      { tag: 'image/png', bump: associatedInscriptionAccount[1], dataType: DataType.Uninitialized }
+      {
+        tag: 'image/png',
+        bump: associatedInscriptionAccount[1],
+        dataType: DataType.Uninitialized,
+      },
     ],
   });
 
@@ -160,6 +189,9 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
     });
   }
 
-  const shardDataLast = await fetchInscriptionShard(umi, inscriptionShardAccount)
+  const shardDataLast = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
   t.is(shardDataAfter.count, shardDataLast.count);
 });
