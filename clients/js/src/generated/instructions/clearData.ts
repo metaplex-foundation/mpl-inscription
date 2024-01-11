@@ -32,7 +32,7 @@ import {
 
 // Accounts.
 export type ClearDataInstructionAccounts = {
-  /** The account to store the metadata in. */
+  /** The account where data is stored. */
   inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
   inscriptionMetadataAccount: PublicKey | Pda;

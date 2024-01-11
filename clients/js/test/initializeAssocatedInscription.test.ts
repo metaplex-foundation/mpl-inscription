@@ -53,15 +53,15 @@ test('it can initialize an Associated Inscription account', async (t) => {
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   // Create an Associated Inscription account.
   await initializeAssociatedInscription(umi, {
+    inscriptionAccount: inscriptionAccount.publicKey,
     inscriptionMetadataAccount,
-    // associatedInscriptionAccount,
-    associationTag: 'image/png',
+    associationTag: 'image',
   }).sendAndConfirm(umi);
 
   const inscriptionMetadata = await fetchInscriptionMetadata(
@@ -78,7 +78,7 @@ test('it can initialize an Associated Inscription account', async (t) => {
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [
       {
-        tag: 'image/png',
+        tag: 'image',
         bump: associatedInscriptionAccount[1],
         dataType: DataType.Uninitialized,
       },
@@ -149,15 +149,15 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
   t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   // Create an Associated Inscription account.
   await initializeAssociatedInscription(umi, {
+    inscriptionAccount: inscriptionAccount[0],
     inscriptionMetadataAccount,
-    // associatedInscriptionAccount,
-    associationTag: 'image/png',
+    associationTag: 'image',
   }).sendAndConfirm(umi);
 
   const inscriptionMetadata = await fetchInscriptionMetadata(
@@ -174,7 +174,7 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [
       {
-        tag: 'image/png',
+        tag: 'image',
         bump: associatedInscriptionAccount[1],
         dataType: DataType.Uninitialized,
       },

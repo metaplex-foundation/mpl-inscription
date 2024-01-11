@@ -32,6 +32,8 @@ import {
 
 // Accounts.
 export type InitializeAssociatedInscriptionInstructionAccounts = {
+  /** The account where data is stored. */
+  inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
   inscriptionMetadataAccount: PublicKey | Pda;
   /** The account to create and store the new associated data in. */
@@ -95,20 +97,25 @@ export function initializeAssociatedInscription(
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    inscriptionMetadataAccount: {
+    inscriptionAccount: {
       index: 0,
+      isWritable: false,
+      value: input.inscriptionAccount ?? null,
+    },
+    inscriptionMetadataAccount: {
+      index: 1,
       isWritable: true,
       value: input.inscriptionMetadataAccount ?? null,
     },
     associatedInscriptionAccount: {
-      index: 1,
+      index: 2,
       isWritable: true,
       value: input.associatedInscriptionAccount ?? null,
     },
-    payer: { index: 2, isWritable: true, value: input.payer ?? null },
-    authority: { index: 3, isWritable: false, value: input.authority ?? null },
+    payer: { index: 3, isWritable: true, value: input.payer ?? null },
+    authority: { index: 4, isWritable: false, value: input.authority ?? null },
     systemProgram: {
-      index: 4,
+      index: 5,
       isWritable: false,
       value: input.systemProgram ?? null,
     },

@@ -46,10 +46,20 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
         &[
             PREFIX.as_bytes(),
             crate::ID.as_ref(),
-            inscription_metadata.inscription_account.as_ref(),
+            ctx.accounts.inscription_account.key.as_ref(),
         ],
         MplInscriptionError::DerivedKeyInvalid,
     )?;
+
+    // We don't allow empty tags.
+    if args.association_tag.is_empty() {
+        return Err(MplInscriptionError::AssociationTagCannotBeBlank.into());
+    }
+
+    // A tag can't be greater than the seed size.
+    if args.association_tag.len() > 32 {
+        return Err(MplInscriptionError::AssociationTagTooLong.into());
+    }
 
     // Verify that the derived address is correct for the metadata account.
     let inscription_bump = assert_derivation(

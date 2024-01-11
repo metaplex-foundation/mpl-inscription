@@ -283,15 +283,16 @@ test('it can write Image data to an associated inscription account', async (t) =
   );
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   builder = builder.add(
     initializeAssociatedInscription(umi, {
+      inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png',
+      associationTag: 'image',
     })
   );
 
@@ -311,7 +312,7 @@ test('it can write Image data to an associated inscription account', async (t) =
         inscriptionAccount: associatedInscriptionAccount,
         inscriptionMetadataAccount,
         value: chunk,
-        associatedTag: 'image/png',
+        associatedTag: 'image',
         offset: i,
       }).sendAndConfirm(umi)
     );
@@ -366,15 +367,16 @@ test('it can write Image data to an associated mint inscription account', async 
   );
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   builder = builder.add(
     initializeAssociatedInscription(umi, {
+      inscriptionAccount: inscriptionAccount[0],
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png',
+      associationTag: 'image',
     })
   );
 
@@ -394,7 +396,7 @@ test('it can write Image data to an associated mint inscription account', async 
         inscriptionAccount: associatedInscriptionAccount,
         inscriptionMetadataAccount,
         value: chunk,
-        associatedTag: 'image/png',
+        associatedTag: 'image',
         offset: i,
       }).sendAndConfirm(umi)
     );
@@ -432,15 +434,16 @@ test('it can write Image data to an associated inscription account, with preallo
   );
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   builder = builder.add(
     initializeAssociatedInscription(umi, {
+      inscriptionAccount: inscriptionAccount.publicKey,
       inscriptionMetadataAccount,
       associatedInscriptionAccount,
-      associationTag: 'image/png',
+      associationTag: 'image',
     })
   );
 
@@ -454,7 +457,7 @@ test('it can write Image data to an associated inscription account, with preallo
     await allocate(umi, {
       inscriptionAccount: associatedInscriptionAccount,
       inscriptionMetadataAccount,
-      associatedTag: 'image/png',
+      associatedTag: 'image',
       targetSize: imageBytes.length,
     }).sendAndConfirm(umi);
   }
@@ -477,7 +480,7 @@ test('it can write Image data to an associated inscription account, with preallo
         inscriptionAccount: associatedInscriptionAccount,
         inscriptionMetadataAccount,
         value: chunk,
-        associatedTag: 'image/png',
+        associatedTag: 'image',
         offset: i,
       }).sendAndConfirm(umi)
     );
