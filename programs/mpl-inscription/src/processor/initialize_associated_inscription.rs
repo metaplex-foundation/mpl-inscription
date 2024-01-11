@@ -1,6 +1,6 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use mpl_utils::{
-    assert_derivation, assert_signer, create_or_allocate_account_raw,
+    assert_derivation, assert_owned_by, assert_signer, create_or_allocate_account_raw,
     resize_or_reallocate_account_raw,
 };
 use solana_program::{
@@ -21,6 +21,12 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
     args: AssociateInscriptionAccountArgs,
 ) -> ProgramResult {
     let ctx = &InitializeAssociatedInscriptionAccounts::context(accounts)?;
+
+    assert_owned_by(
+        ctx.accounts.inscription_account,
+        &crate::ID,
+        MplInscriptionError::IncorrectOwner,
+    )?;
 
     // Check that the account isn't already initialized.
     if (ctx.accounts.associated_inscription_account.owner != &system_program::ID)
