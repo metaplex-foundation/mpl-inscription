@@ -6,6 +6,7 @@ import { download_nfts } from './commands/download/nft.js';
 
 import { Command } from 'commander';
 import { test_createCollection } from './commands/test/createCollection.js';
+import { cost_nfts } from './commands/cost/nft.js';
 
 const program = new Command();
 
@@ -69,6 +70,31 @@ downloadCmd.command('hashlist')
         const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
 
         await download_nfts(rpc, keypair, mints, parseInt(concurrency));
+    });
+
+const costCmd = program.command('cost');
+
+costCmd.command('nft')
+    .description('Calculate the cost of inscribing an NFT')
+    .option('-r --rpc <string>', 'The endpoint to connect to.')
+    .option('-m --mint <string>', 'Mint address of the NFT')
+    .action(async (str, options) => {
+        const { rpc, mint } = options.opts();
+
+        await cost_nfts([publicKey(mint)]);
+    });
+
+costCmd.command('hashlist')
+    .description('Calculate the cost of inscribing a hashlist')
+    .option('-r --rpc <string>', 'The endpoint to connect to.')
+    .option('-h --hashlist <string>', 'The file containing the hashlist')
+    .action(async (str, options) => {
+        const { rpc, hashlist } = options.opts();
+
+        const hashlistArray = JSON.parse(readFileSync(hashlist, 'utf-8'));
+        const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
+
+        await cost_nfts(mints);
     });
 
 const createCmd = program.command('create');
