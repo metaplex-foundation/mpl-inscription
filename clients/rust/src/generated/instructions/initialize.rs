@@ -10,7 +10,7 @@ use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct Initialize {
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     pub inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
@@ -101,7 +101,7 @@ impl InitializeBuilder {
     pub fn new() -> Self {
         Self::default()
     }
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     #[inline(always)]
     pub fn inscription_account(
         &mut self,
@@ -191,7 +191,7 @@ impl InitializeBuilder {
 
 /// `initialize` CPI accounts.
 pub struct InitializeCpiAccounts<'a, 'b> {
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
@@ -209,7 +209,7 @@ pub struct InitializeCpiAccounts<'a, 'b> {
 pub struct InitializeCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
@@ -358,7 +358,7 @@ impl<'a, 'b> InitializeCpiBuilder<'a, 'b> {
         });
         Self { instruction }
     }
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     #[inline(always)]
     pub fn inscription_account(
         &mut self,

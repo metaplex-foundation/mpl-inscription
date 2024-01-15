@@ -1,6 +1,6 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use mpl_utils::{
-    assert_derivation, assert_signer, create_or_allocate_account_raw,
+    assert_derivation, assert_owned_by, assert_signer, create_or_allocate_account_raw,
     resize_or_reallocate_account_raw,
 };
 use solana_program::{
@@ -21,6 +21,12 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
     args: AssociateInscriptionAccountArgs,
 ) -> ProgramResult {
     let ctx = &InitializeAssociatedInscriptionAccounts::context(accounts)?;
+
+    assert_owned_by(
+        ctx.accounts.inscription_account,
+        &crate::ID,
+        MplInscriptionError::IncorrectOwner,
+    )?;
 
     // Check that the account isn't already initialized.
     if (ctx.accounts.associated_inscription_account.owner != &system_program::ID)
@@ -46,10 +52,20 @@ pub(crate) fn process_initialize_associated_inscription<'a>(
         &[
             PREFIX.as_bytes(),
             crate::ID.as_ref(),
-            inscription_metadata.inscription_account.as_ref(),
+            ctx.accounts.inscription_account.key.as_ref(),
         ],
         MplInscriptionError::DerivedKeyInvalid,
     )?;
+
+    // We don't allow empty tags.
+    if args.association_tag.is_empty() {
+        return Err(MplInscriptionError::AssociationTagCannotBeBlank.into());
+    }
+
+    // A tag can't be greater than the seed size.
+    if args.association_tag.len() > 32 {
+        return Err(MplInscriptionError::AssociationTagTooLong.into());
+    }
 
     // Verify that the derived address is correct for the metadata account.
     let inscription_bump = assert_derivation(

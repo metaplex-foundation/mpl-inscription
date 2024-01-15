@@ -10,6 +10,8 @@ use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct InitializeAssociatedInscription {
+    /// The account where data is stored.
+    pub inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
     /// The account to create and store the new associated data in.
@@ -35,7 +37,11 @@ impl InitializeAssociatedInscription {
         args: InitializeAssociatedInscriptionInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.inscription_account,
+            false,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.inscription_metadata_account,
             false,
@@ -96,6 +102,7 @@ pub struct InitializeAssociatedInscriptionInstructionArgs {
 /// Instruction builder.
 #[derive(Default)]
 pub struct InitializeAssociatedInscriptionBuilder {
+    inscription_account: Option<solana_program::pubkey::Pubkey>,
     inscription_metadata_account: Option<solana_program::pubkey::Pubkey>,
     associated_inscription_account: Option<solana_program::pubkey::Pubkey>,
     payer: Option<solana_program::pubkey::Pubkey>,
@@ -108,6 +115,15 @@ pub struct InitializeAssociatedInscriptionBuilder {
 impl InitializeAssociatedInscriptionBuilder {
     pub fn new() -> Self {
         Self::default()
+    }
+    /// The account where data is stored.
+    #[inline(always)]
+    pub fn inscription_account(
+        &mut self,
+        inscription_account: solana_program::pubkey::Pubkey,
+    ) -> &mut Self {
+        self.inscription_account = Some(inscription_account);
+        self
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
@@ -173,6 +189,9 @@ impl InitializeAssociatedInscriptionBuilder {
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = InitializeAssociatedInscription {
+            inscription_account: self
+                .inscription_account
+                .expect("inscription_account is not set"),
             inscription_metadata_account: self
                 .inscription_metadata_account
                 .expect("inscription_metadata_account is not set"),
@@ -198,6 +217,8 @@ impl InitializeAssociatedInscriptionBuilder {
 
 /// `initialize_associated_inscription` CPI accounts.
 pub struct InitializeAssociatedInscriptionCpiAccounts<'a, 'b> {
+    /// The account where data is stored.
+    pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to create and store the new associated data in.
@@ -214,6 +235,8 @@ pub struct InitializeAssociatedInscriptionCpiAccounts<'a, 'b> {
 pub struct InitializeAssociatedInscriptionCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The account where data is stored.
+    pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to create and store the new associated data in.
@@ -236,6 +259,7 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpi<'a, 'b> {
     ) -> Self {
         Self {
             __program: program,
+            inscription_account: accounts.inscription_account,
             inscription_metadata_account: accounts.inscription_metadata_account,
             associated_inscription_account: accounts.associated_inscription_account,
             payer: accounts.payer,
@@ -277,7 +301,11 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.inscription_account.key,
+            false,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.inscription_metadata_account.key,
             false,
@@ -323,8 +351,9 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
+        account_infos.push(self.inscription_account.clone());
         account_infos.push(self.inscription_metadata_account.clone());
         account_infos.push(self.associated_inscription_account.clone());
         account_infos.push(self.payer.clone());
@@ -353,6 +382,7 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(InitializeAssociatedInscriptionCpiBuilderInstruction {
             __program: program,
+            inscription_account: None,
             inscription_metadata_account: None,
             associated_inscription_account: None,
             payer: None,
@@ -362,6 +392,15 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
+    }
+    /// The account where data is stored.
+    #[inline(always)]
+    pub fn inscription_account(
+        &mut self,
+        inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.inscription_account = Some(inscription_account);
+        self
     }
     /// The account to store the inscription account's metadata in.
     #[inline(always)]
@@ -462,6 +501,11 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
         let instruction = InitializeAssociatedInscriptionCpi {
             __program: self.instruction.__program,
 
+            inscription_account: self
+                .instruction
+                .inscription_account
+                .expect("inscription_account is not set"),
+
             inscription_metadata_account: self
                 .instruction
                 .inscription_metadata_account
@@ -491,6 +535,7 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
 
 struct InitializeAssociatedInscriptionCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
+    inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     inscription_metadata_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     associated_inscription_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,

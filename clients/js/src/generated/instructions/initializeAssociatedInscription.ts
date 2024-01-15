@@ -21,7 +21,10 @@ import {
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
-import { findAssociatedInscriptionAccountPda } from '../accounts';
+import {
+  findAssociatedInscriptionAccountPda,
+  findInscriptionMetadataPda,
+} from '../accounts';
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
@@ -32,8 +35,10 @@ import {
 
 // Accounts.
 export type InitializeAssociatedInscriptionInstructionAccounts = {
+  /** The account where data is stored. */
+  inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
-  inscriptionMetadataAccount: PublicKey | Pda;
+  inscriptionMetadataAccount?: PublicKey | Pda;
   /** The account to create and store the new associated data in. */
   associatedInscriptionAccount?: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
@@ -95,20 +100,25 @@ export function initializeAssociatedInscription(
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    inscriptionMetadataAccount: {
+    inscriptionAccount: {
       index: 0,
+      isWritable: false,
+      value: input.inscriptionAccount ?? null,
+    },
+    inscriptionMetadataAccount: {
+      index: 1,
       isWritable: true,
       value: input.inscriptionMetadataAccount ?? null,
     },
     associatedInscriptionAccount: {
-      index: 1,
+      index: 2,
       isWritable: true,
       value: input.associatedInscriptionAccount ?? null,
     },
-    payer: { index: 2, isWritable: true, value: input.payer ?? null },
-    authority: { index: 3, isWritable: false, value: input.authority ?? null },
+    payer: { index: 3, isWritable: true, value: input.payer ?? null },
+    authority: { index: 4, isWritable: false, value: input.authority ?? null },
     systemProgram: {
-      index: 4,
+      index: 5,
       isWritable: false,
       value: input.systemProgram ?? null,
     },
@@ -120,6 +130,14 @@ export function initializeAssociatedInscription(
   };
 
   // Default values.
+  if (!resolvedAccounts.inscriptionMetadataAccount.value) {
+    resolvedAccounts.inscriptionMetadataAccount.value =
+      findInscriptionMetadataPda(context, {
+        inscriptionAccount: expectPublicKey(
+          resolvedAccounts.inscriptionAccount.value
+        ),
+      });
+  }
   if (!resolvedAccounts.associatedInscriptionAccount.value) {
     resolvedAccounts.associatedInscriptionAccount.value =
       findAssociatedInscriptionAccountPda(context, {
