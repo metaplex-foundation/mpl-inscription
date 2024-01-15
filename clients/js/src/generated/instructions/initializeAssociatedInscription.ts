@@ -21,7 +21,10 @@ import {
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
-import { findAssociatedInscriptionAccountPda } from '../accounts';
+import {
+  findAssociatedInscriptionAccountPda,
+  findInscriptionMetadataPda,
+} from '../accounts';
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
@@ -35,7 +38,7 @@ export type InitializeAssociatedInscriptionInstructionAccounts = {
   /** The account where data is stored. */
   inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
-  inscriptionMetadataAccount: PublicKey | Pda;
+  inscriptionMetadataAccount?: PublicKey | Pda;
   /** The account to create and store the new associated data in. */
   associatedInscriptionAccount?: PublicKey | Pda;
   /** The account that will pay for the transaction and rent. */
@@ -127,6 +130,14 @@ export function initializeAssociatedInscription(
   };
 
   // Default values.
+  if (!resolvedAccounts.inscriptionMetadataAccount.value) {
+    resolvedAccounts.inscriptionMetadataAccount.value =
+      findInscriptionMetadataPda(context, {
+        inscriptionAccount: expectPublicKey(
+          resolvedAccounts.inscriptionAccount.value
+        ),
+      });
+  }
   if (!resolvedAccounts.associatedInscriptionAccount.value) {
     resolvedAccounts.associatedInscriptionAccount.value =
       findAssociatedInscriptionAccountPda(context, {

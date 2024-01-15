@@ -117,6 +117,12 @@ kinobi.update(
       ...k.pdaDefault("inscriptionMetadata"),
     },
     {
+      account: "inscriptionMetadataAccount",
+      ignoreIfOptional: true,
+      instruction: "initializeAssociatedInscription",
+      ...k.pdaDefault("inscriptionMetadata"),
+    },
+    {
       account: "tokenMetadataAccount",
       ignoreIfOptional: true,
       ...k.pdaDefault("metadata", {

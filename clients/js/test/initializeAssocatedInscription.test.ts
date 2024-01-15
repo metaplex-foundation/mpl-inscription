@@ -60,7 +60,6 @@ test('it can initialize an Associated Inscription account', async (t) => {
   // Create an Associated Inscription account.
   await initializeAssociatedInscription(umi, {
     inscriptionAccount: inscriptionAccount.publicKey,
-    inscriptionMetadataAccount,
     associationTag: 'image',
   }).sendAndConfirm(umi);
 
@@ -156,7 +155,6 @@ test('it can initialize an Associated Inscription account on a Mint', async (t) 
   // Create an Associated Inscription account.
   await initializeAssociatedInscription(umi, {
     inscriptionAccount: inscriptionAccount[0],
-    inscriptionMetadataAccount,
     associationTag: 'image',
   }).sendAndConfirm(umi);
 

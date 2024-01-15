@@ -290,8 +290,6 @@ test('it can write Image data to an associated inscription account', async (t) =
   builder = builder.add(
     initializeAssociatedInscription(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
-      inscriptionMetadataAccount,
-      associatedInscriptionAccount,
       associationTag: 'image',
     })
   );
@@ -374,8 +372,6 @@ test('it can write Image data to an associated mint inscription account', async 
   builder = builder.add(
     initializeAssociatedInscription(umi, {
       inscriptionAccount: inscriptionAccount[0],
-      inscriptionMetadataAccount,
-      associatedInscriptionAccount,
       associationTag: 'image',
     })
   );
@@ -441,8 +437,6 @@ test('it can write Image data to an associated inscription account, with preallo
   builder = builder.add(
     initializeAssociatedInscription(umi, {
       inscriptionAccount: inscriptionAccount.publicKey,
-      inscriptionMetadataAccount,
-      associatedInscriptionAccount,
       associationTag: 'image',
     })
   );
