@@ -218,15 +218,14 @@ test('it can write Image data to an associated inscription account', async (t) =
   );
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   builder = builder.add(
     initializeAssociatedInscription(umi, {
-      inscriptionMetadataAccount,
-      associatedInscriptionAccount,
-      associationTag: 'image/png',
+      inscriptionAccount: inscriptionAccount.publicKey,
+      associationTag: 'image',
     })
   );
 
@@ -242,11 +241,12 @@ test('it can write Image data to an associated inscription account', async (t) =
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
     promises.push(
+      // eslint-disable-next-line no-await-in-loop
       await writeData(umi, {
         inscriptionAccount: associatedInscriptionAccount,
         inscriptionMetadataAccount,
         value: chunk,
-        associatedTag: 'image/png',
+        associatedTag: 'image',
         offset: i,
       }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } })
     );
@@ -257,7 +257,7 @@ test('it can write Image data to an associated inscription account', async (t) =
   await clearData(umi, {
     inscriptionAccount: associatedInscriptionAccount,
     inscriptionMetadataAccount,
-    associatedTag: 'image/png',
+    associatedTag: 'image',
   }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
 
   // Then an account was cleared with no remaining data.
@@ -308,15 +308,14 @@ test('it can write Image data to an associated mint inscription account', async 
   );
 
   const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
-    associated_tag: 'image/png',
+    associated_tag: 'image',
     inscriptionMetadataAccount,
   });
 
   builder = builder.add(
     initializeAssociatedInscription(umi, {
-      inscriptionMetadataAccount,
-      associatedInscriptionAccount,
-      associationTag: 'image/png',
+      inscriptionAccount: inscriptionAccount[0],
+      associationTag: 'image',
     })
   );
 
@@ -332,11 +331,12 @@ test('it can write Image data to an associated mint inscription account', async 
     const chunk = imageBytes.slice(i, i + chunkSize);
     // eslint-disable-next-line no-await-in-loop
     promises.push(
+      // eslint-disable-next-line no-await-in-loop
       await writeData(umi, {
         inscriptionAccount: associatedInscriptionAccount,
         inscriptionMetadataAccount,
         value: chunk,
-        associatedTag: 'image/png',
+        associatedTag: 'image',
         offset: i,
       }).sendAndConfirm(umi)
     );

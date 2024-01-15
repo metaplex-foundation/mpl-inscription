@@ -10,7 +10,7 @@ use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct InitializeFromMint {
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     pub mint_inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
@@ -117,7 +117,7 @@ impl InitializeFromMintBuilder {
     pub fn new() -> Self {
         Self::default()
     }
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     #[inline(always)]
     pub fn mint_inscription_account(
         &mut self,
@@ -226,7 +226,7 @@ impl InitializeFromMintBuilder {
 
 /// `initialize_from_mint` CPI accounts.
 pub struct InitializeFromMintCpiAccounts<'a, 'b> {
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     pub mint_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
@@ -248,7 +248,7 @@ pub struct InitializeFromMintCpiAccounts<'a, 'b> {
 pub struct InitializeFromMintCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     pub mint_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
@@ -417,7 +417,7 @@ impl<'a, 'b> InitializeFromMintCpiBuilder<'a, 'b> {
         });
         Self { instruction }
     }
-    /// The account to store the metadata in.
+    /// The account where data is stored.
     #[inline(always)]
     pub fn mint_inscription_account(
         &mut self,
