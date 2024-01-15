@@ -49,6 +49,10 @@ export async function download_nfts(rpc: string, keypair: string, mints: PublicK
 
         let retries = 5;
         while (retries > 0) {
+            if (nft.metadata.uri === '') {
+                throw new Error(`No URI found for ${nft.metadata.mint}!`);
+            }
+
             try {
                 const json = Buffer.from(await (await fetch(nft.metadata.uri)).arrayBuffer());
                 const jsonFile = `./cache/${nft.metadata.mint}.json`;
@@ -57,6 +61,7 @@ export async function download_nfts(rpc: string, keypair: string, mints: PublicK
                 return json;
             } catch (e) {
                 console.log(`\n${e}\n`);
+                console.log(nft);
                 retries--;
             }
         }
@@ -74,7 +79,7 @@ export async function download_nfts(rpc: string, keypair: string, mints: PublicK
             imageURI = jsonData.animation_url;
         } else if (jsonData.image) {
             imageURI = jsonData.image;
-        } else {
+        } else if (jsonData.properties && jsonData.properties.files) {
             for (const file of jsonData.properties.files) {
                 if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/gif') {
                     imageURI = file.uri;
