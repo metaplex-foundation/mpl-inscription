@@ -7,6 +7,8 @@ import { download_nfts } from './commands/download/nft.js';
 import { Command } from 'commander';
 import { test_createCollection } from './commands/test/createCollection.js';
 import { cost_nfts } from './commands/cost/nft.js';
+import { compress_images } from './commands/compress/images.js';
+import { compress_json } from './commands/compress/json.js';
 
 const program = new Command();
 
@@ -95,6 +97,30 @@ costCmd.command('hashlist')
         const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
 
         await cost_nfts(mints);
+    });
+
+const compressCmd = program.command('compress');
+
+compressCmd.command('images')
+    .description('Compress images in the cache folder')
+    .option('-q --quality <number>', 'The quality (%) of the compressed image', '80')
+    .option('-s --size <number>', 'The resize (%) of the output image', '100')
+    .option('-e --extension <string>', 'The extension of the output image', 'jpg')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .action(async (str, options) => {
+        const { quality, size, extension, concurrency } = options.opts();
+
+        await compress_images(quality, size, extension, parseInt(concurrency));
+    });
+
+compressCmd.command('json')
+    .description('Reduce size of the JSON files in the cache folder')
+    .option('-r --remove [fields...]', 'Fields to remove from the JSON files')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .action(async (str, options) => {
+        const { remove, concurrency } = options.opts();
+
+        await compress_json(remove, parseInt(concurrency));
     });
 
 const createCmd = program.command('create');
