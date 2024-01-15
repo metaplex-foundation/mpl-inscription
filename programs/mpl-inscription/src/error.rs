@@ -75,6 +75,10 @@ pub enum MplInscriptionError {
     /// 16 - Authority Already Exists
     #[error("The authority already exists.")]
     AuthorityAlreadyExists,
+
+    /// 17 - Remaining Associated Inscription Accounts
+    #[error("Cannot close Inscription accounts until all Associated Inscriptions are closed.")]
+    RemainingAssociatedInscriptionAccounts,
 }
 
 impl PrintProgramError for MplInscriptionError {

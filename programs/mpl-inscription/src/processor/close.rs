@@ -120,6 +120,10 @@ pub(crate) fn process_close<'a>(accounts: &'a [AccountInfo<'a>], args: CloseArgs
             close_account_raw(ctx.accounts.payer, ctx.accounts.inscription_account)?;
         }
         None => {
+            if !inscription_metadata.associated_inscriptions.is_empty() {
+                return Err(MplInscriptionError::RemainingAssociatedInscriptionAccounts.into());
+            }
+
             let bump = assert_derivation(
                 &crate::ID,
                 ctx.accounts.inscription_metadata_account,
