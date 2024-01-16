@@ -11,8 +11,8 @@ A Umi-compatible JavaScript library for the project.
    ```
 2. Finally, register the library with your Umi instance like so.
    ```ts
-   import { MplInscription } from '@metaplex-foundation/mpl-inscription';
-   umi.use(MplInscription());
+   import { mplInscription } from '@metaplex-foundation/mpl-inscription';
+   umi.use(mplInscription());
    ```
 
 3. Inscribe any binary data on chain

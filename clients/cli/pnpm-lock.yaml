@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.0.0
     version: 1.0.0(@metaplex-foundation/umi@0.8.10)
   '@metaplex-foundation/mpl-inscription':
-    specifier: ^0.5.2
-    version: 0.5.2(@metaplex-foundation/umi@0.8.10)
+    specifier: ^0.8.0
+    version: 0.8.0(@metaplex-foundation/umi@0.8.10)
   '@metaplex-foundation/mpl-token-metadata':
     specifier: ^3.1.2
     version: 3.1.2(@metaplex-foundation/umi@0.8.10)
@@ -651,8 +651,8 @@ packages:
       '@metaplex-foundation/umi': 0.8.10
     dev: false
 
-  /@metaplex-foundation/mpl-inscription@0.5.2(@metaplex-foundation/umi@0.8.10):
-    resolution: {integrity: sha512-Sb6OuT+EUGp1XK4pGSm81Zfns8JRe+rakmEqNGGDC+1ph7gDhZivEoIJ4hhqCTlT2j0ssNPOEDHq7oUvMcTZUA==}
+  /@metaplex-foundation/mpl-inscription@0.8.0(@metaplex-foundation/umi@0.8.10):
+    resolution: {integrity: sha512-F/xxtPghGrUEzJr1j3AAdMcHgzQIRr+8F9899EhLtrGio+9hHtsyEFnzzXb4z2y541MXFLOY2Vg4+gGicqHR0Q==}
     peerDependencies:
       '@metaplex-foundation/umi': ^0.8.2
     dependencies:

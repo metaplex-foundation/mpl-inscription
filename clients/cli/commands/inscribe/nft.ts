@@ -1,7 +1,7 @@
 import { fetchDigitalAsset, mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { accountExists, accountValid, inscribe, loadWalletKey } from "../../utils.js";
-import { MplInscription, findAssociatedInscriptionPda, findInscriptionMetadataPda, findMintInscriptionPda, initializeAssociatedInscription, initializeFromMint } from "@metaplex-foundation/mpl-inscription";
+import { mplInscription, findAssociatedInscriptionPda, findInscriptionMetadataPda, findMintInscriptionPda, initializeAssociatedInscription, initializeFromMint } from "@metaplex-foundation/mpl-inscription";
 import { PublicKey } from "@metaplex-foundation/umi";
 import pMap from "p-map";
 
@@ -10,7 +10,7 @@ const INSCRIPTION_GATEWAY: string = 'https://igw.metaplex.com/';
 export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicKey[], concurrency: number) {
     let umi = createUmi(rpc);
     umi = loadWalletKey(umi, keypair);
-    umi.use(MplInscription());
+    umi.use(mplInscription());
     umi.use(mplTokenMetadata());
 
     const network = umi.rpc.getCluster().toString().replace('-beta', '');
@@ -83,6 +83,9 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
     console.log(`Initializing ${mediaBytes.length} Inscription Image Accounts...`);
 
     const associatedInscriptionAccounts = await pMap(inscriptionMetadataAccounts, async (inscriptionMetadataAccount, i) => {
+        const mintInscriptionAccount = findMintInscriptionPda(umi, {
+            mint: nfts[i].mint.publicKey
+        });
         const associatedInscriptionAccount = findAssociatedInscriptionPda(umi, {
             associated_tag: 'image',
             inscriptionMetadataAccount,
@@ -90,7 +93,7 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
 
         if (!await accountExists(umi, associatedInscriptionAccount[0])) {
             await initializeAssociatedInscription(umi, {
-                inscriptionMetadataAccount,
+                inscriptionAccount: mintInscriptionAccount[0],
                 associationTag: 'image'
             }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
         }
