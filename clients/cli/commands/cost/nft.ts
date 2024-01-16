@@ -25,18 +25,21 @@ export async function cost_nfts(mints: PublicKey[]) {
     }, { concurrency: 1 });
     fetchJsonBar.stop();
 
+    let totalSize = jsonBytes.reduce((a, b) => a + b.length, 0);
     let totalCost = jsonBytes.reduce((a, b) => a + getInscribeJsonCost(b.length), getInitCost() * mints.length);
 
+    console.log(`Estimating cost for ${mints.length} Media files...`);
     let fetchMediaBar = new SingleBar({}, Presets.shades_classic)
     fetchMediaBar.start(mints.length, 0);
     const mediaBytes = await pMap(mints, async (mint, i) => {
-        const mediaFiles = globSync(`./cache/${mint}.*`, { ignore: ['cache/*.json', 'cache/*.metadata'] });
+        const mediaFiles = globSync(`cache/${mint}.*`, { ignore: ['cache/*.json', 'cache/*.metadata'] });
         const media = readFileSync(mediaFiles[0]);
         fetchMediaBar.increment();
         return media;
     }, { concurrency: 1 });
     fetchMediaBar.stop();
 
+    totalSize = mediaBytes.reduce((a, b) => a + b.length, totalSize);
     totalCost = mediaBytes.reduce((a, b) => a + getInscribeMediaCost(b.length), totalCost);
-    console.log(`Total Inscription cost is ${totalCost} SOL.`);
+    console.log(`Total Inscription cost for ${mints.length} NFTs and ${totalSize} bytes is ${totalCost} SOL.`);
 }

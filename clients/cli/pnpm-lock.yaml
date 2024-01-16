@@ -47,6 +47,9 @@ dependencies:
   sharp:
     specifier: ^0.33.2
     version: 0.33.2
+  yesno:
+    specifier: ^0.4.0
+    version: 0.4.0
 
 devDependencies:
   '@types/node':
@@ -4483,4 +4486,8 @@ packages:
   /yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
+    dev: false
+
+  /yesno@0.4.0:
+    resolution: {integrity: sha512-tdBxmHvbXPBKYIg81bMCB7bVeDmHkRzk5rVJyYYXurwKkHq/MCd8rz4HSJUP7hW0H2NlXiq8IFiWvYKEHhlotA==}
     dev: false

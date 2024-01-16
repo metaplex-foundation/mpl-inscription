@@ -1,9 +1,12 @@
 import { fetchDigitalAsset, mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { accountExists, accountValid, inscribe, loadWalletKey } from "../../utils.js";
+import { accountExists, accountValid, getInitCost, getInscribeJsonCost, getInscribeMediaCost, inscribe, loadWalletKey } from "../../utils.js";
 import { mplInscription, findAssociatedInscriptionPda, findInscriptionMetadataPda, findMintInscriptionPda, initializeAssociatedInscription, initializeFromMint } from "@metaplex-foundation/mpl-inscription";
 import { PublicKey } from "@metaplex-foundation/umi";
 import pMap from "p-map";
+import { exists, existsSync, readFileSync } from "fs";
+import { globSync } from "glob";
+import yesno from "yesno";
 
 const INSCRIPTION_GATEWAY: string = 'https://igw.metaplex.com/';
 
@@ -26,9 +29,15 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
     });
 
     const jsonBytes = await pMap(nfts, async (nft, _i) => {
-        return Buffer.from(await (await fetch(nft.metadata.uri)).arrayBuffer());
+        const cacheFile = `cache/${nft.mint.publicKey.toString()}.json`;
+        if (existsSync(cacheFile)) {
+            return readFileSync(cacheFile);
+        } else {
+            return Buffer.from(await (await fetch(nft.metadata.uri)).arrayBuffer());
+        }
     }, { concurrency });
 
+    let totalCost = jsonBytes.reduce((a, b) => a + getInscribeJsonCost(b.length), getInitCost() * mints.length);
     const totalJsonBytes = jsonBytes.reduce((a, b) => a + b.length, 0);
     console.log(`${jsonBytes.length} JSON files are a total of ${totalJsonBytes} bytes.`);
     const jsonDatas = jsonBytes.map((bytes) => JSON.parse(bytes.toString()));
@@ -55,11 +64,29 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
         return imageURI;
     });
 
-    const mediaBytes = await pMap(imageURIs, async (imageURI, _i) => {
-        return Buffer.from(await (await fetch(imageURI)).arrayBuffer());
+    const mediaBytes = await pMap(imageURIs, async (imageURI, i) => {
+        const cacheFiles = globSync(`cache/${nfts[i].metadata.mint.toString()}.*`, {
+            ignore: ['cache/*.json', 'cache/*.metadata']
+        });
+        if (cacheFiles.length > 0) {
+            return readFileSync(cacheFiles[0]);
+        } else {
+            return Buffer.from(await (await fetch(imageURI)).arrayBuffer());
+        }
     }, { concurrency });
+
+    totalCost = mediaBytes.reduce((a, b) => a + getInscribeMediaCost(b.length), totalCost);
     const totalImageBytes = mediaBytes.reduce((a, b) => a + b.length, 0);
     console.log(`${mediaBytes.length} Image files are a total of ${totalImageBytes} bytes.`);
+
+    const ok = await yesno({
+        question: `Inscribing ${nfts.length} NFTs will cost ${totalCost} SOL. Do you want to continue (y/n)?`
+    });
+
+    if (!ok) {
+        console.log("Aborting...");
+        return;
+    }
 
     console.log(`Initializing ${jsonBytes.length} Inscription JSON Accounts...`);
 
