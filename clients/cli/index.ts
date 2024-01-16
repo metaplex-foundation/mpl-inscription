@@ -78,20 +78,18 @@ const costCmd = program.command('cost');
 
 costCmd.command('nft')
     .description('Calculate the cost of inscribing an NFT')
-    .option('-r --rpc <string>', 'The endpoint to connect to.')
     .option('-m --mint <string>', 'Mint address of the NFT')
     .action(async (str, options) => {
-        const { rpc, mint } = options.opts();
+        const { mint } = options.opts();
 
         await cost_nfts([publicKey(mint)]);
     });
 
 costCmd.command('hashlist')
     .description('Calculate the cost of inscribing a hashlist')
-    .option('-r --rpc <string>', 'The endpoint to connect to.')
     .option('-h --hashlist <string>', 'The file containing the hashlist')
     .action(async (str, options) => {
-        const { rpc, hashlist } = options.opts();
+        const { hashlist } = options.opts();
 
         const hashlistArray = JSON.parse(readFileSync(hashlist, 'utf-8'));
         const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
@@ -110,12 +108,12 @@ compressCmd.command('images')
     .action(async (str, options) => {
         const { quality, size, extension, concurrency } = options.opts();
 
-        await compress_images(quality, size, extension, parseInt(concurrency));
+        await compress_images(parseInt(quality), parseInt(size), extension, parseInt(concurrency));
     });
 
 compressCmd.command('json')
     .description('Reduce size of the JSON files in the cache folder')
-    .option('-r --remove [fields...]', 'Fields to remove from the JSON files')
+    .option('-r --remove [fields...]', 'Fields to remove from the JSON files', ['symbol', 'description', 'seller_fee_basis_points', 'collection'])
     .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
     .action(async (str, options) => {
         const { remove, concurrency } = options.opts();
