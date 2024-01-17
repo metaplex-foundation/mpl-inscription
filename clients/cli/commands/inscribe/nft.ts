@@ -10,7 +10,7 @@ import yesno from "yesno";
 
 const INSCRIPTION_GATEWAY: string = 'https://igw.metaplex.com/';
 
-export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicKey[], concurrency: number) {
+export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicKey[], concurrency: number, skipJson: boolean, skipImages: boolean) {
     let umi = createUmi(rpc);
     umi = loadWalletKey(umi, keypair);
     umi.use(mplInscription());
@@ -37,8 +37,12 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
         }
     }, { concurrency });
 
-    let totalCost = jsonBytes.reduce((a, b) => a + getInscribeJsonCost(b.length), getInitCost() * mints.length);
-    const totalJsonBytes = jsonBytes.reduce((a, b) => a + b.length, 0);
+    let totalJsonBytes = 0;
+    let totalCost = getInitCost() * mints.length;
+    if (!skipJson) {
+        totalCost = jsonBytes.reduce((a, b) => a + getInscribeJsonCost(b.length), totalCost);
+        totalJsonBytes = jsonBytes.reduce((a, b) => a + b.length, 0);
+    }
     console.log(`${jsonBytes.length} JSON files are a total of ${totalJsonBytes} bytes.`);
     const jsonDatas = jsonBytes.map((bytes) => JSON.parse(bytes.toString()));
 
@@ -75,8 +79,11 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
         }
     }, { concurrency });
 
-    totalCost = mediaBytes.reduce((a, b) => a + getInscribeMediaCost(b.length), totalCost);
-    const totalImageBytes = mediaBytes.reduce((a, b) => a + b.length, 0);
+    let totalImageBytes = 0;
+    if (!skipImages) {
+        totalCost = mediaBytes.reduce((a, b) => a + getInscribeMediaCost(b.length), totalCost);
+        totalImageBytes = mediaBytes.reduce((a, b) => a + b.length, 0);
+    }
     console.log(`${mediaBytes.length} Image files are a total of ${totalImageBytes} bytes.`);
 
     const ok = await yesno({
@@ -99,9 +106,17 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
         });
 
         if (!await accountExists(umi, mintInscriptionAccount[0])) {
-            await initializeFromMint(umi, {
-                mintAccount: nft.mint.publicKey,
-            }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
+            let success = false;
+            while (!success) {
+                try {
+                    await initializeFromMint(umi, {
+                        mintAccount: nft.mint.publicKey,
+                    }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
+                    success = true;
+                } catch (e) {
+                    console.log(`\n${e}`);
+                }
+            }
         }
 
         return inscriptionMetadataAccount;
@@ -118,37 +133,48 @@ export async function inscribe_nfts(rpc: string, keypair: string, mints: PublicK
             inscriptionMetadataAccount,
         });
 
-        if (!await accountExists(umi, associatedInscriptionAccount[0])) {
-            await initializeAssociatedInscription(umi, {
-                inscriptionAccount: mintInscriptionAccount[0],
-                associationTag: 'image'
-            }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
+        if (!skipImages && !await accountExists(umi, associatedInscriptionAccount[0])) {
+            let success = false;
+            while (!success) {
+                try {
+                    await initializeAssociatedInscription(umi, {
+                        inscriptionAccount: mintInscriptionAccount[0],
+                        associationTag: 'image'
+                    }).sendAndConfirm(umi, { confirm: { commitment: 'finalized' } });
+                } catch (e) {
+                    console.log(`\n${e}`);
+                }
+            }
         }
 
         return associatedInscriptionAccount;
     }, { concurrency });
 
-    for (let i = 0; i < nfts.length; i += 1) {
-        const mintInscriptionAccount = findMintInscriptionPda(umi, {
-            mint: nfts[i].mint.publicKey
-        });
+    if (!skipJson) {
+        for (let i = 0; i < nfts.length; i += 1) {
+            const mintInscriptionAccount = findMintInscriptionPda(umi, {
+                mint: nfts[i].mint.publicKey
+            });
 
-        if (!await accountValid(umi, mintInscriptionAccount[0], jsonBytes[i])) {
-            console.log('Inscribing JSON...');
-            await inscribe(umi, jsonBytes[i], mintInscriptionAccount, inscriptionMetadataAccounts[i], null, concurrency);
-        } else {
-            console.log('JSON already inscribed.');
+            if (!await accountValid(umi, mintInscriptionAccount[0], jsonBytes[i])) {
+                console.log('Inscribing JSON...');
+                await inscribe(umi, jsonBytes[i], mintInscriptionAccount, inscriptionMetadataAccounts[i], null, concurrency);
+            } else {
+                console.log('JSON already inscribed.');
+            }
+            console.log(`JSON Inscription viewable at ${INSCRIPTION_GATEWAY}${network}/${mintInscriptionAccount[0].toString()}`);
         }
-        console.log(`JSON Inscription viewable at ${INSCRIPTION_GATEWAY}${network}/${mintInscriptionAccount[0].toString()}`);
     }
 
-    for (let i = 0; i < nfts.length; i += 1) {
-        if (!await accountValid(umi, associatedInscriptionAccounts[i][0], mediaBytes[i])) {
-            console.log('Inscribing image...');
-            await inscribe(umi, mediaBytes[i], associatedInscriptionAccounts[i], inscriptionMetadataAccounts[i], 'image', concurrency);
-        } else {
-            console.log('Image already inscribed.');
+    if (!skipImages) {
+        for (let i = 0; i < nfts.length; i += 1) {
+            if (!await accountValid(umi, associatedInscriptionAccounts[i][0], mediaBytes[i])) {
+                console.log('Inscribing image...');
+                await inscribe(umi, mediaBytes[i], associatedInscriptionAccounts[i], inscriptionMetadataAccounts[i], 'image', concurrency);
+            } else {
+                console.log('Image already inscribed.');
+            }
+            console.log(`Image Inscription viewable at ${INSCRIPTION_GATEWAY}${network}/${associatedInscriptionAccounts[i][0].toString()}`);
         }
-        console.log(`Image Inscription viewable at ${INSCRIPTION_GATEWAY}${network}/${associatedInscriptionAccounts[i][0].toString()}`);
     }
 }

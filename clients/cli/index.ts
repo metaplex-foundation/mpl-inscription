@@ -25,9 +25,11 @@ inscribeCmd.command('nft')
     .option('-k --keypair <string>', 'Solana wallet location')
     .option('-m --mint <string>', 'Mint address of the NFT')
     .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .option('-sj --skip-json', 'Skip the JSON file creation', false)
+    .option('-si --skip-images', 'Skip the image file creation', false)
     .action(async (str, options) => {
-        const { rpc, keypair, mint, concurrency } = options.opts();
-        await inscribe_nfts(rpc, keypair, [publicKey(mint)], parseInt(concurrency));
+        const { rpc, keypair, mint, concurrency, skipJson, skipImages } = options.opts();
+        await inscribe_nfts(rpc, keypair, [publicKey(mint)], parseInt(concurrency), skipJson, skipImages);
     });
 
 inscribeCmd.command('hashlist')
@@ -36,13 +38,15 @@ inscribeCmd.command('hashlist')
     .option('-k --keypair <string>', 'Solana wallet location')
     .option('-h --hashlist <string>', 'The file containing the hashlist')
     .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .option('-sj --skip-json', 'Skip the JSON file creation', false)
+    .option('-si --skip-images', 'Skip the image file creation', false)
     .action(async (str, options) => {
-        const { rpc, keypair, hashlist, concurrency } = options.opts();
+        const { rpc, keypair, hashlist, concurrency, skipJson, skipImages } = options.opts();
 
         const hashlistArray = JSON.parse(readFileSync(hashlist, 'utf-8'));
         const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
 
-        await inscribe_nfts(rpc, keypair, mints, parseInt(concurrency));
+        await inscribe_nfts(rpc, keypair, mints, parseInt(concurrency), skipJson, skipImages);
     });
 
 const downloadCmd = program.command('download');
