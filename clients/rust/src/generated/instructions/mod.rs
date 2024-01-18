@@ -14,6 +14,7 @@ pub(crate) mod initialize;
 pub(crate) mod initialize_associated_inscription;
 pub(crate) mod initialize_from_mint;
 pub(crate) mod remove_authority;
+pub(crate) mod set_mint;
 pub(crate) mod write_data;
 
 pub use self::add_authority::*;
@@ -25,4 +26,5 @@ pub use self::initialize::*;
 pub use self::initialize_associated_inscription::*;
 pub use self::initialize_from_mint::*;
 pub use self::remove_authority::*;
+pub use self::set_mint::*;
 pub use self::write_data::*;

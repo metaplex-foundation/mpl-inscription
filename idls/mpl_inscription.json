@@ -567,6 +567,56 @@
         "type": "u8",
         "value": 9
       }
+    },
+    {
+      "name": "SetMint",
+      "accounts": [
+        {
+          "name": "mintInscriptionAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The account where data is stored."
+          ]
+        },
+        {
+          "name": "inscriptionMetadataAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The account to store the inscription account's metadata in."
+          ]
+        },
+        {
+          "name": "mintAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The mint that will be used to derive the PDA."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The account that will pay for the transaction and rent."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 10
+      }
     }
   ],
   "accounts": [
@@ -620,11 +670,17 @@
             }
           },
           {
+            "name": "mint",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                8
+                7
               ]
             }
           }
@@ -908,6 +964,16 @@
       "code": 16,
       "name": "AuthorityAlreadyExists",
       "msg": "The authority already exists."
+    },
+    {
+      "code": 17,
+      "name": "RemainingAssociatedInscriptionAccounts",
+      "msg": "Cannot close Inscription accounts until all Associated Inscriptions are closed."
+    },
+    {
+      "code": 18,
+      "name": "InvalidInscriptionMetadataAccount",
+      "msg": "The inscription metadata account is invalid."
     }
   ],
   "metadata": {

@@ -54,6 +54,7 @@ export type InscriptionMetadataAccountData = {
   inscriptionBump: Option<number>;
   updateAuthorities: Array<PublicKey>;
   associatedInscriptions: Array<AssociatedInscription>;
+  mint: Option<PublicKey>;
   padding: Array<number>;
 };
 
@@ -66,6 +67,7 @@ export type InscriptionMetadataAccountDataArgs = {
   inscriptionBump: OptionOrNullable<number>;
   updateAuthorities: Array<PublicKey>;
   associatedInscriptions: Array<AssociatedInscriptionArgs>;
+  mint: OptionOrNullable<PublicKey>;
   padding: Array<number>;
 };
 
@@ -83,7 +85,8 @@ export function getInscriptionMetadataAccountDataSerializer(): Serializer<
       ['inscriptionBump', option(u8())],
       ['updateAuthorities', array(publicKeySerializer())],
       ['associatedInscriptions', array(getAssociatedInscriptionSerializer())],
-      ['padding', array(u8(), { size: 8 })],
+      ['mint', option(publicKeySerializer())],
+      ['padding', array(u8(), { size: 7 })],
     ],
     { description: 'InscriptionMetadataAccountData' }
   ) as Serializer<
@@ -176,6 +179,7 @@ export function getInscriptionMetadataGpaBuilder(
       inscriptionBump: OptionOrNullable<number>;
       updateAuthorities: Array<PublicKey>;
       associatedInscriptions: Array<AssociatedInscriptionArgs>;
+      mint: OptionOrNullable<PublicKey>;
       padding: Array<number>;
     }>({
       key: [0, getKeySerializer()],
@@ -189,7 +193,8 @@ export function getInscriptionMetadataGpaBuilder(
         null,
         array(getAssociatedInscriptionSerializer()),
       ],
-      padding: [null, array(u8(), { size: 8 })],
+      mint: [null, option(publicKeySerializer())],
+      padding: [null, array(u8(), { size: 7 })],
     })
     .deserializeUsing<InscriptionMetadata>((account) =>
       deserializeInscriptionMetadata(account)

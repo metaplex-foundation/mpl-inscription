@@ -13,4 +13,5 @@ export * from './close';
 export * from './createShard';
 export * from './initializeAssociatedInscription';
 export * from './removeAuthority';
+export * from './setMint';
 export * from './writeData';

@@ -85,6 +85,14 @@ pub enum MplInscriptionInstruction {
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     Allocate(AllocateArgs),
+
+    /// Set the mint for the inscription metadata account.
+    #[account(0, name="mint_inscription_account", desc = "The account where data is stored.")]
+    #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
+    #[account(2, name="mint_account", desc="The mint that will be used to derive the PDA.")]
+    #[account(3, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(4, name="system_program", desc = "System program")]
+    SetMint,
 }
 
 #[repr(C)]
