@@ -93,6 +93,17 @@ pub enum MplInscriptionInstruction {
     #[account(3, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
     #[account(4, name="system_program", desc = "System program")]
     SetMint,
+
+    /// Initialize a Collection from the Inscription content.
+    #[account(0, writable, name="collection_metadata", desc = "The Collection Metadata account.")]
+    #[account(1, writable, name="collection_master_edition", desc = "The master edition of the Collection NFT.")]
+    #[account(2, writable, name="collection_mint", desc="The mint for the Collection NFT.")]
+    #[account(3, writable, name="collection_token_account", desc = "The token account for the Collection NFT.")]
+    #[account(4, name="sysvar_instructions", desc = "The instructions sysvar.")]
+    #[account(5, name="spl_token_program", desc = "The token program.")]
+    #[account(6, name="spl_ata_program", desc = "The ATA Program.")]
+    #[account(8, name="mpl_token_metadata", desc = "The token metadata program.")]
+    #[account(7, name="system_program", desc = "System program")]
 }
 
 #[repr(C)]
