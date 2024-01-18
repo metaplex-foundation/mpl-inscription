@@ -123,7 +123,7 @@ pub(crate) fn process_write_data<'a>(
         )?;
     }
 
-    // Write the inscription metadata to the metadata account.
+    // Write the inscription data to the inscription account.
     sol_memcpy(
         &mut ctx.accounts.inscription_account.try_borrow_mut_data()?[args.offset..],
         &args.value,
