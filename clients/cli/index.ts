@@ -9,6 +9,7 @@ import { test_createCollection } from './commands/test/createCollection.js';
 import { cost_nfts } from './commands/cost/nft.js';
 import { compress_images } from './commands/compress/images.js';
 import { compress_json } from './commands/compress/json.js';
+import { fetchInscriptionsByMint } from './commands/fetch/nft.js';
 
 const program = new Command();
 
@@ -123,6 +124,35 @@ compressCmd.command('json')
         const { remove, concurrency } = options.opts();
 
         await compress_json(remove, parseInt(concurrency));
+    });
+
+const fetchCmd = program.command('fetch');
+
+fetchCmd.command('nft')
+    .description('Fetch an NFT\'s Inscription data')
+    .option('-r --rpc <string>', 'The endpoint to connect to.')
+    .option('-m --mint <string>', 'Mint address of the NFT')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .option('o --output <string>', 'Output file', 'output.json')
+    .action(async (str, options) => {
+        const { rpc, mint, concurrency, output } = options.opts();
+
+        await fetchInscriptionsByMint(rpc, [publicKey(mint)], parseInt(concurrency), output);
+    });
+
+fetchCmd.command('hashlist')
+    .description('Fetch a Hashlist\'s Inscription data')
+    .option('-r --rpc <string>', 'The endpoint to connect to.')
+    .option('-h --hashlist <string>', 'The file containing the hashlist')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .option('o --output <string>', 'Output file', 'output.json')
+    .action(async (str, options) => {
+        const { rpc, hashlist, concurrency, output } = options.opts();
+
+        const hashlistArray = JSON.parse(readFileSync(hashlist, 'utf-8'));
+        const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
+
+        await fetchInscriptionsByMint(rpc, mints, parseInt(concurrency), output);
     });
 
 const createCmd = program.command('create');
