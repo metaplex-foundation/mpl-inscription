@@ -10,6 +10,7 @@ import { cost_nfts } from './commands/cost/nft.js';
 import { compress_images } from './commands/compress/images.js';
 import { compress_json } from './commands/compress/json.js';
 import { fetchInscriptionsByMint } from './commands/fetch/nft.js';
+import { fetchInscriptionsByRank } from './commands/fetch/number.js';
 
 const program = new Command();
 
@@ -153,6 +154,20 @@ fetchCmd.command('hashlist')
         const mints: PublicKey[] = hashlistArray.map((mint: string) => publicKey(mint));
 
         await fetchInscriptionsByMint(rpc, mints, parseInt(concurrency), output);
+    });
+
+fetchCmd.command('rank')
+    .description('Fetch Inscription data by rank')
+    .option('-r --rpc <string>', 'The endpoint to connect to.')
+    .option('-rn --rankNumbers <number...>', 'The rank to search for')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .option('o --output <string>', 'Output file', 'output.json')
+    .action(async (str, options) => {
+        const { rpc, rankNumbers, concurrency, output } = options.opts();
+
+        const ranks: number[] = rankNumbers.map((rank: string) => parseInt(rank));
+
+        await fetchInscriptionsByRank(rpc, ranks, parseInt(concurrency), output);
     });
 
 const createCmd = program.command('create');
