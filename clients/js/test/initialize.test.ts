@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { generateSigner } from '@metaplex-foundation/umi';
+import { generateSigner, none } from '@metaplex-foundation/umi';
 import test from 'ava';
 import {
   AssociatedInscription,
@@ -59,6 +59,7 @@ test('it can initialize an Inscription account', async (t) => {
       shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
+    mint: none(),
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);
@@ -120,6 +121,7 @@ test('it can initialize multiple Inscription accounts', async (t) => {
         BigInt(shardDataBefore.shardNumber),
       updateAuthorities: [umi.identity.publicKey],
       associatedInscriptions: [] as AssociatedInscription[],
+      mint: none(),
     });
 
     const jsonData = await umi.rpc.getAccount(inscriptionAccount[i].publicKey);
@@ -178,6 +180,7 @@ test('it can initialize an Inscription account with separate authority', async (
       shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
+    mint: none(),
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount.publicKey);

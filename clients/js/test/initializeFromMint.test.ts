@@ -1,4 +1,4 @@
-import { generateSigner, percentAmount } from '@metaplex-foundation/umi';
+import { generateSigner, percentAmount, some } from '@metaplex-foundation/umi';
 import test from 'ava';
 import {
   TokenStandard,
@@ -84,6 +84,7 @@ test('it can initialize a Mint Inscription account', async (t) => {
       shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [umi.identity.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
+    mint: some(mint.publicKey),
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);
@@ -208,6 +209,7 @@ test('it can initialize a Mint Inscription account with separate authority', asy
       shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
     updateAuthorities: [authority.publicKey],
     associatedInscriptions: [] as AssociatedInscription[],
+    mint: some(mint.publicKey),
   });
 
   const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);

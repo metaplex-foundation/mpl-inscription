@@ -17,9 +17,7 @@ pub(crate) fn process_set_mint<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRe
     let ctx = &SetMintAccounts::context(accounts)?;
 
     // Check that the account is already initialized.
-    if (ctx.accounts.mint_inscription_account.owner != &crate::ID)
-        || ctx.accounts.mint_inscription_account.data_is_empty()
-    {
+    if ctx.accounts.mint_inscription_account.owner != &crate::ID {
         return Err(MplInscriptionError::NotInitialized.into());
     }
 
