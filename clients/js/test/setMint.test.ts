@@ -1,4 +1,9 @@
-import { TransactionBuilder, generateSigner, percentAmount, some } from '@metaplex-foundation/umi';
+import {
+  TransactionBuilder,
+  generateSigner,
+  percentAmount,
+  some,
+} from '@metaplex-foundation/umi';
 import test from 'ava';
 import {
   TokenStandard,
@@ -51,16 +56,20 @@ test('it can set the mint on a Mint Inscription account', async (t) => {
   let builder = new TransactionBuilder();
 
   // When we create a new account.
-  builder = builder.append(initializeFromMint(umi, {
-    mintAccount: mint.publicKey,
-  }));
+  builder = builder.append(
+    initializeFromMint(umi, {
+      mintAccount: mint.publicKey,
+    })
+  );
 
   // Set the mint on the account.
-  builder = builder.append(setMint(umi, {
-    mintInscriptionAccount: inscriptionAccount,
-    inscriptionMetadataAccount,
-    mintAccount: mint.publicKey
-  }));
+  builder = builder.append(
+    setMint(umi, {
+      mintInscriptionAccount: inscriptionAccount,
+      inscriptionMetadataAccount,
+      mintAccount: mint.publicKey,
+    })
+  );
 
   await builder.sendAndConfirm(umi);
 
@@ -109,16 +118,20 @@ test('it cannot set the mint on an Inscription account', async (t) => {
   let builder = new TransactionBuilder();
 
   // When we create a new account.
-  builder = builder.append(initialize(umi, {
-    inscriptionAccount,
-  }));
+  builder = builder.append(
+    initialize(umi, {
+      inscriptionAccount,
+    })
+  );
 
   // Set the mint on the account.
-  builder = builder.append(setMint(umi, {
-    mintInscriptionAccount: inscriptionAccount.publicKey,
-    inscriptionMetadataAccount,
-    mintAccount: mint.publicKey,
-  }));
+  builder = builder.append(
+    setMint(umi, {
+      mintInscriptionAccount: inscriptionAccount.publicKey,
+      inscriptionMetadataAccount,
+      mintAccount: mint.publicKey,
+    })
+  );
 
   const promise = builder.sendAndConfirm(umi);
   // Then an error is thrown.
@@ -170,16 +183,20 @@ test('it cannot set the wrong mint on a Mint Inscription account', async (t) => 
   let builder = new TransactionBuilder();
 
   // When we create a new account.
-  builder = builder.append(initializeFromMint(umi, {
-    mintAccount: mint.publicKey,
-  }));
+  builder = builder.append(
+    initializeFromMint(umi, {
+      mintAccount: mint.publicKey,
+    })
+  );
 
   // Set the mint on the account.
-  builder = builder.append(setMint(umi, {
-    mintInscriptionAccount: inscriptionAccount,
-    inscriptionMetadataAccount,
-    mintAccount: wrongMint.publicKey
-  }));
+  builder = builder.append(
+    setMint(umi, {
+      mintInscriptionAccount: inscriptionAccount,
+      inscriptionMetadataAccount,
+      mintAccount: wrongMint.publicKey,
+    })
+  );
 
   const promise = builder.sendAndConfirm(umi);
 
