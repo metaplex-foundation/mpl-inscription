@@ -61,6 +61,12 @@ pub enum MplInscriptionError {
     /// 16 (0x10) - The authority already exists.
     #[error("The authority already exists.")]
     AuthorityAlreadyExists,
+    /// 17 (0x11) - Cannot close Inscription accounts until all Associated Inscriptions are closed.
+    #[error("Cannot close Inscription accounts until all Associated Inscriptions are closed.")]
+    RemainingAssociatedInscriptionAccounts,
+    /// 18 (0x12) - The inscription metadata account is invalid.
+    #[error("The inscription metadata account is invalid.")]
+    InvalidInscriptionMetadataAccount,
 }
 
 impl solana_program::program_error::PrintProgramError for MplInscriptionError {

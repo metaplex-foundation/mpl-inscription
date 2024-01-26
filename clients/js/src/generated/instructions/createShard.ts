@@ -30,7 +30,7 @@ import {
 export type CreateShardInstructionAccounts = {
   /** The account to store the shard data in. */
   shardAccount: PublicKey | Pda;
-  /** The account that will pay for the transaction and rent. */
+  /** The account that will pay for the rent. */
   payer?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;

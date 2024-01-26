@@ -39,7 +39,7 @@ export type WriteDataInstructionAccounts = {
   inscriptionAccount: PublicKey | Pda;
   /** The account to store the inscription account's metadata in. */
   inscriptionMetadataAccount: PublicKey | Pda;
-  /** The account that will pay for the transaction and rent. */
+  /** The account that will pay for the rent. */
   payer?: Signer;
   /** The authority of the inscription account. */
   authority?: Signer;

@@ -43,7 +43,8 @@ pub struct InscriptionMetadata {
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
     pub associated_inscriptions: Vec<AssociatedInscription>,
-    pub _padding: [u8; 8],
+    pub mint: Option<Pubkey>,
+    pub _padding: [u8; 7],
 }
 
 impl Default for InscriptionMetadata {
@@ -57,7 +58,8 @@ impl Default for InscriptionMetadata {
             inscription_bump: None,
             update_authorities: vec![],
             associated_inscriptions: vec![],
-            _padding: [0; 8],
+            mint: None,
+            _padding: [0; 7],
         }
     }
 }

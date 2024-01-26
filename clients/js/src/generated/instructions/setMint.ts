@@ -17,7 +17,6 @@ import {
 import {
   Serializer,
   mapSerializer,
-  publicKey as publicKeySerializer,
   struct,
   u8,
 } from '@metaplex-foundation/umi/serializers';
@@ -28,52 +27,40 @@ import {
 } from '../shared';
 
 // Accounts.
-export type AddAuthorityInstructionAccounts = {
-  /** The account to store the metadata's metadata in. */
+export type SetMintInstructionAccounts = {
+  /** The account where data is stored. */
+  mintInscriptionAccount: PublicKey | Pda;
+  /** The account to store the inscription account's metadata in. */
   inscriptionMetadataAccount: PublicKey | Pda;
+  /** The mint that will be used to derive the PDA. */
+  mintAccount: PublicKey | Pda;
   /** The account that will pay for the rent. */
   payer?: Signer;
-  /** The authority of the inscription account. */
-  authority?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
 };
 
 // Data.
-export type AddAuthorityInstructionData = {
-  discriminator: number;
-  newAuthority: PublicKey;
-};
+export type SetMintInstructionData = { discriminator: number };
 
-export type AddAuthorityInstructionDataArgs = { newAuthority: PublicKey };
+export type SetMintInstructionDataArgs = {};
 
-export function getAddAuthorityInstructionDataSerializer(): Serializer<
-  AddAuthorityInstructionDataArgs,
-  AddAuthorityInstructionData
+export function getSetMintInstructionDataSerializer(): Serializer<
+  SetMintInstructionDataArgs,
+  SetMintInstructionData
 > {
-  return mapSerializer<
-    AddAuthorityInstructionDataArgs,
-    any,
-    AddAuthorityInstructionData
-  >(
-    struct<AddAuthorityInstructionData>(
-      [
-        ['discriminator', u8()],
-        ['newAuthority', publicKeySerializer()],
-      ],
-      { description: 'AddAuthorityInstructionData' }
-    ),
-    (value) => ({ ...value, discriminator: 5 })
-  ) as Serializer<AddAuthorityInstructionDataArgs, AddAuthorityInstructionData>;
+  return mapSerializer<SetMintInstructionDataArgs, any, SetMintInstructionData>(
+    struct<SetMintInstructionData>([['discriminator', u8()]], {
+      description: 'SetMintInstructionData',
+    }),
+    (value) => ({ ...value, discriminator: 10 })
+  ) as Serializer<SetMintInstructionDataArgs, SetMintInstructionData>;
 }
 
-// Args.
-export type AddAuthorityInstructionArgs = AddAuthorityInstructionDataArgs;
-
 // Instruction.
-export function addAuthority(
+export function setMint(
   context: Pick<Context, 'payer' | 'programs'>,
-  input: AddAuthorityInstructionAccounts & AddAuthorityInstructionArgs
+  input: SetMintInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
@@ -83,22 +70,28 @@ export function addAuthority(
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    inscriptionMetadataAccount: {
+    mintInscriptionAccount: {
       index: 0,
+      isWritable: false,
+      value: input.mintInscriptionAccount ?? null,
+    },
+    inscriptionMetadataAccount: {
+      index: 1,
       isWritable: true,
       value: input.inscriptionMetadataAccount ?? null,
     },
-    payer: { index: 1, isWritable: true, value: input.payer ?? null },
-    authority: { index: 2, isWritable: false, value: input.authority ?? null },
+    mintAccount: {
+      index: 2,
+      isWritable: false,
+      value: input.mintAccount ?? null,
+    },
+    payer: { index: 3, isWritable: true, value: input.payer ?? null },
     systemProgram: {
-      index: 3,
+      index: 4,
       isWritable: false,
       value: input.systemProgram ?? null,
     },
   };
-
-  // Arguments.
-  const resolvedArgs: AddAuthorityInstructionArgs = { ...input };
 
   // Default values.
   if (!resolvedAccounts.payer.value) {
@@ -125,9 +118,7 @@ export function addAuthority(
   );
 
   // Data.
-  const data = getAddAuthorityInstructionDataSerializer().serialize(
-    resolvedArgs as AddAuthorityInstructionDataArgs
-  );
+  const data = getSetMintInstructionDataSerializer().serialize({});
 
   // Bytes Created On Chain.
   const bytesCreatedOnChain = 0;

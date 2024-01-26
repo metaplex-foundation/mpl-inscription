@@ -115,6 +115,7 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         bump,
         inscription_bump: Some(inscription_bump),
         update_authorities: vec![token_metadata.update_authority],
+        mint: Some(*ctx.accounts.mint_account.key),
         ..InscriptionMetadata::default()
     };
 

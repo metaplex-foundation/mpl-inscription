@@ -243,6 +243,42 @@ export class AuthorityAlreadyExistsError extends ProgramError {
 codeToErrorMap.set(0x10, AuthorityAlreadyExistsError);
 nameToErrorMap.set('AuthorityAlreadyExists', AuthorityAlreadyExistsError);
 
+/** RemainingAssociatedInscriptionAccounts: Cannot close Inscription accounts until all Associated Inscriptions are closed. */
+export class RemainingAssociatedInscriptionAccountsError extends ProgramError {
+  readonly name: string = 'RemainingAssociatedInscriptionAccounts';
+
+  readonly code: number = 0x11; // 17
+
+  constructor(program: Program, cause?: Error) {
+    super(
+      'Cannot close Inscription accounts until all Associated Inscriptions are closed.',
+      program,
+      cause
+    );
+  }
+}
+codeToErrorMap.set(0x11, RemainingAssociatedInscriptionAccountsError);
+nameToErrorMap.set(
+  'RemainingAssociatedInscriptionAccounts',
+  RemainingAssociatedInscriptionAccountsError
+);
+
+/** InvalidInscriptionMetadataAccount: The inscription metadata account is invalid. */
+export class InvalidInscriptionMetadataAccountError extends ProgramError {
+  readonly name: string = 'InvalidInscriptionMetadataAccount';
+
+  readonly code: number = 0x12; // 18
+
+  constructor(program: Program, cause?: Error) {
+    super('The inscription metadata account is invalid.', program, cause);
+  }
+}
+codeToErrorMap.set(0x12, InvalidInscriptionMetadataAccountError);
+nameToErrorMap.set(
+  'InvalidInscriptionMetadataAccount',
+  InvalidInscriptionMetadataAccountError
+);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

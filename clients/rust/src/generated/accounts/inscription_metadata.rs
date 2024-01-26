@@ -27,7 +27,8 @@ pub struct InscriptionMetadata {
     pub inscription_bump: Option<u8>,
     pub update_authorities: Vec<Pubkey>,
     pub associated_inscriptions: Vec<AssociatedInscription>,
-    pub padding: [u8; 8],
+    pub mint: Option<Pubkey>,
+    pub padding: [u8; 7],
 }
 
 impl InscriptionMetadata {

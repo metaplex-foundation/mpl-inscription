@@ -40,7 +40,7 @@ export type InitializeFromMintInstructionAccounts = {
   tokenMetadataAccount?: PublicKey | Pda;
   /** The shard account for the inscription counter. */
   inscriptionShardAccount: PublicKey | Pda;
-  /** The account that will pay for the transaction and rent. */
+  /** The account that will pay for the rent. */
   payer?: Signer;
   /** The authority of the inscription account. */
   authority?: Signer;

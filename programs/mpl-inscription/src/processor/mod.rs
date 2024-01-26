@@ -11,6 +11,7 @@ mod initialize;
 mod initialize_associated_inscription;
 mod initialize_from_mint;
 mod remove_authority;
+mod set_mint;
 mod write_data;
 
 use add_authority::*;
@@ -22,6 +23,7 @@ use initialize::*;
 use initialize_associated_inscription::*;
 use initialize_from_mint::*;
 use remove_authority::*;
+use set_mint::*;
 use write_data::*;
 
 pub struct Processor;
@@ -73,6 +75,10 @@ impl Processor {
             MplInscriptionInstruction::Allocate(args) => {
                 msg!("Instruction: Allocate");
                 process_allocate(accounts, args)
+            }
+            MplInscriptionInstruction::SetMint => {
+                msg!("Instruction: SetMint");
+                process_set_mint(accounts)
             }
         }
     }
