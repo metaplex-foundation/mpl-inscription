@@ -51,8 +51,6 @@ test('it can set the mint on a Mint Inscription account', async (t) => {
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  // const asset = await fetchDigitalAsset(umi, mint.publicKey);
-
   let builder = new TransactionBuilder();
 
   // When we create a new account.
@@ -90,7 +88,7 @@ test('it can set the mint on a Mint Inscription account', async (t) => {
   });
 });
 
-test('it cannot set the mint on an Inscription account', async (t) => {
+test('it cannot set the mint on an Inscription account that is not derived from a mint', async (t) => {
   // Given a Umi instance and a new signer.
   const umi = await createUmi();
   umi.use(mplTokenMetadata());
@@ -109,6 +107,7 @@ test('it cannot set the mint on an Inscription account', async (t) => {
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
+  // We are creating an inscription account that is not derived from a mint and is not a PDA.
   const inscriptionAccount = generateSigner(umi);
 
   const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
@@ -157,6 +156,7 @@ test('it cannot set the wrong mint on a Mint Inscription account', async (t) => 
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
+  // Create a second mint.
   const wrongMint = generateSigner(umi);
   await createV1(umi, {
     mint: wrongMint,
@@ -178,8 +178,6 @@ test('it cannot set the wrong mint on a Mint Inscription account', async (t) => 
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  // const asset = await fetchDigitalAsset(umi, mint.publicKey);
-
   let builder = new TransactionBuilder();
 
   // When we create a new account.
@@ -189,7 +187,7 @@ test('it cannot set the wrong mint on a Mint Inscription account', async (t) => 
     })
   );
 
-  // Set the mint on the account.
+  // It tries to set the mint to an invalid mint.
   builder = builder.append(
     setMint(umi, {
       mintInscriptionAccount: inscriptionAccount,
@@ -200,6 +198,6 @@ test('it cannot set the wrong mint on a Mint Inscription account', async (t) => 
 
   const promise = builder.sendAndConfirm(umi);
 
-  // Then an error is thrown.
+  // And it fails because the derivation from the wrong mint is invalid.
   await t.throwsAsync(promise, { name: 'DerivedKeyInvalid' });
 });

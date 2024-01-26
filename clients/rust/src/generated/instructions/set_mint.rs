@@ -16,7 +16,7 @@ pub struct SetMint {
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
     /// The mint that will be used to derive the PDA.
     pub mint_account: solana_program::pubkey::Pubkey,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// System program
     pub system_program: solana_program::pubkey::Pubkey,
@@ -112,7 +112,7 @@ impl SetMintBuilder {
         self.mint_account = Some(mint_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
@@ -171,7 +171,7 @@ pub struct SetMintCpiAccounts<'a, 'b> {
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The mint that will be used to derive the PDA.
     pub mint_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
@@ -187,7 +187,7 @@ pub struct SetMintCpi<'a, 'b> {
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The mint that will be used to derive the PDA.
     pub mint_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
@@ -339,7 +339,7 @@ impl<'a, 'b> SetMintCpiBuilder<'a, 'b> {
         self.instruction.mint_account = Some(mint_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);

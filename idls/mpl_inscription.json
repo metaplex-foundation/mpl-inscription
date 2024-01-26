@@ -34,7 +34,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -109,7 +109,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -160,7 +160,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -218,7 +218,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -276,7 +276,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -326,7 +326,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -419,7 +419,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -476,7 +476,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -534,7 +534,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {
@@ -600,7 +600,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The account that will pay for the transaction and rent."
+            "The account that will pay for the rent."
           ]
         },
         {

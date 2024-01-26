@@ -16,7 +16,7 @@ pub struct InitializeAssociatedInscription {
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
     /// The account to create and store the new associated data in.
     pub associated_inscription_account: solana_program::pubkey::Pubkey,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// The authority of the inscription account.
     pub authority: Option<solana_program::pubkey::Pubkey>,
@@ -143,7 +143,7 @@ impl InitializeAssociatedInscriptionBuilder {
         self.associated_inscription_account = Some(associated_inscription_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
@@ -223,7 +223,7 @@ pub struct InitializeAssociatedInscriptionCpiAccounts<'a, 'b> {
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to create and store the new associated data in.
     pub associated_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -241,7 +241,7 @@ pub struct InitializeAssociatedInscriptionCpi<'a, 'b> {
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to create and store the new associated data in.
     pub associated_inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -420,7 +420,7 @@ impl<'a, 'b> InitializeAssociatedInscriptionCpiBuilder<'a, 'b> {
         self.instruction.associated_inscription_account = Some(associated_inscription_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);

@@ -34,7 +34,7 @@ export type SetMintInstructionAccounts = {
   inscriptionMetadataAccount: PublicKey | Pda;
   /** The mint that will be used to derive the PDA. */
   mintAccount: PublicKey | Pda;
-  /** The account that will pay for the transaction and rent. */
+  /** The account that will pay for the rent. */
   payer?: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;

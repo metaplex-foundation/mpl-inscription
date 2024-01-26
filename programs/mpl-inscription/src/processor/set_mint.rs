@@ -16,6 +16,11 @@ use crate::{
 pub(crate) fn process_set_mint<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
     let ctx = &SetMintAccounts::context(accounts)?;
 
+    // Check that the system program is correct.
+    if ctx.accounts.system_program.key != &solana_program::system_program::ID {
+        return Err(MplInscriptionError::InvalidSystemProgram.into());
+    }
+
     // Check that the account is already initialized.
     if ctx.accounts.mint_inscription_account.owner != &crate::ID {
         return Err(MplInscriptionError::NotInitialized.into());
@@ -34,7 +39,7 @@ pub(crate) fn process_set_mint<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRe
         MplInscriptionError::IncorrectOwner,
     )?;
 
-    // Verify that the derived address is correct for the metadata account.
+    // Verify that the derived address is correct for the mint inscription account.
     let _inscription_bump = assert_derivation(
         &crate::ID,
         ctx.accounts.mint_inscription_account,
@@ -60,7 +65,7 @@ pub(crate) fn process_set_mint<'a>(accounts: &'a [AccountInfo<'a>]) -> ProgramRe
 
     assert_signer(ctx.accounts.payer)?;
 
-    // Initialize the inscription metadata.
+    // Deserialize the inscription metadata.
     let mut inscription_metadata = InscriptionMetadata::try_from_slice(
         &ctx.accounts.inscription_metadata_account.data.borrow(),
     )?;

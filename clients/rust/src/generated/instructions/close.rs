@@ -14,7 +14,7 @@ pub struct Close {
     pub inscription_account: solana_program::pubkey::Pubkey,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// The authority of the inscription account.
     pub authority: Option<solana_program::pubkey::Pubkey>,
@@ -125,7 +125,7 @@ impl CloseBuilder {
         self.inscription_metadata_account = Some(inscription_metadata_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
@@ -198,7 +198,7 @@ pub struct CloseCpiAccounts<'a, 'b> {
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -214,7 +214,7 @@ pub struct CloseCpi<'a, 'b> {
     pub inscription_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The account to store the inscription account's metadata in.
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -375,7 +375,7 @@ impl<'a, 'b> CloseCpiBuilder<'a, 'b> {
         self.instruction.inscription_metadata_account = Some(inscription_metadata_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);

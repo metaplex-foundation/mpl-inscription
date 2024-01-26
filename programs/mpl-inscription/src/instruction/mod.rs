@@ -9,7 +9,7 @@ pub enum MplInscriptionInstruction {
     #[account(0, writable, signer, name="inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, writable, name="inscription_shard_account", desc="The shard account for the inscription counter.")]
-    #[account(3, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(3, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(4, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(5, name="system_program", desc = "System program")]
     Initialize,
@@ -20,7 +20,7 @@ pub enum MplInscriptionInstruction {
     #[account(2, name="mint_account", desc="The mint that will be used to derive the PDA.")]
     #[account(3, name="token_metadata_account", desc="The metadata for the mint.")]
     #[account(4, writable, name="inscription_shard_account", desc="The shard account for the inscription counter.")]
-    #[account(5, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(5, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(6, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(7, name="system_program", desc = "System program")]
     InitializeFromMint,
@@ -28,7 +28,7 @@ pub enum MplInscriptionInstruction {
     /// Close the Inscription and Metadata accounts.
     #[account(0, writable, name="inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
-    #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(2, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     Close(CloseArgs),
@@ -36,7 +36,7 @@ pub enum MplInscriptionInstruction {
     /// Write data to the inscription account.
     #[account(0, writable, name="inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
-    #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(2, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     WriteData(WriteDataArgs),
@@ -44,14 +44,14 @@ pub enum MplInscriptionInstruction {
     /// Clear the inscription account.
     #[account(0, writable, name="inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
-    #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(2, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     ClearData(ClearDataArgs),
 
     /// Add an update authority to the Inscription.
     #[account(0, writable, name="inscription_metadata_account", desc = "The account to store the metadata's metadata in.")]
-    #[account(1, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(1, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(2, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(3, name="system_program", desc = "System program")]
     AddAuthority(AddAuthorityArgs),
@@ -65,7 +65,7 @@ pub enum MplInscriptionInstruction {
 
     /// Create an Inscription Shard account for counting inscriptions.
     #[account(0, writable, name="shard_account", desc = "The account to store the shard data in.")]
-    #[account(1, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(1, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(2, name="system_program", desc = "System program")]
     CreateShard(CreateShardArgs),
 
@@ -73,7 +73,7 @@ pub enum MplInscriptionInstruction {
     #[account(0, name="inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, writable, name="associated_inscription_account", desc = "The account to create and store the new associated data in.")]
-    #[account(3, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(3, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(4, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(5, name="system_program", desc = "System program")]
     InitializeAssociatedInscription(AssociateInscriptionAccountArgs),
@@ -81,7 +81,7 @@ pub enum MplInscriptionInstruction {
     /// Allocate additional space for the inscription account.
     #[account(0, writable, name="inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
-    #[account(2, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(2, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(3, optional, signer, name="authority", desc="The authority of the inscription account.")]
     #[account(4, name="system_program", desc = "System program")]
     Allocate(AllocateArgs),
@@ -90,7 +90,7 @@ pub enum MplInscriptionInstruction {
     #[account(0, name="mint_inscription_account", desc = "The account where data is stored.")]
     #[account(1, writable, name="inscription_metadata_account", desc = "The account to store the inscription account's metadata in.")]
     #[account(2, name="mint_account", desc="The mint that will be used to derive the PDA.")]
-    #[account(3, writable, signer, name="payer", desc="The account that will pay for the transaction and rent.")]
+    #[account(3, writable, signer, name="payer", desc="The account that will pay for the rent.")]
     #[account(4, name="system_program", desc = "System program")]
     SetMint,
 }

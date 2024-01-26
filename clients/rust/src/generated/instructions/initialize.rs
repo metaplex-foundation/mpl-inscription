@@ -16,7 +16,7 @@ pub struct Initialize {
     pub inscription_metadata_account: solana_program::pubkey::Pubkey,
     /// The shard account for the inscription counter.
     pub inscription_shard_account: solana_program::pubkey::Pubkey,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: solana_program::pubkey::Pubkey,
     /// The authority of the inscription account.
     pub authority: Option<solana_program::pubkey::Pubkey>,
@@ -128,7 +128,7 @@ impl InitializeBuilder {
         self.inscription_shard_account = Some(inscription_shard_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
@@ -197,7 +197,7 @@ pub struct InitializeCpiAccounts<'a, 'b> {
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The shard account for the inscription counter.
     pub inscription_shard_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -215,7 +215,7 @@ pub struct InitializeCpi<'a, 'b> {
     pub inscription_metadata_account: &'b solana_program::account_info::AccountInfo<'a>,
     /// The shard account for the inscription counter.
     pub inscription_shard_account: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
     /// The authority of the inscription account.
     pub authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -385,7 +385,7 @@ impl<'a, 'b> InitializeCpiBuilder<'a, 'b> {
         self.instruction.inscription_shard_account = Some(inscription_shard_account);
         self
     }
-    /// The account that will pay for the transaction and rent.
+    /// The account that will pay for the rent.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);
