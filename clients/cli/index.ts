@@ -11,6 +11,7 @@ import { compress_images } from './commands/compress/images.js';
 import { compress_json } from './commands/compress/json.js';
 import { fetchInscriptionsByMint } from './commands/fetch/nft.js';
 import { fetchInscriptionsByRank } from './commands/fetch/number.js';
+import { fetchShard } from './commands/fetch/shard.js';
 
 const program = new Command();
 
@@ -170,6 +171,20 @@ fetchCmd.command('rank')
         await fetchInscriptionsByRank(rpc, ranks, parseInt(concurrency), output);
     });
 
+fetchCmd.command('shard')
+    .description('Print a Shard\'s data')
+    .option('-r --rpc <string>', 'The endpoint to connect to.')
+    .option('-n --shards <number...>', 'The shard number')
+    .option('-c --concurrency <number>', 'Number of concurrent writes to perform', '10')
+    .option('-o --output <string>', 'Output file', 'output.json')
+    .action(async (str, options) => {
+        const { rpc, shards, concurrency, output } = options.opts();
+
+        const shardNumbers = shards.map((shard: string) => parseInt(shard));
+
+        await fetchShard(rpc, shardNumbers, parseInt(concurrency), output);
+    });
+
 const createCmd = program.command('create');
 
 createCmd.command('shards')
@@ -177,6 +192,7 @@ createCmd.command('shards')
     .option('-r --rpc <string>', 'The endpoint to connect to.')
     .option('-k --keypair <string>', 'Solana wallet location')
     .action(create_shards);
+
 
 const testCmd = program.command('test');
 
