@@ -29,7 +29,7 @@
     "@metaplex-foundation/mpl-token-metadata": "^3.1.2"
   },
   "peerDependencies": {
-    "@metaplex-foundation/umi": "^0.8.2"
+    "@metaplex-foundation/umi": ">= 0.8.2 < 1"
   },
   "devDependencies": {
     "@ava/typescript": "^3.0.1",
