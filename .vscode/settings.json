@@ -1,6 +1,6 @@
 {
-    "rust-analyzer.linkedProjects": [
-        "./clients/rust/Cargo.toml",
-        "./programs/mpl-inscription/Cargo.toml",
-    ]
+  "rust-analyzer.linkedProjects": [
+    "./clients/rust/Cargo.toml",
+    "./programs/inscription/Cargo.toml"
+  ]
 }

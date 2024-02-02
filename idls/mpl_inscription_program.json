@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "mpl_inscription",
+  "name": "mpl_inscription_program",
   "instructions": [
     {
       "name": "Initialize",

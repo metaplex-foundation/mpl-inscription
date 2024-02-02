@@ -1035,7 +1035,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mpl-inscription"
+name = "mpl-inscription-program"
 version = "0.1.0"
 dependencies = [
  "borsh 0.10.3",

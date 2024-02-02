@@ -13,7 +13,7 @@ program_common: &program_common
 
 mpl_inscription: &mpl_inscription
   - *program_common
-  - "programs/mpl-inscription/**"
+  - "programs/inscription/**"
 
 programs: &programs
   - *mpl_inscription

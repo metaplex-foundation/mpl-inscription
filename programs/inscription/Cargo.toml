@@ -1,5 +1,5 @@
 [package]
-name = "mpl-inscription"
+name = "mpl-inscription-program"
 version = "0.1.0"
 edition = "2021"
 readme = "./README.md"
@@ -17,6 +17,6 @@ num-traits = "^0.2"
 solana-program = "~1.16"
 thiserror = "^1.0"
 mpl-utils = "0.3.1"
-serde_json = { version = "1.0.108", features = ["std"]}
+serde_json = { version = "1.0.108", features = ["std"] }
 mpl-token-metadata = "3.2.3"
 spl-token = { version = "4.0.0", features = ["no-entrypoint"] }
