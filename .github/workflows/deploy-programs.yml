@@ -6,10 +6,10 @@ on:
       program:
         description: Program
         required: true
-        default: vault
+        default: inscription
         type: choice
         options:
-          - vault
+          - inscription
       cluster:
         description: Cluster environment
         required: true
