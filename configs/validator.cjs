@@ -11,7 +11,7 @@ module.exports = {
     commitment: "processed",
     programs: [
       {
-        label: "Mpl Json",
+        label: "Mpl Inscription",
         programId: "1NSCRfGeyo7wPUazGbaPBUsTM49e1k2aXewHGARfzSo",
         deployPath: getProgram("mpl_inscription_program.so"),
       },

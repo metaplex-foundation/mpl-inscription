@@ -6,10 +6,10 @@ on:
       program:
         description: Program
         required: true
-        default: inscription
+        default: mpl_inscription
         type: choice
         options:
-          - inscription
+          - mpl_inscription
       cluster:
         description: Cluster environment
         required: true
