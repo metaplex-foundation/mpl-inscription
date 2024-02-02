@@ -45,6 +45,12 @@ jobs:
           version: ${{ inputs.solana || env.SOLANA_VERSION }}
           cache: ${{ env.CACHE }}
 
+      - name: Cache Rust client test dependencies
+        uses: metaplex-foundation/actions/cache-crate@v1
+        with:
+          folder: ./clients/rust
+          key: rust-client-test
+
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
         with:
@@ -61,5 +67,5 @@ jobs:
         with:
           name: rust-client-builds
           # First wildcard ensures exported paths are consistently under the clients folder.
-          path: ./client*/rust/target/release/*mpl_inscription*
+          path: ./targe*/release/*mpl_inscription*
           if-no-files-found: error
