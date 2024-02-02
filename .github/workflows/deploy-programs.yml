@@ -6,10 +6,10 @@ on:
       program:
         description: Program
         required: true
-        default: mpl_inscription
+        default: inscription
         type: choice
         options:
-          - mpl_inscription
+          - inscription
       cluster:
         description: Cluster environment
         required: true
@@ -103,7 +103,7 @@ jobs:
 
       - name: Determine program version
         run: |
-          IDL_NAME="${{ inputs.program }}_program"
+          IDL_NAME="mpl_${{ inputs.program }}_program"
           VERSION=`jq '.version' ./idls/${IDL_NAME}.json | sed 's/"//g'`
           MAJOR=`echo ${VERSION} | cut -d. -f1`
           MINOR=`echo ${VERSION} | cut -d. -f2`
