@@ -140,7 +140,7 @@ jobs:
           echo ${{ secrets.INSCRIPTION_DEPLOYER_KEY }} > ./deployer-key.json 
           echo ${{ secrets.INSCRIPTION_ID }} > ./program-id.json
 
-          solana -v program deploy ./programs/.bin/${{ inputs.program }}_program.so \
+          solana -v program deploy ./programs/.bin/mpl_${{ inputs.program }}_program.so \
             -u ${{ env.RPC }} \
             --program-id ./program-id.json \
             -k ./deployer-key.json
