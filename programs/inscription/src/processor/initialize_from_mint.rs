@@ -1,7 +1,8 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use mpl_token_metadata::accounts::Metadata;
 use mpl_utils::{
-    assert_derivation, assert_owned_by, assert_signer, create_or_allocate_account_raw,
+    assert_derivation, assert_owned_by, assert_owner_in, assert_signer,
+    create_or_allocate_account_raw, token::SPL_TOKEN_PROGRAM_IDS,
 };
 use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, program_memory::sol_memcpy,
@@ -38,9 +39,9 @@ pub(crate) fn process_initialize_from_mint<'a>(accounts: &'a [AccountInfo<'a>]) 
         MplInscriptionError::IncorrectOwner,
     )?;
 
-    assert_owned_by(
+    assert_owner_in(
         ctx.accounts.mint_account,
-        &spl_token::ID,
+        &SPL_TOKEN_PROGRAM_IDS,
         MplInscriptionError::IncorrectOwner,
     )?;
 
