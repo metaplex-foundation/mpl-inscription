@@ -6,6 +6,8 @@ import {
   mintV1,
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
+import { publicKey as publicKeySerializer } from '@metaplex-foundation/umi/serializers';
+import { SPL_ASSOCIATED_TOKEN_PROGRAM_ID } from '@metaplex-foundation/mpl-toolbox';
 import {
   AssociatedInscription,
   DataType,
@@ -19,7 +21,7 @@ import {
   findMintInscriptionPda,
   initializeFromMint,
 } from '../src';
-import { createUmi } from './_setup';
+import { SPL_TOKEN_2022_PROGRAM_ID, createUmi } from './_setup';
 
 test('it can initialize a Mint Inscription account', async (t) => {
   // Given a Umi instance and a new signer.
@@ -40,14 +42,101 @@ test('it can initialize a Mint Inscription account', async (t) => {
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
-  const inscriptionAccount = await findMintInscriptionPda(umi, {
+  const inscriptionAccount = findMintInscriptionPda(umi, {
     mint: mint.publicKey,
   });
-  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
+  const inscriptionMetadataAccount = findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount[0],
   });
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+  const inscriptionShardAccount = findInscriptionShardPda(umi, {
+    shardNumber: 0,
+  });
+  const shardDataBefore = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
+
+  // const asset = await fetchDigitalAsset(umi, mint.publicKey);
+
+  // When we create a new account.
+  await initializeFromMint(umi, {
+    mintAccount: mint.publicKey,
+    inscriptionShardAccount,
+  }).sendAndConfirm(umi);
+
+  // Then an account was created with the correct data.
+  const inscriptionMetadata = await fetchInscriptionMetadata(
+    umi,
+    inscriptionMetadataAccount
+  );
+
+  const shardDataAfter = await fetchInscriptionShard(
+    umi,
+    inscriptionShardAccount
+  );
+  t.is(shardDataBefore.count + BigInt(1), shardDataAfter.count);
+
+  t.like(inscriptionMetadata, <InscriptionMetadata>{
+    key: Key.MintInscriptionMetadataAccount,
+    inscriptionAccount: inscriptionAccount[0],
+    bump: inscriptionMetadataAccount[1],
+    dataType: DataType.Uninitialized,
+    inscriptionRank:
+      shardDataBefore.count * BigInt(32) + BigInt(shardDataBefore.shardNumber),
+    updateAuthorities: [umi.identity.publicKey],
+    associatedInscriptions: [] as AssociatedInscription[],
+    mint: some(mint.publicKey),
+  });
+
+  const jsonData = await umi.rpc.getAccount(inscriptionAccount[0]);
+  if (jsonData.exists) {
+    t.like(jsonData, {
+      owner: MPL_INSCRIPTION_PROGRAM_ID,
+      data: Uint8Array.from([]),
+    });
+  }
+});
+
+test('it can initialize a Mint Inscription account from SPL Token 2022', async (t) => {
+  // Given a Umi instance and a new signer.
+  const umi = await createUmi();
+  umi.use(mplTokenMetadata());
+
+  const mint = generateSigner(umi);
+  await createV1(umi, {
+    mint,
+    name: 'My Programmable NFT',
+    uri: 'https://arweave.net/LcjCf-NDr5bhCJ0YMKGlc8m8qT_J6TDWtIuW8lbu0-A',
+    sellerFeeBasisPoints: percentAmount(5.5),
+    splTokenProgram: SPL_TOKEN_2022_PROGRAM_ID,
+    tokenStandard: TokenStandard.NonFungible,
+  }).sendAndConfirm(umi);
+
+  // And we derive the associated token account from SPL Token 2022.
+  const [token] = umi.eddsa.findPda(SPL_ASSOCIATED_TOKEN_PROGRAM_ID, [
+    publicKeySerializer().serialize(umi.identity.publicKey),
+    publicKeySerializer().serialize(SPL_TOKEN_2022_PROGRAM_ID),
+    publicKeySerializer().serialize(mint.publicKey),
+  ]);
+
+  // When we mint one token.
+  await mintV1(umi, {
+    mint: mint.publicKey,
+    token,
+    tokenOwner: umi.identity.publicKey,
+    splTokenProgram: SPL_TOKEN_2022_PROGRAM_ID,
+    tokenStandard: TokenStandard.NonFungible,
+  }).sendAndConfirm(umi);
+
+  const inscriptionAccount = findMintInscriptionPda(umi, {
+    mint: mint.publicKey,
+  });
+  const inscriptionMetadataAccount = findInscriptionMetadataPda(umi, {
+    inscriptionAccount: inscriptionAccount[0],
+  });
+
+  const inscriptionShardAccount = findInscriptionShardPda(umi, {
     shardNumber: 0,
   });
   const shardDataBefore = await fetchInscriptionShard(
@@ -116,7 +205,7 @@ test('it cannot initialize a Mint Inscription account if it is not the update au
     tokenStandard: TokenStandard.NonFungible,
   }).sendAndConfirm(umi);
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+  const inscriptionShardAccount = findInscriptionShardPda(umi, {
     shardNumber: 0,
   });
   const shardDataBefore = await fetchInscriptionShard(
@@ -160,7 +249,7 @@ test('it can initialize a Mint Inscription account with separate authority', asy
     creators: [{ address: authority.publicKey, verified: false, share: 100 }],
   }).sendAndConfirm(umi);
 
-  const inscriptionShardAccount = await findInscriptionShardPda(umi, {
+  const inscriptionShardAccount = findInscriptionShardPda(umi, {
     shardNumber: 0,
   });
   const shardDataBefore = await fetchInscriptionShard(
@@ -174,10 +263,10 @@ test('it can initialize a Mint Inscription account with separate authority', asy
     authority,
   }).sendAndConfirm(umi);
 
-  const inscriptionAccount = await findMintInscriptionPda(umi, {
+  const inscriptionAccount = findMintInscriptionPda(umi, {
     mint: mint.publicKey,
   });
-  const inscriptionMetadataAccount = await findInscriptionMetadataPda(umi, {
+  const inscriptionMetadataAccount = findInscriptionMetadataPda(umi, {
     inscriptionAccount: inscriptionAccount[0],
   });
 
